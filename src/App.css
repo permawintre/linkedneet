@@ -65,6 +65,9 @@ ul {
                 flex-grow: 1;
                 padding: 10px;
             }
+            :hover{
+                color: white;
+            }
             
         }
         .header__mid {
@@ -81,23 +84,43 @@ ul {
 
             flex: 3;
             display: flex;
-            padding-top: 15px;
 
             .header__searchbar {
 
+                .searchbar {
+
+                    height: 5px;
+                    border-radius: 20px;
+                    border-color: var(--color_2);
+                    background-color: var(--color_3);
+                }
+                :focus {
+
+                    background-color: var(--color_2);
+                    outline: none;
+                }
+                :hover {
+
+                    border-color: white;
+                }
+
                 flex: 3;
                 padding: 10px;
+                margin-top: 5px;
             }
             .header__notice {
 
                 flex: 1;
                 padding: 10px;
+                margin-top: 15px;
             }
             .header__loginout {
 
                 flex: 1;
                 padding: 10px;
+                margin-top: 15px
             }
+            
 
         }
 

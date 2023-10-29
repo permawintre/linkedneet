@@ -4,8 +4,12 @@ import './App.css'
 import { auth } from './firebase.js'
 import { Header } from "./Header.js"
 import { Home } from "./Home.js"
-import { Signup, Login, Google } from "./Auth.js"
+import { Signup, Login} from "./Auth.js"
 import { NotFound } from "./Notfound.js"
+import { Project } from "./Project.js"
+import { NeetCompany } from "./NeetCompany.js"
+import { Profile } from "./Profile.js"
+
 
 function App() {
 
@@ -40,6 +44,10 @@ function App() {
         <Header/>
         <Routes>
             <Route path="/" element={isLoggedIn ? <Home/> : <RedirectToLogIn/>}></Route>
+            <Route path="/project" element={isLoggedIn ? <Project/> : <RedirectToLogIn/>}></Route>
+            <Route path="/neetCompany" element={isLoggedIn ? <NeetCompany/> : <RedirectToLogIn/>}></Route>
+            <Route path="/profile" element={isLoggedIn ? <Profile/> : <RedirectToLogIn/>}></Route>
+
             <Route path="/signUp" element={<Signup/>}></Route>
             <Route path="/logIn" element={<Login/>}></Route>
             <Route path="*" element={<NotFound/>}></Route>

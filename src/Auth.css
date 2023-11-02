@@ -11,15 +11,18 @@
 
 button {
   border-radius: 20px;
-  border: 1px solid var(--color_4);
+  border: none;
   background-color: var(--color_4);
-  color: #FFFFFF;
+  color: white;
   font-size: 12px;
   font-weight: bold;
   padding: 12px 45px;
   letter-spacing: 1px;
   text-transform: uppercase;
   transition: transform 80ms ease-in;
+}
+button:hover{
+  color:var(--color_2);
 }
 
 button:active {
@@ -38,11 +41,10 @@ button.ghost {
 input {
   background-color: white;
   border: solid 2px rgb(187, 187, 187);
-  border-radius: 5px;
+  border-radius: 25px;
   padding: 12px 15px;
   margin: 8px 0;
 }
-
 
 
 

@@ -9,6 +9,7 @@ import { NotFound } from "./Notfound.js"
 import { Project } from "./Project.js"
 import { NeetCompany } from "./NeetCompany.js"
 import { Profile } from "./Profile.js"
+import ProfileDetail from './ProfileDetail'
 
 
 function App() {
@@ -47,6 +48,7 @@ function App() {
             <Route path="/project" element={isLoggedIn ? <Project/> : <RedirectToLogIn/>}></Route>
             <Route path="/neetCompany" element={isLoggedIn ? <NeetCompany/> : <RedirectToLogIn/>}></Route>
             <Route path="/profile" element={isLoggedIn ? <Profile/> : <RedirectToLogIn/>}></Route>
+            <Route path="/profiledetail" element={<ProfileDetail/>}></Route>
 
             <Route path="/signUp" element={<Signup/>}></Route>
             <Route path="/logIn" element={<Login/>}></Route>

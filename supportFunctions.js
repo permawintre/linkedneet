@@ -52,11 +52,13 @@ export const getDayMinuteCounter = (date) => {
     return -yearDiff + '년 전'		 // '년'으로 표시
 }
 
-//게시글 짧으면 그냥 표시, 길면 더보기/접기 버튼 표시
 /**
- * 
- * @param {string} param0 
- * @returns 
+ * 게시글에 접기, 펼치기 기능을 달아 반환하는 함수형 컴포넌트입니다.
+ * 1) 220자 이하일 때에는 그대로 출력
+ * 2) 220자 이상일 때에는 3줄로 줄이고 더 보기 표시(default)
+ * 2-1) 더 보기 누르면 전체 내용 표시되고 접기 버튼 표시
+ * @param {string} 텍스트 input 
+ * @returns className 'postContents'인 div로 둘러싸인 컴포넌트 반환
  */
 export const PostContents = ({contents}) => {
 
@@ -70,7 +72,7 @@ export const PostContents = ({contents}) => {
   const contentsLength = JSON.parse(JSON.stringify({contents})).contents.length
   if(contentsLength<=220) {
     return(
-      <div>{contents}</div>
+      <div className='postContents'>{contents}</div>
     )
   }
 
@@ -92,7 +94,11 @@ export const PostContents = ({contents}) => {
   }
 }
 
-//사진 여러장일때 슬라이더로
+/**
+ * 함수형 컴포넌트로, 이미지 배열 넣으면 좌우 슬라이드 가능한 component로 반환합니다(550px * 550px)
+ * @param {Array} 사진으로 구성된 배열 input 
+ * @returns className 'postPic'인 div로 둘러싸인 컴포넌트 반환
+ */
 export const PostPics = ({imgs}) => {
 
   /* 리스너 설치하기 */
@@ -139,6 +145,11 @@ export const PostPics = ({imgs}) => {
   )
 }
 
+/**
+ * state사용해서 버튼 눌린상태 / 눌리지 않은상태 체크
+ * 반응형 애니메이션은 css로 구현
+ * @returns 좋아요 버튼 렌더링
+ */
 export const LikeBtn = () => {
 
   let [state, setState] = useState(false)
@@ -164,6 +175,10 @@ export const LikeBtn = () => {
   
 }
 
+/**
+ * 반응형 애니메이션은 css로 구현
+ * @returns 댓글 버튼 렌더링
+ */
 export const CommentBtn = () => {
 
   return(

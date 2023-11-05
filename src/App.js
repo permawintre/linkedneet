@@ -3,12 +3,13 @@ import { Routes, Route, useNavigate } from "react-router-dom"
 import './App.css'
 import { auth } from './firebase.js'
 import { Header } from "./Header.js"
-import { Home } from "./Home.js"
-import { Signup, Login} from "./Auth.js"
-import { NotFound } from "./Notfound.js"
-import { Project } from "./Project.js"
-import { NeetCompany } from "./NeetCompany.js"
-import { Profile } from "./Profile.js"
+import { Home } from "./Home/Home.js"
+import { Signup, Login} from "./Auth/Auth.js"
+import { NotFound } from "./etc/Notfound.js"
+import { Project } from "./ProjectPage/Project.js"
+import { NeetCompany } from "./Neetcompany/NeetCompany.js"
+import { Profile } from "./Profile/Profile.js"
+import ProfileDetail from './Profile/ProfileDetail.js'
 
 
 function App() {
@@ -43,10 +44,11 @@ function App() {
     <div className="background">
         <Header/>
         <Routes>
-            <Route path="/" element={loggedIn ? <Home/> : <RedirectToLogIn/>}></Route>
-            <Route path="/project" element={loggedIn ? <Project/> : <RedirectToLogIn/>}></Route>
-            <Route path="/neetCompany" element={loggedIn ? <NeetCompany/> : <RedirectToLogIn/>}></Route>
-            <Route path="/profile" element={loggedIn ? <Profile/> : <RedirectToLogIn/>}></Route>
+            <Route path="/" element={isLoggedIn ? <Home/> : <RedirectToLogIn/>}></Route>
+            <Route path="/project" element={isLoggedIn ? <Project/> : <RedirectToLogIn/>}></Route>
+            <Route path="/neetCompany" element={isLoggedIn ? <NeetCompany/> : <RedirectToLogIn/>}></Route>
+            <Route path="/profile" element={isLoggedIn ? <Profile/> : <RedirectToLogIn/>}></Route>
+            <Route path="/profiledetail" element={<ProfileDetail/>}></Route>
 
             <Route path="/signUp" element={<Signup/>}></Route>
             <Route path="/logIn" element={<Login/>}></Route>
@@ -56,6 +58,5 @@ function App() {
 
   )
 }
-
 
 export default App;

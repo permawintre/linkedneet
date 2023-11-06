@@ -25,6 +25,16 @@
     background-color: #fff;
 }
 
+.career-container {
+    max-width: 1250px;
+    margin: 15px auto;
+    padding: 0 0 15px 0 !important;
+    width: 90%;
+
+    height: auto;
+    background-color: #fff;
+}
+
 .buttons {
     text-align: center;
 }

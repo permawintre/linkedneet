@@ -1,9 +1,9 @@
 import moment from 'moment'
 import { useState } from 'react'
-import arrow from './arrow.png'
-import filledStar from './filledStar.png'
-import emptyStar from './emptyStar.png'
-import comments from './comments.png'
+import arrow from '../images/arrow.png'
+import filledStar from '../images/filledStar.png'
+import emptyStar from '../images/emptyStar.png'
+import comments from '../images/comments.png'
 
 /**
  * 몇시간 전에 게시된건지 텍스트로 반환하는 함수입니다(moment.js 설치필요)

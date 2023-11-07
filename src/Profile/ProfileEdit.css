@@ -1,0 +1,105 @@
+:root {
+    
+    --color_1: #FFA500;
+    --color_2: #DFE0DF;
+    --color_3: #1e1f38;
+    --color_4: #FF4B2B;
+
+}
+
+button {
+    border-radius: 20px;
+    border: none;
+    background-color: var(--color_4);
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 12px 45px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: transform 80ms ease-in;
+  }
+  button:hover{
+    color:var(--color_2);
+  }
+  
+  button:active {
+    transform: scale(0.95);
+  }
+  
+  button:focus {
+    outline: none;
+  }
+  
+  button.ghost {
+    background-color: transparent;
+    border-color: white;
+  }
+  
+  input {
+    background-color: white;
+    border: solid 2px rgb(187, 187, 187);
+    border-radius: 25px;
+    padding: 12px 15px;
+    margin: 8px 0;
+  }
+
+.body{
+
+    display: flex;
+    justify-content: center;
+    box-shadow: 3px #000000;
+
+    .body_inner{
+
+        background-color: white;
+        border-radius: 30px;
+        margin-top: 100px;
+        padding: 30px;
+        width: 1000px;
+        height: 700px;
+        
+        .body__partition{
+
+            margin-top: 20px;
+            margin-bottom: 20px;
+            border: solid black 2px;
+        }
+
+        .body__inputline--description{
+            flex: 2;
+            display: flex;
+            align-items: left;
+            text-align: left; 
+            font-weight: 800;
+        }
+
+        .body_input{
+
+            display: flex;
+            margin: 10px;
+
+            .body__inputline--input{
+                font-weight:initial ;
+                flex: 5;
+            }
+            
+        }
+
+        .body__submitbtn{
+
+            display: block;
+            margin: 40px 255px;
+            margin-bottom: 10px;
+            width: 480px;
+        }
+
+        .body__signup{
+
+            display: block;
+            text-align: right;
+            margin: 0 20px;
+        }
+    }
+
+}

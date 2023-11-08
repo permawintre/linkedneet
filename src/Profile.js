@@ -1,13 +1,16 @@
 import React from "react"
+import { Link } from "react-router-dom"
 import './Profile.css'
 
 const UserProfile = ({name, profileImage, backgroundImage, groupInfo, friendInfo, bgImage, }) => {
     return (
         <div className="user-profile">
-            <img className="background-img" src={backgroundImage}/>
-            <img className="profile-img" src={profileImage} alt={name} />
+            <Link to="/profiledetail">
+              <img className="background-img" src={backgroundImage}/>
+              <img className="profile-img" src={profileImage} alt={name} />
+            </Link>
             <div className="profile-info">
-              <p className="profile-name">{name}</p>
+              <Link to="/profiledetail" className="profile-name">{name}</Link>
               <p className="profile-group">{groupInfo}</p>
               <p className="profile-friend">{friendInfo}</p>
             </div>

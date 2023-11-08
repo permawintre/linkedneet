@@ -59,7 +59,7 @@ const profileData = {
 
 const ProfileEditModal = ({EditModalClose}) => {
     const closeClick = () => {
-        EditModalClose?.(); // profileEditModalClose을 실행!
+        return EditModalClose?.(); // profileEditModalClose을 실행!
     };
 
     // Profile 사진 
@@ -133,7 +133,7 @@ const ProfileEditModal = ({EditModalClose}) => {
 
 const ProfileIntroEditModal = ({EditModalClose}) => {
   const closeClick = () => {
-      EditModalClose?.(); // profileEditModalClose을 실행!
+      return EditModalClose?.(); // profileEditModalClose을 실행!
   };
 
   // Profile 사진 
@@ -205,7 +205,7 @@ const ProfileIntroEditModal = ({EditModalClose}) => {
 
 const ProfileCareerEditModal = ({EditModalClose}) => {
   const closeClick = () => {
-      EditModalClose?.(); // profileEditModalClose을 실행!
+      return EditModalClose?.(); // profileEditModalClose을 실행!
   };
 
   const [AddClicked, setAddClicked] = useState(false);

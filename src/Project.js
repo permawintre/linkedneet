@@ -1,5 +1,6 @@
 import React, { useState } from "react"
 import './Project.css'
+import { Link } from 'react-router-dom';
 
 const UserProject = ({ project }) => {
     return (
@@ -22,7 +23,7 @@ const DetailedProject = ({ project }) => {
         <div className="project-box">
             <span className={`tag ${getTagColor(project.status)}`}>{project.status}</span>
             <img src={project.image} alt={project.name} /> {/* alt 속성 추가 */}
-            <div className="name">{project.name}</div>
+            <Link to="/projectDetail" style={{ textDecoration: 'none' }} className="name">{project.name}</Link>
             <div className="comment">{project.comment}</div>
         </div>
     );

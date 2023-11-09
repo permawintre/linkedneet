@@ -59,7 +59,7 @@ const ProfileHeader = () => {
                 </div>
             </div>
             <div className="header-mid">
-                <img className="profile-image" src={profileData.profile_image} alt="Profile Photo"/>
+                <img className="profile-image" src={profileData.profile_image} alt="ProfilePhoto"/>
             </div>
             <div className="header-right">
                 <div className="header-right1">
@@ -98,7 +98,7 @@ const ProfileIntro = () => {
       <main>
         <h2>나를 <span className="highlight">소개</span>합니다</h2>
         <div className="body1">
-            <img className="intro-image" src={profileData.intro_image}></img>
+            <img className="intro-image" src={profileData.intro_image} alt='introImg'></img>
             <div className="intro">
               <div className="intro-content">
                 {profileData.intro_content}

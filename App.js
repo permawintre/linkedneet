@@ -44,11 +44,11 @@ function App() {
     <div className="background">
         <Header/>
         <Routes>
-            <Route path="/" element={isLoggedIn ? <Home/> : <RedirectToLogIn/>}></Route>
-            <Route path="/project" element={isLoggedIn ? <Project/> : <RedirectToLogIn/>}></Route>
-            <Route path="/neetCompany" element={isLoggedIn ? <NeetCompany/> : <RedirectToLogIn/>}></Route>
-            <Route path="/profile" element={isLoggedIn ? <Profile/> : <RedirectToLogIn/>}></Route>
-            <Route path="/profiledetail" element={<ProfileDetail/>}></Route>
+            <Route path="/" element={loggedIn ? <Home/> : <RedirectToLogIn/>}></Route>
+            <Route path="/project" element={loggedIn ? <Project/> : <RedirectToLogIn/>}></Route>
+            <Route path="/neetCompany" element={loggedIn ? <NeetCompany/> : <RedirectToLogIn/>}></Route>
+            <Route path="/profile" element={loggedIn ? <Profile/> : <RedirectToLogIn/>}></Route>
+            <Route path="/profiledetail" element={loggedIn ? <ProfileDetail/> : <RedirectToLogIn/>}></Route>
 
             <Route path="/signUp" element={<Signup/>}></Route>
             <Route path="/logIn" element={<Login/>}></Route>

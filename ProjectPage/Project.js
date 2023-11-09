@@ -16,6 +16,7 @@ const DetailedProject = ({ project }) => {
             case '모집중': return 'tag-recruiting';
             case '진행중': return 'tag-in-progress';
             case '진행완료': return 'tag-completed';
+            default : return '';
         }
     }
     return (

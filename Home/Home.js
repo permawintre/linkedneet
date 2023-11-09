@@ -12,6 +12,7 @@ import {
 import { useEffect, useState } from 'react'
 import close from '../images/close.png'
 import moment from 'moment'
+import styled from 'styled-components'
 import { getStorage, ref, uploadString } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid'; // 랜덤 식별자를 생성해주는 라이브러리
 
@@ -84,9 +85,92 @@ function Posts() {
 
 
 
+function DndBox(props) {
 
+    const [isDragging, setIsDragging] = useState(false);
+    
+    // 부모 컴포넌트에서 내려준 contentImage state
+    const contentImages = props.contentImages;
+    const setContentImages = props.setContentImages;
 
+    const readImage = (image) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(image);
+        reader.onload = (e) => {
+            
+            setContentImages(contentImages => [...contentImages, String(e.target?.result)]);
+        };
+        
+    };
 
+    
+
+    const onDragEnter = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(true);
+      };
+      const onDragLeave = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDragging(false);
+      };
+      const onDragOver = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.dataTransfer.files) {
+          setIsDragging(true);
+        }
+      };
+      const onDrop = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const files = e.dataTransfer.files || e.target.files;
+        for(let i=0;i<files.length;i++){
+            readImage(files[i]);
+        }
+        setIsDragging(false);
+      };
+/*
+      const onContentImageChange = (e) => {
+        if (e.target.files) {
+          readImage(e.target.files[0]);
+          readImage(e.target.files[1]);
+        }
+        console.log(e.target.files)
+      };
+*/
+      const StyledCpnt = styled.div`
+        border: ${(props) => props.$isDragging ? '3px dotted #808080' : '3px solid #bbbbbb'}
+      `
+
+    return(
+        <div>
+        {contentImages.length > 0 &&
+        <div>
+            {contentImages.map((img) => 
+                <img src={img} alt='preview' className='previewImg' />
+            )}
+        </div>
+        }
+        <StyledCpnt className='dndBox'
+            onDragEnter={onDragEnter}
+            onDragLeave={onDragLeave}
+            onDragOver={onDragOver}
+            onDrop={onDrop}
+            //onChange={onContentImageChange}
+
+            // styled components props
+            $isDragging={isDragging}
+        >
+            <div>
+                <img src={close} alt='add photos' className='addPhotos'/>
+                <p>사진을 이곳에 올려주세요</p>
+            </div>
+        </StyledCpnt>
+        </div>
+    )
+}
 
 function Write() {
 
@@ -99,31 +183,12 @@ function Write() {
     let [isOpen, setIsOpen] = useState(false)
     let [values, setValues] = useState(defaultValues)
     let [async, setAsync] = useState(false)
-    let [attachment, setAttachment] = useState()
+    let [contentImages, setContentImages] = useState([])
     let [uid, setUid] = useState("")
-
-  
-    const onFileChange = (evt) => {
-      // 업로드 된 file
-      const files = evt.target.files;
-      const file = files[0]
-  
-      // FileReader 생성
-      const reader = new FileReader();
-  
-      // file 업로드가 완료되면 실행
-      reader.onloadend = (finishedEvent) => {
-        // 업로드한 이미지 URL 저장
-        const result = finishedEvent.currentTarget.result;
-        setAttachment(result);
-      };
-      // 파일 정보를 읽기
-      reader.readAsDataURL(file);
-      
-    };
-  
-    const onClearAttachment = () => setAttachment(null);
     
+
+
+
     useEffect(() => {
           if(auth.currentUser) {
             setUid(auth.currentUser.uid)
@@ -133,12 +198,13 @@ function Write() {
 
     useEffect( () => {
         if(async) {
+            
             addDoc(collection(db, "posts"), values)
             setAsync(false)
         }
         else {
             setValues(defaultValues)
-            //onClearAttachment()
+            setContentImages([])
         }
         // 에러 임시로 없앰
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -151,21 +217,28 @@ function Write() {
         });
     };
 
-    const handleSubmit = /*async*/ (e) => {
+    const handleSubmit = (e) => {
 
+        const imgUrls = [...new Array(contentImages.length)].map(() => uuidv4())
         e.preventDefault();
         setValues({
             ...values,
             'postedAt': moment().toDate(),
-            'userId': uid
+            'userId': uid,
+            'imgUrls': imgUrls
         })
-/*
-        const storage = getStorage();
-        const fileRef = ref(storage, uuidv4());
-        await uploadString(fileRef, attachment, 'data_url');
-*/
+        
         setIsOpen(false)
+
+        const storage = getStorage();
+
+        for(let i=0;i<contentImages.length;i++) {
+            const fileRef = ref(storage, imgUrls[i]);
+            uploadString(fileRef, contentImages[i], 'data_url');
+        }
+
         setAsync(true)
+        
     };
 
 
@@ -188,15 +261,7 @@ function Write() {
                         </div>
                         <form onSubmit={handleSubmit} className='modalForm'>
                             <textarea type='text' name='contents' value={values.contents} onChange={handleChange} placeholder='나누고 싶은 생각이 있으세요?'/>
-                            {/*
-                            <input type="file" accept="image/*" onChange={onFileChange} multiple/>
-                            {attachment && (
-                                <div>
-                                    <img src={attachment} width="50px" height="50px" alt="" />
-                                    <button onClick={onClearAttachment}>Clear</button>
-                                </div>
-                            )}
-                            */}
+                            <DndBox contentImages={ contentImages } setContentImages={ setContentImages } />
                             <button type='submit'>게시</button>
                         </form>
                     </div>

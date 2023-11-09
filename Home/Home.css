@@ -268,7 +268,7 @@ hr {
     border: none;
     font-size: 20px;
     overflow-y: scroll;
-    height: 500px;
+    height: 400px;
     resize: none;
 }
 .modalForm textarea:focus {
@@ -276,4 +276,38 @@ hr {
 }
 .modalForm button {
     margin: 10px 0 10px 560px;
+}
+
+.dndBox {
+    display: flex;
+    height: 100px;
+    border: 3px solid #bbbbbb;
+    border-radius: 10px;
+    margin: 10px;
+}
+.dndBox:hover {
+    border-color: #808080;
+    cursor: pointer;
+}
+.dndBox div {
+    margin: auto;
+    text-align: center;
+}
+.dndBox p {
+    color: #AAAAAA;
+    font-size: 15px;
+    margin-top: 10px;
+}
+.dndBox .addPhotos {
+    width: 30px;
+    height: 30px;
+    margin: auto;
+    filter: invert(74%) sepia(0%) saturate(1876%) hue-rotate(138deg) brightness(105%) contrast(88%);
+    transform: rotate(45deg);
+}
+
+.write .previewImg {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
 }

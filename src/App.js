@@ -19,12 +19,12 @@ function App() {
     const navigate = useNavigate();
     // 처음에는 false이고 나중에 사용자 존재 판명이 모두 끝났을 때 true를 통해 해당 화면을 render
     const [isLoggedIn, setIsLoggedIn] = useState(false); 
-    const [userid, setUserid] = useState(null);
+    const [authObj, setAuthObj] = useState(null);
     useEffect(() => {
       auth.onAuthStateChanged((user) => { // user 판명을 듣고 
         if(user) { // 있으면
           setIsLoggedIn(true); // 로그인 됨
-          setUserid(user);
+          setAuthObj(user);
         } else {
           setIsLoggedIn(false); // 로그인 안됨
         }
@@ -52,7 +52,7 @@ function App() {
             <Route path="/neetCompany" element={isLoggedIn ? <NeetCompany/> : <RedirectToLogIn/>}></Route>
             <Route path="/profile" element={isLoggedIn ? <Profile/> : <RedirectToLogIn/>}></Route>
             <Route path="/profiledetail" element={<ProfileDetail/>}></Route>
-            <Route path="/profileheaderedit" element={isLoggedIn ? <ProfileHeaderEdit userid = {userid}/> : <RedirectToLogIn/>}></Route>
+            <Route path="/profileheaderedit" element={isLoggedIn ? <ProfileHeaderEdit authObj = {authObj}/> : <RedirectToLogIn/>}></Route>
 
             <Route path="/signUp" element={<Signup/>}></Route>
             <Route path="/logIn" element={<Login/>}></Route>

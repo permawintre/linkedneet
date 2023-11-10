@@ -108,6 +108,110 @@ input {
 
 
 
+.signupbody{
+
+  display: flex;
+  justify-content: center;
+  box-shadow: 3px #000000;
+
+  .signup__body__inner{
+
+      background-color: white;
+      border-radius: 30px;
+      margin-top: 100px;
+      padding: 30px;
+      width: 500px;
+      height: 800px;
+      
+      .signup__body__partition{
+
+          margin-top: 20px;
+          margin-bottom: 20px;
+          border: solid black 2px;
+      }
+
+      .signup__body__inputline{
+
+          display: flex;
+          margin: 10px;
+          .signup__body__inputline--description{
+              flex: 2;
+              display: flex;
+              align-items: center;
+              text-align: left;
+              font-weight: 600;
+              
+          }
+          .signup__body__inputline--input{
+              flex: 5;
+          }
+          
+      }
+
+      .signup__body__submitbtn{
+
+          display: block;
+          margin: 40px 10px;
+          margin-bottom: 10px;
+          width: 480px;
+      }
+
+      .signup__body__signup{
+
+          display: block;
+          text-align: right;
+          margin: 0 20px;
+      }
+  }
+
+}
+
+
+
+
+
+
+
+
+
+.google-btn {
+  width: 480px;
+  height: 42px;
+  background-color: white;
+  border-radius: 2px;
+  box-shadow: 0 3px 4px 0 rgba(0,0,0,.25);
+  margin: 40px 10px;
+  .google-icon-wrapper {
+    position: absolute;
+    margin-top: 1px;
+    margin-left: 1px;
+    width: 40px;
+    height: 40px;
+    border-radius: 2px;
+    background-color: white;
+  }
+  .google-icon {
+    position: absolute;
+    margin-top: 11px;
+    margin-left: 160px;
+    width: 18px;
+    height: 18px;
+  }
+  .btn-text {
+    float: right;
+    margin: 11px 140px 0 0;
+    color: rgb(112, 112, 112);
+    font-size: 14px;
+    letter-spacing: 0.2px;
+    font-family: "Roboto";
+  }
+  &:hover {
+    box-shadow: 0 0 6px white;
+  }
+  &:active {
+    background: white;
+  }
+}
 
 
 

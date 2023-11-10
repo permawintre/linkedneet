@@ -11,6 +11,7 @@ import { NeetCompany } from "./Neetcompany/NeetCompany.js"
 import { Profile } from "./Profile/Profile.js"
 import ProfileDetail from './Profile/ProfileDetail.js'
 import { ProfileHeaderEdit } from './Profile/ProfileEdit.js'
+import { ProjectDetail } from './ProjectPage/ProjectDetail.js'
 
 
 function App() {
@@ -49,6 +50,7 @@ function App() {
         <Routes>
             <Route path="/" element={isLoggedIn ? <Home/> : <RedirectToLogIn/>}></Route>
             <Route path="/project" element={isLoggedIn ? <Project/> : <RedirectToLogIn/>}></Route>
+            <Route path="/projectdetail" element={isLoggedIn ? <ProjectDetail/> : <RedirectToLogIn/>}></Route>
             <Route path="/neetCompany" element={isLoggedIn ? <NeetCompany/> : <RedirectToLogIn/>}></Route>
             <Route path="/profile" element={isLoggedIn ? <Profile/> : <RedirectToLogIn/>}></Route>
             <Route path="/profiledetail" element={<ProfileDetail/>}></Route>

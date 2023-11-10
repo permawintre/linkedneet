@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { FaFacebookSquare, FaInstagramSquare} from 'react-icons/fa';
 import { MdPhoneIphone, MdEmail, MdCalendarMonth } from 'react-icons/md'
 import './ProfileDetail.css';
+import { ProfileEditModal, ProfileIntroEditModal, ProfileCareerEditModal } from './ProfileEditModal';
 
 const profileData = {
   nickname: '홍길동',
@@ -38,6 +39,15 @@ const ProfileHeader = () => {
       };
     const facebook_url = 'https://www.facebook.com/' + profileData.contact_facebook;
     const insta_url = 'https://www.instagram.com/' + profileData.contact_insta
+    
+    // Profile Edit
+    const [EditClicked, setEditClicked] = useState(false);
+    const EditClick = () => {
+      setEditClicked(true);
+    };
+    const EditModalClose = () => {
+      setEditClicked(false);
+    };
 
   return (
     <div className="header-container">
@@ -79,10 +89,20 @@ const ProfileHeader = () => {
                         <MdEmail size="16"/>&nbsp;
                         {profileData.contact_email}
                     </div>
-                    <div className="calendar">
+                    <span className="calendar">
                         <MdCalendarMonth size="16"/>&nbsp;
                         비행일정 확인하기
-                    </div>
+                    </span>
+                    <span className="edit-profile">
+                      <input type="button" class="edit-button" onClick={EditClick}>
+                      </input>
+                      {EditClicked && (
+                        <ProfileEditModal
+                          user={null}
+                          EditModalClose={EditModalClose}
+                        />
+                      )}
+                    </span>
                 </div>
             </div>
         </div>
@@ -92,6 +112,14 @@ const ProfileHeader = () => {
 };
 
 const ProfileIntro = () => {
+  // Profile Intro Edit
+  const [EditClicked, setEditClicked] = useState(false);
+  const EditClick = () => {
+    setEditClicked(true);
+  };
+  const EditModalClose = () => {
+    setEditClicked(false);
+  };
 
   return (
     <div className="container">
@@ -103,11 +131,21 @@ const ProfileIntro = () => {
               <div className="intro-content">
                 {profileData.intro_content}
               </div>
-              <div className="intro-keywords">
+              <span className="intro-keywords">
                   {profileData.intro_keyword.map((keyword, index) => (
                       <span key={index} className="keyword">{`#${keyword}`}</span>
                   ))}
-              </div>
+              </span>
+              <span className="edit-profile">
+                      <input type="button" class="edit-button" onClick={EditClick}>
+                      </input>
+                      {EditClicked && (
+                        <ProfileIntroEditModal
+                          user={null}
+                          EditModalClose={EditModalClose}
+                        />
+                      )}
+                    </span>
             </div>
         </div>
       </main>
@@ -117,25 +155,43 @@ const ProfileIntro = () => {
 
 const ProfileCareer = () => {
 
-return (
-  <div className="container">
-    <main>
-      <h2>나는 이런 <span className="highlight">경험</span>을 했어요</h2>
-      <div className="career-body">
-        {Object.keys(profileData.career).map((job, index) => (
-          <div className="career" key={index}>
-            <div className="career-title">{job}</div>
-            <div className="career-content">
-              {profileData.career[job].map((item, i) => (
-                <li key={i}>{item}</li>
-              ))}
+  // Profile Intro Edit
+  const [EditClicked, setEditClicked] = useState(false);
+  const EditClick = () => {
+    setEditClicked(true);
+  };
+  const EditModalClose = () => {
+    setEditClicked(false);
+  };
+
+  return (
+    <div className="career-container">
+      <main>
+        <h2>나는 이런 <span className="highlight">경험</span>을 했어요</h2>
+        <span className="career-body">
+          {Object.keys(profileData.career).map((job, index) => (
+            <div className="career" key={index}>
+              <div className="career-title">{job}</div>
+              <div className="career-content">
+                {profileData.career[job].map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
-    </main>
-  </div>
-);
+          ))}
+        </span>
+        <span className="edit-profile" style={{margin: "-10px"}}>
+          <input type="button" class="edit-button" onClick={EditClick} style={{margin: "-5px 10px"}}></input>
+          {EditClicked && (
+            <ProfileCareerEditModal
+              user={null}
+              EditModalClose={EditModalClose}
+            />
+          )}
+        </span>
+      </main>
+    </div>
+  );
 };
 
 const ProfilePost = () => {

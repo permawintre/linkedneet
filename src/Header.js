@@ -1,4 +1,6 @@
 import { Link } from "react-router-dom"
+import React from "react"
+
 import { logOut } from "./firebase.js"
 
 export const Header = () => {

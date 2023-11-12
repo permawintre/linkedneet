@@ -1,9 +1,12 @@
 import moment from 'moment'
 import { useState } from 'react'
+
 import arrow from '../images/arrow.png'
 import filledStar from '../images/filledStar.png'
 import emptyStar from '../images/emptyStar.png'
 import comments from '../images/comments.png'
+import React from 'react'
+
 
 /**
  * 몇시간 전에 게시된건지 텍스트로 반환하는 함수입니다(moment.js 설치필요)
@@ -186,4 +189,59 @@ export const CommentBtn = () => {
       <img src={comments} alt='comment' className='comment' />
     </div>
   )
+}
+
+export const PlusBtn = () => {
+
+  let [activeClass, setActiveClass] = useState("")
+
+  const toggleActive = () => {
+    setActiveClass(activeClass === '' ? 'active' : '');
+  };
+
+  return (
+    <div className={`plusSign ${activeClass}`} onClick={toggleActive}>
+      +
+    </div>
+  )
+  
+}
+
+export const WritePost = ({profile})  =>{
+  const [showPopup, setShowPopup] = useState(false);
+
+  const handlePostClick = () => {
+    setShowPopup(true);
+  };
+
+  const closePopup = () => {
+    setShowPopup(false);
+  };
+
+  return (
+    <>
+      <div className="write-post" onClick={handlePostClick}>
+        <img src={profile} alt="profile-img" className="profile-img1"/>
+        <input type="text" placeholder="당신의 일상을 공유해주세요!" readOnly />
+      </div>
+      
+      {showPopup && (
+        <div className="modal-overlay">
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <img src={profile} alt="profile-img" className="profile-img2"/>
+              <h5 className="modal-title">홍길동</h5>
+              <button onClick={closePopup}>닫기</button>
+            </div>
+            <div className="modal-body">
+              <textarea id="textArea" placeholder="나누고 싶은 생각이 있으세요?" />
+            </div>
+            <div className="modal-footer">
+              <button onClick={closePopup}>업데이트</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
 }

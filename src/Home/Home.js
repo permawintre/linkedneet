@@ -1,4 +1,5 @@
-import { getDayMinuteCounter, PostContents, PostPics, LikeBtn, CommentBtn } from './supportFunctions'
+import React from "react"
+import { getDayMinuteCounter, PostContents, PostPics, LikeBtn, CommentBtn, PlusBtn } from './supportFunctions'
 import './Home.css'
 import { dbService , auth } from '../firebase.js'
 import {
@@ -131,15 +132,7 @@ function DndBox(props) {
         }
         setIsDragging(false);
       };
-/*
-      const onContentImageChange = (e) => {
-        if (e.target.files) {
-          readImage(e.target.files[0]);
-          readImage(e.target.files[1]);
-        }
-        console.log(e.target.files)
-      };
-*/
+      
       const StyledCpnt = styled.div`
         border: ${(props) => props.$isDragging ? '3px dotted #808080' : '3px solid #bbbbbb'}
       `
@@ -281,10 +274,42 @@ export const Home = () => {
 
     return(
         <div className='home'>
+            <aside className="left-sidebar">
+                <div className="background-img-container">
+                    <img src={img1} alt="background" className="background-img"/>
+                </div>
+                <img src={profile1Img} alt="profile" className="profile-img1" />
+                <div className="profile-info">
+                    <h3>{userName}</h3>
+                </div>
+                <button>내 그룹</button>
+            </aside>
             
-            <Write/>
-            <Post/>
-            <Post/>
+            <div className='postsContainer'>
+                <Write/>
+                <Post/>
+                <Post/>
+            </div>
+
+            <aside className="right-sidebar">
+                <ul class="interestList">
+                    <li class="interestItem">
+                    <img src={profile1Img} alt="홍길동"/>
+                    <span class="interestTitle">홍길동</span>
+                    <PlusBtn/>
+                    </li>
+                    <li class="interestItem">
+                    <img src={profile1Img} alt="고길동"/>
+                    <span class="interestTitle">고길동</span>
+                    <PlusBtn/>
+                    </li>
+                    <li class="interestItem">
+                    <img src={profile1Img} alt="김선생"/>
+                    <span class="interestTitle">김선생</span>
+                    <PlusBtn/>
+                    </li>
+                </ul>
+                </aside>
         </div>
     )
 

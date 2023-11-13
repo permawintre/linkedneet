@@ -184,6 +184,13 @@ const ProjectList = () => {
                     </div>
                 </div>
             </div>
+            <div className="projects-recommand">
+            <div className="new-project">
+                <div className="new-project-small">원하는 소모임이 없다면?</div>
+                <Link to="/projectcreate" style={{ textDecoration: 'none' }}>
+                <div className="new-project-large">소모임 만들기 ▶</div>
+                </Link>
+            </div>
             {[...Array(totalRows)].map((_, rowIndex) => (
                 <div key={rowIndex} className="projects-row">
                     {visibleProjects
@@ -193,6 +200,7 @@ const ProjectList = () => {
                         ))}
                 </div>
             ))}
+            </div>
             <div className="navigation">
                 <button onClick={showPreviousPage} disabled={page === 0}>{'<'}</button>
                 <span>{page + 1} / {totalPages}</span>

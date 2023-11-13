@@ -12,6 +12,7 @@ import { Profile } from "./Profile/Profile.js"
 import ProfileDetail from './Profile/ProfileDetail.js'
 import { ProfileHeaderEdit } from './Profile/ProfileEdit.js'
 import { ProjectDetail } from './ProjectPage/ProjectDetail.js'
+import { ProjectCreate } from './ProjectPage/ProjectCreate.js'
 
 
 function App() {
@@ -54,6 +55,7 @@ function App() {
             <Route path="/neetCompany" element={isLoggedIn ? <NeetCompany/> : <RedirectToLogIn/>}></Route>
             <Route path="/profile" element={isLoggedIn ? <Profile/> : <RedirectToLogIn/>}></Route>
             <Route path="/profiledetail" element={<ProfileDetail/>}></Route>
+            <Route path="/projectcreate" element={<ProjectCreate/>}></Route>
             <Route path="/profileheaderedit" element={isLoggedIn ? <ProfileHeaderEdit authObj = {authObj}/> : <RedirectToLogIn/>}></Route>
 
             <Route path="/signUp" element={<Signup/>}></Route>

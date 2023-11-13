@@ -280,7 +280,7 @@ hr {
 
 .dndBox {
     display: flex;
-    height: 100px;
+    height: 150px;
     border: 3px solid #bbbbbb;
     border-radius: 10px;
     margin: 10px;

@@ -7,7 +7,8 @@ import {
     orderBy,
     limit,
     getDocs,
-    addDoc
+    addDoc,
+    startAfter
 } from "firebase/firestore"
 import { useEffect, useState } from 'react'
 import close from '../images/close.png'
@@ -94,51 +95,154 @@ function Post(props) {
 
 const Posts = () => {
 
-    const [postsData, setPostsData] = useState([]);
+    const [posts, setPosts] = useState([]);
+    const [lastKey, setLastKey] = useState(0);
+    const [nextPosts_loading, setNextPostsLoading] = useState(false);
 
 
-    const fetchData = async () => {
+    const initFetch = async () => {
         
-        setPostsData([])
-        // ... try, catch 생략
-        const q = query(
-            collection(db, 'posts'),
-            orderBy("postedAt", "desc"),
-            limit(2)
-        ) // 참조
-        const postSnap = await getDocs(q) // 데이터 스냅 받아오기 - 비동기처리
-        postSnap.forEach((doc) => {
-            const docObj = {
-                ...doc.data(),
-                id: doc.id,
-            }
-            setPostsData(prev => [...prev, docObj])
-        })
+        try {
+            let posts = [];
+            let lastKey = '';
+            const q = query(
+                collection(db, 'posts'),
+                orderBy("postedAt", "desc"),
+                limit(5)
+            );
+            const data = await getDocs(q);
+            data.forEach((doc) => {
+                posts.push({
+                    ...doc.data(),
+                    postId: doc.id
+                });
+                lastKey = doc.data().postedAt;
+            })
+            return { posts, lastKey };
+        } catch (e) {
+            console.log(e);
+        }
     }
     
-    useEffect(() => {
-        fetchData();
-    }, [])
-
-    const rendering = () => {
-        const result = [];
-        console.log(postsData.length)
-        for(let i=0;i<postsData.length;i++){
-            const date = new Date(postsData[i].postedAt.seconds*1000) // js timestamp = unix timestamp * 1000 밀리세컨드단위라 환산해야함
-            result.push(<Post
-                contents = {postsData[i].contents}
-                postedAt = {date}
-                numOfComments = {postsData[i].numOfComments}
-                numOfLikes = {postsData[i].numOfLikes}
-                imgUrls = {postsData[i].imgUrls}
-            />);
+    const moreFetch = async (key) => {
+        
+        try {
+            let posts = [];
+            let lastKey = '';
+            const q = query(
+                collection(db, 'posts'),
+                orderBy("postedAt", "desc"),
+                startAfter(key),
+                limit(1)
+            );
+            const data = await getDocs(q);
+            data.forEach((doc) => {
+                posts.push({
+                    ...doc.data(),
+                    postId: doc.id
+                });
+                lastKey = doc.data().postedAt;
+            })
+            return { posts, lastKey };
+        } catch (e) {
+            console.log(e);
         }
-        return result;
     }
 
-    return(
-        <div>{rendering()}</div>
-    )
+    useEffect(() => {
+        initFetch()
+            .then((res) => {
+                setPosts(res.posts);
+                setLastKey(res.lastKey);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }, [])
+
+    const fetchMorePosts = (key) => {
+        console.log(key)
+        if (key > 0) {
+          setNextPostsLoading(true);
+          moreFetch(key)
+            .then((res) => {
+              setLastKey(res.lastKey);
+              // add new posts to old posts
+              setPosts(posts.concat(res.posts));
+              setNextPostsLoading(false);
+            })
+            .catch((err) => {
+              console.log(err);
+              setNextPostsLoading(false);
+            });
+        }
+    };
+    
+    const allPosts = (
+        <div>
+          {posts.map((post) => {
+            const date = new Date(post.postedAt*1000) // js timestamp = unix timestamp * 1000 밀리세컨드단위라 환산해야함
+            
+            return (
+              <div key={post.postId}>
+                <Post
+                    contents = {post.contents}
+                    postedAt = {date}
+                    numOfComments = {post.numOfComments}
+                    numOfLikes = {post.numOfLikes}
+                    imgUrls = {post.imgUrls}
+                />
+              </div>
+            );
+          })}
+        </div>
+      );
+
+
+
+
+      useEffect(() => {
+        const handleScroll = () => {
+          const { scrollTop, offsetHeight } = document.documentElement
+          if (window.innerHeight + scrollTop >= offsetHeight-1000) {
+            setNextPostsLoading(true)
+          }
+        }
+        setNextPostsLoading(true)
+        window.addEventListener('scroll', handleScroll)
+        return () => window.removeEventListener('scroll', handleScroll)
+      }, [])
+
+      useEffect(() => {
+        if (nextPosts_loading && lastKey>0) fetchMorePosts(lastKey)
+        else if (!(lastKey>0)) setNextPostsLoading(false)
+      }, [nextPosts_loading])
+
+
+
+
+
+
+
+
+
+
+
+
+      return (
+        <div>
+            <div>{allPosts}</div>
+            <div style={{ textAlign: "center" }}>
+                {nextPosts_loading ? (
+                    <p>Loading..</p>
+                ) : lastKey > 0 ? (
+                    null
+                ) : (
+                    <span>You are up to date!</span>
+                )}
+            </div>
+        </div>
+      );
 
 }
 
@@ -282,7 +386,7 @@ function Write() {
         e.preventDefault();
         setValues({
             ...values,
-            'postedAt': moment().toDate(),
+            'postedAt': moment().unix(),
             'userId': uid,
             'imgUrls': imgUrls
         })

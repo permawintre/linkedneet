@@ -103,7 +103,7 @@
     position: relative;
     top: 15px;
     left: 15px;
-    filter: grayscale(100%) brightness(400%) opacity(70%);
+    filter: grayscale(100%) brightness(300%) opacity(70%);
 }
 .placeHolder {
     height: 50px;

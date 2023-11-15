@@ -9,6 +9,7 @@ import {
     createUserWithEmailAndPassword, //email 회원가입
     signOut // 로그아웃
 } from "firebase/auth";
+import { getStorage } from "firebase/storage";
 
 
 
@@ -23,9 +24,10 @@ const firebaseConfig = {
   appId: "1:165076434428:web:f9645b0dde706ef1160679"
 };
 //initialize Firebase
-const app = initializeApp(firebaseConfig);
+export const app = initializeApp(firebaseConfig);
 // Initialize Cloud Firestore and get a reference to the service
 export const db = getFirestore(app);
+export const storage = getStorage(app);
 
 
 

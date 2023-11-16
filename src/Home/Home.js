@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react'
 import close from '../images/close.png'
 import moment from 'moment'
 import styled from 'styled-components'
-import { getStorage, ref, uploadString, listAll, getDownloadURL } from 'firebase/storage';
+import { getStorage, ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid'; // 랜덤 식별자를 생성해주는 라이브러리
 import { storage } from '../firebase.js'
 

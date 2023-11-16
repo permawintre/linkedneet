@@ -1,7 +1,7 @@
 import React from "react"
 import { getDayMinuteCounter, PostContents, PostPics, LikeBtn, CommentBtn, PlusBtn } from './supportFunctions'
 import './Home.css'
-import { dbService , auth } from '../firebase.js'
+import { db , auth } from '../firebase.js'
 import {
     collection,
     query,
@@ -9,6 +9,7 @@ import {
     limit,
     getDocs,
     addDoc,
+    startAfter,
     doc,
     getDoc
 } from "firebase/firestore"
@@ -16,13 +17,14 @@ import { useEffect, useState } from 'react'
 import close from '../images/close.png'
 import moment from 'moment'
 import styled from 'styled-components'
-import { getStorage, ref, uploadString } from 'firebase/storage';
+import { getStorage, ref, uploadString, listAll, getDownloadURL } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid'; // 랜덤 식별자를 생성해주는 라이브러리
-
+import { storage } from '../firebase.js';
 
 
 
 import profile1Img from '../images/profile1Img.jpg'
+/*
 import img1 from '../images/img1.jpg'
 import img2 from '../images/img2.jpg'
 import img3 from '../images/img3.jpg'
@@ -30,6 +32,7 @@ import img4 from '../images/img4.jpg'
 import img5 from '../images/img5.jpg'
 import img6 from '../images/img6.jpg'
 const imgs = [img1, img2, img3, img4, img5, img6]
+*/
 const user = auth.currentUser;
 const userName = "홍길동"
 const companyClass = 14
@@ -41,7 +44,27 @@ const numOfComments = 2
 const userInfo = {}
 
 
-function Post() {
+function Post(props) {
+    const postedAt = props.postedAt
+    const numOfComments = props.numOfComments
+    const numOfLikes = props.numOfLikes
+    const [imgUrls, setImgUrls] = useState([])
+    const contents = props.contents
+
+    useEffect(() => {
+        setImgUrls([])
+        if (props.imgUrls && Array.isArray(props.imgUrls)) {
+        //console.log(props.imgUrls.length)
+        for(let i=0;i<props.imgUrls.length;i++){
+            (async () => {
+                await getDownloadURL(ref(storage, props.imgUrls[i]))
+                    .then((downloadUrl) => {
+                        setImgUrls(prev => [...prev, downloadUrl])
+                    })
+            })()
+        }
+        }
+    },[])
     return (
         <div className="homePost">
             <div className='paddingDiv'>
@@ -55,7 +78,7 @@ function Post() {
                 </div>
                 <PostContents contents={contents} />
             </div>
-            <PostPics imgs={imgs} />
+            {imgUrls.length === 0 ? null : <PostPics imgs={imgUrls} />}
             <div className='postFooter'>
                 <LikeBtn />
                 <CommentBtn />
@@ -85,20 +108,138 @@ function Post() {
 
 
 
-function Posts() {
-    const fetchposts = async () => {
-        // ... try, catch 생략
-        const q = query(
-            collection(dbService , 'posts'),
-            orderBy("postedAt", "desc", limit(3)),
-        ) // 참조
-        const postSnap = await getDocs(q) // 데이터 스냅 받아오기 - 비동기처리
-        const data = postSnap.docs.map(doc => ({
-            ...doc.data(),
-            id: doc.id
-        }))
-        return data
+const Posts=() =>{
+    const [posts, setPosts] = useState([]);
+    const [lastKey, setLastKey] = useState(0);
+    const [nextPosts_loading, setNextPostsLoading] = useState(false);
+
+
+    const initFetch = async () => {
+        
+        try {
+            let posts = [];
+            let lastKey = '';
+            const q = query(
+                collection(db, 'posts'),
+                orderBy("postedAt", "desc"),
+                limit(5)
+            );
+            const data = await getDocs(q);
+            data.forEach((doc) => {
+                posts.push({
+                    ...doc.data(),
+                    postId: doc.id
+                });
+                lastKey = doc.data().postedAt;
+            })
+            return { posts, lastKey };
+        } catch (e) {
+            console.log(e);
+        }
     }
+    const moreFetch = async (key) => {
+        
+        try {
+            let posts = [];
+            let lastKey = '';
+            const q = query(
+                collection(db, 'posts'),
+                orderBy("postedAt", "desc"),
+                startAfter(key),
+                limit(1)
+            );
+            const data = await getDocs(q);
+            data.forEach((doc) => {
+                posts.push({
+                    ...doc.data(),
+                    postId: doc.id
+                });
+                lastKey = doc.data().postedAt;
+            })
+            return { posts, lastKey };
+        } catch (e) {
+            console.log(e);
+        }
+    }
+    useEffect(() => {
+        initFetch()
+            .then((res) => {
+                setPosts(res.posts);
+                setLastKey(res.lastKey);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }, [])
+    const fetchMorePosts = (key) => {
+        console.log(key)
+        if (key > 0) {
+          setNextPostsLoading(true);
+          moreFetch(key)
+            .then((res) => {
+              setLastKey(res.lastKey);
+              // add new posts to old posts
+              setPosts(posts.concat(res.posts));
+              setNextPostsLoading(false);
+            })
+            .catch((err) => {
+              console.log(err);
+              setNextPostsLoading(false);
+            });
+        }
+    };
+    const allPosts = (
+        <div>
+          {posts.map((post) => {
+            const date = new Date(post.postedAt*1000) // js timestamp = unix timestamp * 1000 밀리세컨드단위라 환산해야함
+            
+            return (
+              <div key={post.postId}>
+                <Post
+                    contents = {post.contents}
+                    postedAt = {date}
+                    numOfComments = {post.numOfComments}
+                    numOfLikes = {post.numOfLikes}
+                    imgUrls = {post.imgUrls}
+                />
+              </div>
+            );
+          })}
+        </div>
+      );
+      useEffect(() => {
+        const handleScroll = () => {
+          const { scrollTop, offsetHeight } = document.documentElement
+          if (window.innerHeight + scrollTop >= offsetHeight-1000) {
+            setNextPostsLoading(true)
+          }
+        }
+        setNextPostsLoading(true)
+        window.addEventListener('scroll', handleScroll)
+        return () => window.removeEventListener('scroll', handleScroll)
+      }, [])
+
+      useEffect(() => {
+        if (nextPosts_loading && lastKey>0) fetchMorePosts(lastKey)
+        else if (!(lastKey>0)) setNextPostsLoading(false)
+      }, [nextPosts_loading])
+
+      return (
+        <div>
+            <div>{allPosts}</div>
+            <div style={{ textAlign: "center" }}>
+                {nextPosts_loading ? (
+                    <p>Loading..</p>
+                ) : lastKey > 0 ? (
+                    null
+                ) : (
+                    <span>You are up to date!</span>
+                )}
+            </div>
+        </div>
+      );
+
+    
 }
 
 
@@ -209,7 +350,7 @@ function Write() {
     useEffect( () => {
         if(async) {
             
-            addDoc(collection(dbService , "posts"), values)
+            addDoc(collection(db , "posts"), values)
             setAsync(false)
         }
         else {
@@ -294,7 +435,7 @@ export const Home = () => {
 
     useEffect(() => { //오른쪽 사이드 바 코드
         const fetchUsers = async () => {
-            const usersCollectionRef = collection(dbService, 'users');
+            const usersCollectionRef = collection(db, 'users');
             const data = await getDocs(usersCollectionRef);
             // 모든 사용자 정보를 배열로 변환
             const allUsers = data.docs.map(doc => ({ ...doc.data(), id: doc.id }));
@@ -314,7 +455,7 @@ export const Home = () => {
     useEffect(() => { // 유저 정보 코드
         const fetchUserInfo = async () => {
             if (auth.currentUser) {
-                const userRef = doc(dbService, "users", auth.currentUser.uid);
+                const userRef = doc(db, "users", auth.currentUser.uid);
                 const docSnap = await getDoc(userRef);
 
                 if (docSnap.exists()) {
@@ -332,7 +473,8 @@ export const Home = () => {
         <div className='home'>
             <aside className="left-sidebar">
                 <div className="background-img-container">
-                    <img src={img1} alt="background" className="background-img"/>
+                    <img src={userInfo?.imgUrls} alt="background" className="background-img"/> 
+                    {/*임시*/}
                 </div>
                 <img src={userInfo?.imgUrls|| profile1Img} alt="profile" className="profile-img1" />
                 <div className="profile-info">

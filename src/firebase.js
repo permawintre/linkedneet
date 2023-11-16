@@ -1,5 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app"
+import { getFirestore } from "firebase/firestore"
 import { 
     getAuth,// authentication 설정
     signInWithPopup, //google 로그인을 팝업창에 띄우기 위해
@@ -8,7 +9,7 @@ import {
     createUserWithEmailAndPassword, //email 회원가입
     signOut // 로그아웃
 } from "firebase/auth";
-import { getFirestore } from "firebase/firestore"
+import { getStorage } from "firebase/storage";
 
 
 
@@ -21,6 +22,11 @@ const firebaseConfig = {
   messagingSenderId: "165076434428",
   appId: "1:165076434428:web:f9645b0dde706ef1160679"
 };
+//initialize Firebase
+export const app = initializeApp(firebaseConfig);
+// Initialize Cloud Firestore and get a reference to the service
+export const db = getFirestore(app);
+export const storage = getStorage(app);
 
 
 
@@ -28,7 +34,6 @@ const firebaseConfig = {
 // Initialize Firebase
 initializeApp(firebaseConfig);
 export const auth = getAuth();
-export const dbService = getFirestore();
 
 
 //Email 로그인

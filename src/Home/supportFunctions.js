@@ -65,6 +65,8 @@ export const getDayMinuteCounter = (date) => {
  */
 export const PostContents = ({contents}) => {
 
+  const validContents = typeof contents === 'string' ? contents : '';
+
   const [state,setState] = useState(true);
 
   const handler = () => {
@@ -72,8 +74,8 @@ export const PostContents = ({contents}) => {
     setState((e) => !e)
   }
 
-  const contentsLength = JSON.parse(JSON.stringify({contents})).contents.length
-  if(contentsLength<=220) {
+  
+  if(validContents.length<=220) {
     return(
       <div className='postContents'>{contents}</div>
     )

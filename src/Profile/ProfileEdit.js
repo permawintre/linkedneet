@@ -1,7 +1,7 @@
 import React from "react"
 import './ProfileEdit.css'
 import  { useState, useEffect } from 'react'
-import { dbService, auth } from '../firebase'
+import { db, auth } from '../firebase'
 import { updateDoc, getDoc, doc } from "firebase/firestore"
 
 
@@ -22,7 +22,7 @@ export const ProfileHeaderEdit = () => {
         const fetchUserData = async (uid) => {
             try {
                 // get [one and only one] docReference using key
-                const userDocRef = doc(dbService, 'users', auth.currentUser.uid);
+                const userDocRef = doc(db, 'users', auth.currentUser.uid);
                 const userDoc = await getDoc(userDocRef);
 
                 // If the document exists, setUserData with the document data
@@ -51,7 +51,7 @@ export const ProfileHeaderEdit = () => {
     // See Query and Update for below. This is only about "CREATING" new data.
     const onSubmit = async(event) => {
         event.preventDefault();
-        const userDocRef = doc(dbService, 'users', auth.currentUser.uid);
+        const userDocRef = doc(db, 'users', auth.currentUser.uid);
         try {
 
             // update DB using user input 

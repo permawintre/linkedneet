@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { loginEmail, loginGoogle, auth, dbService } from '../firebase.js'
+import { loginEmail, loginGoogle, auth, db } from '../firebase.js'
 import { Link } from "react-router-dom"
 import { collection, setDoc, doc } from "firebase/firestore"
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -54,7 +54,7 @@ export const Signup = () => {
             };
             
             // add initial profile for user (key = uid)
-            const userRef = collection(dbService, "users");
+            const userRef = collection(db, "users");
             
             // doc (userRef, __SOME KEY__) => add new default profile if login.
             // in this situation, key is uid in in authobj

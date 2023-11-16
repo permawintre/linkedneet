@@ -126,15 +126,70 @@
     transform: rotate(90deg)
 }
 
-.numOfLikesNComments {
+.numOfLikes {
+    margin-left: 10px;
+    font-weight: 400;
+    font-size: 15px;
+}
+
+.numOfComments {
     margin-left: 10px;
     font-weight: 400;
     font-size: 15px;
 }
 
 hr {
-    margin: 5px 10px 0px 10px;
+    margin: 0px 0px 5px 0px;
 }
+
+.commentcontainer {
+    width: 100%;
+    margin: auto;
+    padding: 5px;
+  }
+  
+  .postcomment {
+    display: flex;
+    justify-content: flex-start;
+  }
+  
+  .postcomment img {
+    width: 40px; /* Adjust the size as necessary */
+    height: 40px;
+    border-radius: 90%; /* Circular profile picture */
+    margin-right: 10px;
+    margin-top: 10px;
+    margin-left: 5px;
+  }
+  
+  .postcomment input[type="text"] {
+    flex-grow: 1;
+    height: 20px;
+    padding: 10px;
+    border: 1px solid #ccc; /* Example input border color */
+    border-radius: 10px;
+    margin-right: 10px;
+  }
+  
+  .postcomment button {
+    width: 70px;
+    height: 40px;
+    border: none;
+    color: #808080;
+    background-color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 15px;
+    margin-top: 10px;
+    transform: none;
+    padding: 0;
+    border: 1px solid #ccc; /* Example input border color */
+    border-radius: 10px;
+  }
+  
+  .postcomment button:hover {
+    background-color: #808080;
+  }
 
 
 @keyframes clickReaction {
@@ -155,7 +210,7 @@ hr {
     transform: scale(1);
 }
 .postFooter {
-    padding: 10px;
+    padding: 10px 10px 5px 10px;
     display: flex;
 }
 .like {
@@ -177,16 +232,15 @@ hr {
     filter: invert(85%) sepia(39%) saturate(4810%) hue-rotate(2deg) brightness(108%) contrast(104%);
     /** https://codepen.io/sosuke/pen/Pjoqqp */
 }
-.comment {
+.commentbtn {
     width: 25px;
     height: 25px;
     transition: 0.3s;
 }
-.comment:hover{
+.commentbtn:hover{
     -webkit-transform: scale(0.9);
     transform: scale(0.9);
 }
-
 
 
 

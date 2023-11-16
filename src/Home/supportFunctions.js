@@ -186,7 +186,7 @@ export const CommentBtn = () => {
 
   return(
     <div>
-      <img src={comments} alt='comment' className='comment' />
+      <img src={comments} alt='commentbtn' className='commentbtn' />
     </div>
   )
 }

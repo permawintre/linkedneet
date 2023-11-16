@@ -195,7 +195,7 @@ export const CommentBtn = () => {
   )
 }
 
-export const Comment= ( profilePic, author, timestamp, content )=> {
+export const Comments= ( profilePic, author, timestamp, content )=> {
   return (
     <div className="comment">
         <img src={profilePic} alt="Profile" className="commentProfilePic" />
@@ -212,7 +212,7 @@ export const CommentsContainer = (comments) => {
   return (
     <div className="commentsContainer">
         {comments.map((comment, index) => (
-            <Comment
+            <Comments
                 key={index}
                 profilePic={comment.profilePic}
                 author={comment.author}

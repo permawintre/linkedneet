@@ -6,6 +6,8 @@ import filledStar from '../images/filledStar.png'
 import emptyStar from '../images/emptyStar.png'
 import comments from '../images/comments.png'
 import React from 'react'
+import { db , auth } from '../firebase.js'
+
 
 
 /**
@@ -155,7 +157,7 @@ export const PostPics = ({imgs}) => {
  * 반응형 애니메이션은 css로 구현
  * @returns 좋아요 버튼 렌더링
  */
-export const LikeBtn = () => {
+ export const LikeBtn = () => {
 
   let [state, setState] = useState(false)
 
@@ -192,6 +194,36 @@ export const CommentBtn = () => {
     </div>
   )
 }
+
+export const Comment= ( profilePic, author, timestamp, content )=> {
+  return (
+    <div className="comment">
+        <img src={profilePic} alt="Profile" className="commentProfilePic" />
+        <div className="commentDetails">
+            <span className="commentAuthor">{author}</span>
+            <span className="commentTimestamp">{timestamp}</span>
+            <p className="commentContent">{content}</p>
+        </div>
+    </div>
+  );  
+}
+
+export const CommentsContainer = (comments) => {
+  return (
+    <div className="commentsContainer">
+        {comments.map((comment, index) => (
+            <Comment
+                key={index}
+                profilePic={comment.profilePic}
+                author={comment.author}
+                timestamp={comment.timestamp}
+                content={comment.content}
+            />
+        ))}
+    </div>
+);
+}
+
 
 export const PlusBtn = () => {
 

@@ -1,5 +1,5 @@
 import React from "react"
-import { getDayMinuteCounter, PostContents, PostPics, LikeBtn, CommentBtn, PlusBtn } from './supportFunctions'
+import { getDayMinuteCounter, PostContents, PostPics, LikeBtn, CommentBtn, PlusBtn, Comments,CommentsContainer } from './supportFunctions'
 import './Home.css'
 import { db , auth } from '../firebase.js'
 import {
@@ -42,19 +42,41 @@ const contents = "지난달 초 우리 학교의 상징과도 같은 거위들�
 const numOfLikes = 26
 const numOfComments = 2
 const userInfo = {}
+const comments = [
+    {
+        id: 1,
+        profileImg: "profile1.jpg", // 프로필 이미지 경로
+        author: "작성자1",
+        timestamp: "2023-11-16 10:00:00",
+        content: "첫 번째 댓글입니다!"
+    },
+    {
+        id: 2,
+        profileImg: "profile2.jpg",
+        author: "작성자2",
+        timestamp: "2023-11-16 11:00:00",
+        content: "두 번째 댓글입니다!"
+    }
+    // 추가 댓글...
+];
+
 
 
 function Post(props) {
     const postedAt = props.postedAt
     const numOfComments = props.numOfComments
-    const numOfLikes = props.numOfLikes
+    const numOfLikes = props.numOfLikes;
     const [imgUrls, setImgUrls] = useState([])
     const contents = props.contents
+    const [showComments, setShowComments] = useState(false);
+    const toggleComments = () => {
+        setShowComments(!showComments);
+    };
 
     useEffect(() => {
         setImgUrls([])
         if (props.imgUrls && Array.isArray(props.imgUrls)) {
-        //console.log(props.imgUrls.length)
+        console.log(props.numOfLikes)
         for(let i=0;i<props.imgUrls.length;i++){
             (async () => {
                 await getDownloadURL(ref(storage, props.imgUrls[i]))
@@ -87,9 +109,14 @@ function Post(props) {
             <div className='numOfLikes'>
                 {numOfLikes===0? <span></span> : <span>{numOfLikes}명이 응원합니다 </span>}
             </div>
-            <div className='numOfComments'>
+            <div className='numOfComments' onClick={toggleComments}>
                 {numOfComments===0? <span></span> : <span>댓글 {numOfComments}개 모두 보기</span>}
             </div>
+            {showComments && (
+                <div className='commentcontainer'>
+                   <CommentsContainer />
+                </div>
+            )}
             <div className='commentcontainer'>
                 
                 <div className='postcomment'>
@@ -198,11 +225,16 @@ const Posts=() =>{
                 <Post
                     contents = {post.contents}
                     postedAt = {date}
-                    numOfComments = {post.numOfComments}
-                    numOfLikes = {post.numOfLikes}
                     imgUrls = {post.imgUrls}
+                    numOfLikes = {post.numOfLikes}
+                    numOfComments = {post.numOfComments}
                 />
+                <div className='postFooter'>
+                </div>
+            
+            
               </div>
+              
             );
           })}
         </div>
@@ -374,9 +406,10 @@ function Write() {
         e.preventDefault();
         setValues({
             ...values,
-            'postedAt': moment().toDate(),
+            'postedAt': moment().unix(),
             'userId': uid,
             'imgUrls': imgUrls
+        
         })
         
         setIsOpen(false)
@@ -485,8 +518,7 @@ export const Home = () => {
             
             <div className='postsContainer'>
                 <Write/>
-                <Post/>
-                <Post/>
+                <Posts/>
             </div>
 
             <aside className="right-sidebar">

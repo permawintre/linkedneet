@@ -1,6 +1,9 @@
 import React, { useRef, useState } from 'react';
 import { FaFacebookSquare, FaInstagramSquare} from 'react-icons/fa';
 import { MdPhoneIphone, MdEmail, MdCalendarMonth } from 'react-icons/md'
+import { formatDistanceToNow } from 'date-fns';
+import { ko } from 'date-fns/locale';
+
 import './ProfileDetail.css';
 import { ProfileEditModal, ProfileIntroEditModal, ProfileCareerEditModal } from './ProfileEditModal';
 
@@ -94,7 +97,7 @@ const ProfileHeader = () => {
                         비행일정 확인하기
                     </span>
                     <span className="edit-profile">
-                      <input type="button" class="edit-button" onClick={EditClick}>
+                      <input type="button" className="edit-button" onClick={EditClick}>
                       </input>
                       {EditClicked && (
                         <ProfileEditModal
@@ -137,7 +140,7 @@ const ProfileIntro = () => {
                   ))}
               </span>
               <span className="edit-profile">
-                      <input type="button" class="edit-button" onClick={EditClick}>
+                      <input type="button" className="edit-button" onClick={EditClick}>
                       </input>
                       {EditClicked && (
                         <ProfileIntroEditModal
@@ -181,7 +184,7 @@ const ProfileCareer = () => {
           ))}
         </span>
         <span className="edit-profile" style={{margin: "-10px"}}>
-          <input type="button" class="edit-button" onClick={EditClick} style={{margin: "-5px 10px"}}></input>
+          <input type="button" className="edit-button" onClick={EditClick} style={{margin: "-5px 10px"}}></input>
           {EditClicked && (
             <ProfileCareerEditModal
               user={null}
@@ -226,7 +229,7 @@ const ProfilePost = () => {
 const ProfileComment = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
-  const [userProfile, setUserProfile] = useState('https://via.placeholder.com/50'); // 사용자 프로필 이미지 URL
+  const [userProfile, setUserProfile] = useState('https://thumbnail.10x10.co.kr/webimage/image/add1/497/A004979805_01.jpg?cmd=thumb&w=400&h=400&fit=true&ws=false'); // 사용자 프로필 이미지
 
   const handleInputChange = (event) => {
     setNewMessage(event.target.value);
@@ -235,8 +238,9 @@ const ProfileComment = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     if (newMessage.trim() !== '') {
-      const currentTime = new Date().toLocaleString();
-      const message = { text: newMessage, user: '사용자 이름', time: currentTime };
+      const currentTime = new Date();
+      const relativeTime = formatDistanceToNow(currentTime, { addSuffix: true, locale: ko });
+      const message = { text: newMessage, user: '사용자 이름', time: currentTime.toLocaleString(), relativeTime: relativeTime, userProfile: userProfile };
       setMessages([...messages, message]);
       setNewMessage('');
     }
@@ -260,8 +264,15 @@ const ProfileComment = () => {
       </div>
       <div>
         {messages.map((message, index) => (
-          <div key={index}>
-            <div>{message.user} - {message.time} - {message.text}</div>
+          <div key={index} className='message'>
+            <img src={message.userProfile} alt="프로필"/>
+            <div className='message-box'>
+              <div className='message-header'>
+                <h3>{message.user}</h3>
+                <p className='time' data-tooltip={message.time}>{message.relativeTime}</p>
+              </div>
+              <p className='text'>{message.text}</p>
+            </div>
           </div>
         ))}
       </div>
@@ -290,10 +301,10 @@ const ProfileDetail = () => {
           <span onClick={() => scrollToRef(postRef)}>게시글</span>
           <span onClick={() => scrollToRef(commentRef)}>방명록</span>
         </div>
-        <div ref={introRef}>{ProfileIntro()}</div>
-        <div ref={careerRef}>{ProfileCareer()}</div>
-        <div ref={postRef}>{ProfilePost()}</div>
-        <div ref={commentRef}>{ProfileComment()}</div>
+        <div ref={introRef}><ProfileIntro /></div>
+        <div ref={careerRef}><ProfileCareer /></div>
+        <div ref={postRef}><ProfilePost /></div>
+        <div ref={commentRef}><ProfileComment /></div>
     </div>
     )
 }

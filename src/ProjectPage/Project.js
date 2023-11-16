@@ -1,32 +1,34 @@
 import React, { useState } from "react"
-import './Project.css'
+import style from './Project.module.css'
 import { Link } from 'react-router-dom';
 
 const UserProject = ({ project }) => {
     return (
-        <div className="project-box">
-            <img src={project.image} alt={project.name} /> {/* alt 속성 추가 */}
-            <div className="name">{project.name}</div>
-            <div className="comment">{project.comment}</div>
-        </div>
+      <div className={style.projectBox}>
+        <img src={project.image} alt={project.name} />
+        <div className={style.name}>{project.name}</div>
+        <div className={style.comment}>{project.comment}</div>
+      </div>
     );
-};
+  };
 const DetailedProject = ({ project }) => {
     const getTagColor = (status) => {
         switch (status) {
-            case '모집중': return 'tag-recruiting';
-            case '진행중': return 'tag-in-progress';
-            case '진행완료': return 'tag-completed';
+            case '모집중': return 'tagRecruiting';
+            case '진행중': return 'tagInProgress';
+            case '진행완료': return 'tagCompleted';
         }
     }
     return (
-        <div className="project-box">
-            <span className={`tag ${getTagColor(project.status)}`}>{project.status}</span>
-            <img src={project.image} alt={project.name} /> {/* alt 속성 추가 */}
-            <Link to="/projectDetail" style={{ textDecoration: 'none' }} className="name">{project.name}</Link>
-            <div className="comment">{project.comment}</div>
-        </div>
-    );
+    <div className={style.projectBox}>
+        <span className={`${style.tag} ${style[getTagColor(project.status)]}`}>{project.status}</span>
+        <img src={project.image} alt={project.name} />
+        <Link to="/projectDetail" style={{ textDecoration: 'none' }} className={style.name}>
+            {project.name}
+        </Link>
+        <div className={style.comment}>{project.comment}</div>
+    </div>
+      );
 };
 
 const defaultImage = 'https://cdn.imweb.me/upload/S20191010288d21675b22f/e33c22faf15bc.jpg';
@@ -60,13 +62,13 @@ const MyProject = () => {
     const visibleProjects = myProjects.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
 
     return (
-        <div className="projects">
-            <div className="my-projects-title navigation">
+        <div className={style.projects}>
+            <div className={`${style.myProjectsTitle} ${style.navigation}`}>
                 <button onClick={showPreviousPage}>{'<'}</button>
-                <span className="projects-title">나의 소모임</span>
+                <span className={style.projectsTitle}>나의 소모임</span>
                 <button onClick={showNextPage}>{'>'}</button>
             </div>
-            <div className="projects-row">
+            <div className={style.projectsRow}>
                 {visibleProjects.map((project, index) => (
                     <UserProject key={index} project={project} />
                 ))}
@@ -139,80 +141,80 @@ const ProjectList = () => {
 
     // Return
     return (
-        <div className="projects">
-            <div className="project-list-header">
-                <div className="projects-title-header">
-                    <span className="line">-</span>
-                    <span className="projects-title">더 많은 소모임을 찾아보세요!</span>
-                    <span className="line">-</span>
-                </div>
-                <div className="projects-filter">
-                    <span className="searchbar">
-                        <div>이름으로 검색하기</div>
-                        <input
-                            type="text"
-                            placeholder="소모임 이름 검색"
-                            value={searchTerm}
-                            onChange={handleSearch}
-                        />
-                    </span>
-                    <div className="filter-dropdowns">
-                        <span className="dropdown">
-                            <div>모집 기간</div>
-                            <select onChange={handleStatusChange}>
-                                {statuses.map((status, index) => (
-                                    <option key={index} value={status}>{status}</option>
-                                ))}
-                            </select>
-                        </span>
-                        <span className="dropdown">
-                            <div>소모임 형태</div>
-                            <select onChange={handleTypeChange}>
-                                {types.map((type, index) => (
-                                    <option key={index} value={type}>{type}</option>
-                                ))}
-                            </select>
-                        </span>
-                        <span className="dropdown">
-                            <div>소모임 분류</div>
-                            <select onChange={handleFormChange}>
-                                {forms.map((form, index) => (
-                                    <option key={index} value={form}>{form}</option>
-                                ))}
-                            </select>
-                        </span>
-                    </div>
-                </div>
+        <div className={style.projects}>
+          <div className={style.projectListHeader}>
+            <div className={style.projectsTitleHeader}>
+              <span className={style.line}>-</span>
+              <span className={style.projectsTitle}>더 많은 소모임을 찾아보세요!</span>
+              <span className={style.line}>-</span>
             </div>
-            <div className="projects-recommand">
-            <div className="new-project">
-                <div className="new-project-small">원하는 소모임이 없다면?</div>
-                <Link to="/projectcreate" style={{ textDecoration: 'none' }}>
-                <div className="new-project-large">소모임 만들기 ▶</div>
-                </Link>
+            <div className={style.projectsFilter}>
+              <span className={style.searchbar}>
+                <div>이름으로 검색하기</div>
+                <input
+                  type="text"
+                  placeholder="소모임 이름 검색"
+                  value={searchTerm}
+                  onChange={handleSearch}
+                />
+              </span>
+              <div className={style.filterDropdowns}>
+                <span className={style.dropdown}>
+                  <div>모집 기간</div>
+                  <select onChange={handleStatusChange}>
+                    {statuses.map((status, index) => (
+                      <option key={index} value={status}>{status}</option>
+                    ))}
+                  </select>
+                </span>
+                <span className={style.dropdown}>
+                  <div>소모임 형태</div>
+                  <select onChange={handleTypeChange}>
+                    {types.map((type, index) => (
+                      <option key={index} value={type}>{type}</option>
+                    ))}
+                  </select>
+                </span>
+                <span className={style.dropdown}>
+                  <div>소모임 분류</div>
+                  <select onChange={handleFormChange}>
+                    {forms.map((form, index) => (
+                      <option key={index} value={form}>{form}</option>
+                    ))}
+                  </select>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className={style.projectsRecommand}>
+            <div className={style.newProject}>
+              <div className={style.newProjectSmall}>원하는 소모임이 없다면?</div>
+              <Link to="/projectcreate" style={{ textDecoration: 'none' }}>
+                <div className={style.newProjectLarge}>소모임 만들기 ▶</div>
+              </Link>
             </div>
             {[...Array(totalRows)].map((_, rowIndex) => (
-                <div key={rowIndex} className="projects-row">
-                    {visibleProjects
-                        .slice(rowIndex * itemsPerRow, (rowIndex + 1) * itemsPerRow)
-                        .map((project, index) => (
-                            <DetailedProject key={index} project={project} />
-                        ))}
-                </div>
+              <div key={rowIndex} className={style.projectsRow}>
+                {visibleProjects
+                  .slice(rowIndex * itemsPerRow, (rowIndex + 1) * itemsPerRow)
+                  .map((project, index) => (
+                    <DetailedProject key={index} project={project} />
+                  ))}
+              </div>
             ))}
-            </div>
-            <div className="navigation">
-                <button onClick={showPreviousPage} disabled={page === 0}>{'<'}</button>
-                <span>{page + 1} / {totalPages}</span>
-                <button onClick={showNextPage} disabled={page === totalPages - 1}>{'>'}</button>
-            </div>
+          </div>
+          <div className={style.navigation}>
+            <button onClick={showPreviousPage} disabled={page === 0}>{'<'}</button>
+            <span>{page + 1} / {totalPages}</span>
+            <button onClick={showNextPage} disabled={page === totalPages - 1}>{'>'}</button>
+          </div>
         </div>
-    );
+      );
 };
 
 export const Project = () => {
     return (
-        <div className="body">
+        <div className={style.body}>
             <MyProject/>
             <ProjectList/>
         </div>

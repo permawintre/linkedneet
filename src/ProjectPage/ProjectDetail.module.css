@@ -1,0 +1,213 @@
+:root {
+    
+    --color_1: #FFA500;
+    --color_2: #DFE0DF;
+    --color_3: #1e1f38;
+    --color_4: #FF4B2B;
+
+}
+.tagRecruiting {
+    background-color: #edae49;
+}
+.tagInProgress {
+    background-color: #d1495b;
+}
+.tagCompleted {
+    background-color: #00798c;
+}
+.projectDetail {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 15px;
+}
+.projectBoxDetail {
+    display: flex;
+    flex-direction: column;
+    width: 700px;
+    height: 500px;
+    text-align: center;
+    background-color: #f8f8f8;
+    border: solid 2px;
+    position: relative;
+    margin: 0 auto;
+}
+  
+.projectBoxDetail img {
+    width: 100%;
+    height: 50%;
+    object-fit: cover;
+}
+
+.projectBoxDetail .name {
+    height: 15%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    overflow-wrap: break-word;
+    padding: 5px;
+    font-size: 28px;
+    border-top: solid 1px;
+    border-bottom: solid 1px;
+}
+.projectBoxDetail .comment {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 10%;
+    padding: 5px 15px;
+    font-size: 15px;
+    border-bottom: solid 1px;
+    background-color: lemonchiffon;
+}
+.projectBoxDetail .info {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    color: dimgray;
+    padding: 0 150px;
+}
+.projectBoxDetail .info > div {
+    text-align: left;
+    padding: 3px 0;
+}
+.projectBoxDetail .info .infoTitle {
+    display: inline-block;
+    width: 100px;
+    padding-left: 7px;
+}
+.projectBoxDetail .tag {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 3px 5px;
+    border-left: solid 2px;
+    border-bottom: solid 2px;
+}
+
+.projectBoxButtons {
+    width: 700px;
+    text-align: center;
+    margin: 10px auto;
+}
+.projectBoxButtons .recruitButton {
+    display: inline-block;
+    width: 520px;
+    padding: 10px 0;
+    background-color: yellowgreen;
+    margin-right: 15px;
+    border: solid 2px;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+.projectBoxButtons .shareButton {
+    display: inline-block;
+    width: 165px;
+    padding: 10px 0;
+    background-color: silver;
+    border: solid 2px;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+.projectBoxLeader {
+    width: 700px;
+    text-align: center;
+    margin: 0 auto;
+    display: flex;
+}
+.projectBoxLeader .leaderImage > img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+.projectBoxLeader .leaderImage {
+    display: inline-block;
+    width: 100px;
+    display: flex;
+    margin-left: 50px;
+}
+.projectBoxLeader .leaderBody {
+    display: inline-block;
+    width: 500px;
+    text-align: left;
+    margin-right: 50px;
+}
+.projectBoxLeader .leaderBody .leaderName {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+}
+.projectBoxLeader .leaderBody .leaderName .leaderCaption {
+    background-color: lightcoral;
+    margin-left: 5px;
+    padding: 0 8px;
+    font-size: 13px;
+    border-radius: 10px;
+    font-weight: normal;
+}
+.projectBoxLeader .leaderBody .leaderComment {
+    font-size: 12px;
+    height: 40px;
+}
+.projectBody {
+    width: 700px;
+    margin: 0 auto;
+    text-align: left;
+    border-top: solid 2px;
+    padding: 10px;
+    background-color: white;
+}
+.projectBody:last-child {
+    margin-bottom: 20px;
+}
+.projectBody .bodyTitle {
+    font-weight: bold;
+    font-size: 25px;
+    padding: 5px;
+}
+.projectBody .bodyContent {
+    white-space: pre-line;
+    width: 700px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+.projectButton {
+    display: inline-block;
+    width: 130px;
+    margin: 0 2px;
+}
+.projectButton .text {
+    cursor: pointer;
+}
+.projectButton.active .text {
+    font-weight: bold;
+}
+.review {
+    width: 670px;
+    padding: 5px;
+    background-color: whitesmoke;
+    border: solid 1px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+}
+.review:last-child {
+    margin-bottom: 0;
+  }
+.review .review-user {
+    padding: 0 10px;
+    font-weight: bold;
+}
+.review .review-content {
+    padding: 0 10px;
+}
+.review .review-date {
+    font-size: 12px;
+    color: gray;
+}
+.review .review-content {
+    font-size: 15px;
+}

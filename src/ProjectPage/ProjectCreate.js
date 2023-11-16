@@ -1,24 +1,20 @@
 // npm install react-datepicker
 // naver map?
 // 임시저장 버튼
+// leader uid
 
-import React, { useState } from "react"
-import './Project.css'
+import React, { useState, useEffect } from "react"
+import style from './ProjectCreate.css'
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { dbService, auth } from '../firebase.js';
+import { addDoc, collection } from "firebase/firestore"
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import moment from 'moment'
+import { useNavigate } from 'react-router-dom';
 
-const BasicInfoForm = ({ nextStep }) => {
-    const [formData, setFormData] = useState({
-      projectName: '',
-      shortDescription: '',
-      projectCategory: '',
-      projectType: '',
-      openChatRoom: '',
-      recruitStartDate: null,
-      recruitEndDate: null,
-      runningStartDate: null,
-      runningEndDate: null,
-    });
+
+const BasicInfoForm = ({ nextStep, formData, setFormData }) => {
   
     const handleCategoryClick = (category) => {
       setFormData({ ...formData, projectCategory: category });
@@ -47,14 +43,14 @@ const BasicInfoForm = ({ nextStep }) => {
 
     const handleSubmit = (e) => {
       e.preventDefault();
-      // if (!formData.projectName || !formData.shortDescription
-      //   || !formData.projectCategory || !formData.projectType
-      //   || !formData.openChatRoom
-      //   || !formData.recruitStartDate || !formData.recruitEndDate
-      //   || !formData.runningStartDate || !formData.runningEndDate) {
-      //   alert('필수항목을 채워주세요!');
-      //   return;
-      // }
+      if (!formData.projectName || !formData.shortDescription
+        || !formData.projectCategory || !formData.projectType
+        || !formData.openChatRoom
+        || !formData.recruitStartDate || !formData.recruitEndDate
+        || !formData.runningStartDate || !formData.runningEndDate) {
+        alert('필수항목을 입력해주세요!');
+        return;
+      }
       nextStep();
     };
   
@@ -200,16 +196,7 @@ const BasicInfoForm = ({ nextStep }) => {
       </form>
     );
 };
-const DetailedInfoForm = ({ prevStep, nextStep }) => {
-    const [formData, setFormData] = useState({
-        image: null,
-        sub_images: [],
-        introduction: '',
-        desiredCrew: '',
-        preparation: '',
-        location: '',
-        tags: [],
-      });
+const DetailedInfoForm = ({ prevStep, nextStep, formData, setFormData }) => {
     
     const handleImageChange = (e) => {
         const selectedImage = e.target.files[0];
@@ -217,10 +204,10 @@ const DetailedInfoForm = ({ prevStep, nextStep }) => {
     };
     const handleSubImagesChange = (e) => {
       const selectedSubImages = Array.from(e.target.files);
-      setFormData({ ...formData, sub_images: selectedSubImages });
+      setFormData({ ...formData, subImages: selectedSubImages });
     };
     const getFileNames = () => {
-      return formData.sub_images.map((file, index) => `추가 이미지 ${index + 1}: ${file.name}`).join('\n');
+      return formData.subImages.map((file, index) => `추가 이미지 ${index + 1}: ${file.name}`).join('\n');
     };
     const handleIntroductionChange = (e) => {
         setFormData({ ...formData, introduction: e.target.value });
@@ -256,6 +243,10 @@ const DetailedInfoForm = ({ prevStep, nextStep }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        if (!formData.introduction || !formData.desiredCrew) {
+          alert('필수항목을 입력해주세요!');
+          return;
+        }
         nextStep();
     };
     
@@ -305,7 +296,7 @@ const DetailedInfoForm = ({ prevStep, nextStep }) => {
                   onChange={handleSubImagesChange}
                   multiple  // 여러 파일 선택을 허용
                 />
-                {formData.sub_images.length > 0 && (
+                {formData.subImages.length > 0 && (
                   <div className="image-names">{getFileNames()}</div>
                 )}
               </div>
@@ -399,26 +390,23 @@ const DetailedInfoForm = ({ prevStep, nextStep }) => {
         </form>
       );
 }
-const RecruitmentForm = ({ prevStep, nextStep }) => {
-    const [formData, setFormData] = useState({
-        recruit_form: [],
-        newInput: '',
-    });
+const RecruitmentForm = ({ prevStep, nextStep, formData, setFormData }) => {
+  const [newInput, setNewInput] = useState('');
 
     const addInput = () => {
-      if (formData.newInput.trim() !== '') {
+      if (newInput.trim() !== '') {
         setFormData({
           ...formData,
-          recruit_form: [...formData.recruit_form, formData.newInput.trim()],
-          newInput: '', // 입력 후 초기화
+          recruitForm: [...formData.recruitForm, newInput.trim()],
         });
+        setNewInput('');
       }
     };
   
     const removeInput = (index) => {
-      const newRecruitForm = [...formData.recruit_form];
+      const newRecruitForm = [...formData.recruitForm];
       newRecruitForm.splice(index, 1);
-      setFormData({ ...formData, recruit_form: newRecruitForm });
+      setFormData({ ...formData, recruitForm: newRecruitForm });
     };
 
     const handleSubmit = (e) => {
@@ -453,7 +441,7 @@ const RecruitmentForm = ({ prevStep, nextStep }) => {
             <div className="form-content">기본 양식 외로 추가로 입력받고 싶은 양식을 추가하실 수 있습니다.</div>
             <div className="form-content">(예시) 모임 안내를 위해 연락처 or 카톡 아이디를 공유해주세요.</div>
             <div className="recruit-form-container">
-              {formData.recruit_form.map((input, index) => (
+              {formData.recruitForm.map((input, index) => (
                 <div key={index} className="recruit-form-box">
                   <div className="recruit-box">{input}</div>
                   <div className="recruit-button" onClick={() => removeInput(index)}>
@@ -464,8 +452,8 @@ const RecruitmentForm = ({ prevStep, nextStep }) => {
               <div className="recruit-input-box">
                 <input
                   type="text"
-                  value={formData.newInput}
-                  onChange={(e) => setFormData({ ...formData, newInput: e.target.value })}
+                  value={newInput}
+                  onChange={(e) => setNewInput(e.target.value) }
                   placeholder="추가 입력 양식"
                 />
                 <button type="button" onClick={addInput}>
@@ -481,12 +469,75 @@ const RecruitmentForm = ({ prevStep, nextStep }) => {
         </form>
       );
 }
-const CompletionForm = ({ prevStep }) => {
+const CompletionForm = ({ prevStep, formData, setFormData }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  let [uid, setUid] = useState("")
+  useEffect(() => {
+    if(auth.currentUser) {
+      setUid(auth.currentUser.uid)
+    }
+}, [])
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        prevStep();
-    };
+  const navigate = useNavigate();
+
+  const uploadAndReturnUrl = async (storageRef, file) => {
+    try {
+      // Upload 'file' to Firebase Storage.
+      await uploadBytes(storageRef, file);
+
+      // Get download url of uploaded file.
+      const imageUrl = await getDownloadURL(storageRef);
+      return imageUrl;
+    } catch (error) {
+      console.error('Error uploading file: ', error);
+      throw error;
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      setIsSubmitting(true);
+      const storage = getStorage();
+
+      // formData.image
+      const imageRef = ref(storage, `project_images/${formData.image.name}`);
+      const imageUrlPromise = uploadAndReturnUrl(imageRef, formData.image);
+
+      // formData.subImages
+      const subImagePromises = formData.subImages.map(async (subImage) => {
+        const subImageRef = ref(storage, `project_images/${subImage.name}`);
+        return uploadAndReturnUrl(subImageRef, subImage);
+      });
+
+      // Wait for both image and subImage uploads to complete concurrently
+      const [imageUrl, subImageUrls] = await Promise.all([
+        imageUrlPromise,
+        Promise.all(subImagePromises),
+      ]);
+
+      const updatedFormData = {
+        ...formData,
+        createdAt: moment().toDate(),
+        subImages: subImageUrls,
+        image: imageUrl,
+        'leaderId': uid,
+      };
+
+      // Save formData to Firebase Firestore
+      await addDoc(collection(dbService, 'projects'), updatedFormData);
+
+      window.alert('소모임이 생성되었습니다!');
+      navigate('/project');
+
+      console.log('폼 데이터가 성공적으로 저장되었습니다.');
+    } catch (error) {
+      console.error('Error during form submission: ', error);
+    } finally {
+      setIsSubmitting(false); // 예외가 발생하더라도 상태를 초기화하여 계속 진행되도록 함
+    }
+  };
     
       return (
         <form onSubmit={handleSubmit}>
@@ -504,8 +555,21 @@ const CompletionForm = ({ prevStep }) => {
             <div className="form-content">빠진 내용이 없는지 미리보기를 통해 확인해보세요</div>
           </div>
           <div className="form-footer">
-            <button className="prev-button" type="button" onClick={prevStep}>이전으로</button>
-            <button className="next-button" type="submit">제출하기</button>
+            {isSubmitting ? (
+              <div>
+                <div>생성 중입니다...</div>
+                <div>잠시만 기다려주세요.</div>
+              </div>
+            ) : (
+              <>
+                <button className="prev-button" type="button" onClick={prevStep}>
+                  이전으로
+                </button>
+                <button className="next-button" type="submit">
+                  제출하기
+                </button>
+              </>
+            )}
           </div>
         </form>
       )
@@ -514,6 +578,25 @@ const CompletionForm = ({ prevStep }) => {
 
 export const ProjectCreate = () => {
     const [step, setStep] = useState(1);
+    const [formData, setFormData] = useState({
+        projectName: '',
+        shortDescription: '',
+        projectCategory: '',
+        projectType: '',
+        openChatRoom: '',
+        recruitStartDate: null,
+        recruitEndDate: null,
+        runningStartDate: null,
+        runningEndDate: null, // ~ (1)
+        image: null,
+        subImages: [],
+        introduction: '',
+        desiredCrew: '',
+        preparation: '',
+        location: '',
+        tags: [], // ~ (2)
+        recruitForm: [],
+      });
   
     const nextStep = () => {
       setStep(step + 1);
@@ -525,13 +608,39 @@ export const ProjectCreate = () => {
   
     switch (step) {
       case 1:
-        return <div className="body"><BasicInfoForm nextStep={nextStep} /></div>;
+        return <div className="body project-create">
+                    <BasicInfoForm
+                        nextStep={nextStep}
+                        formData={formData}
+                        setFormData={setFormData}
+                    />
+                </div>;
       case 2:
-        return <div className="body"><DetailedInfoForm nextStep={nextStep} prevStep={prevStep} /></div>;
+        return <div className="body project-create">
+                    <DetailedInfoForm
+                        nextStep={nextStep}
+                        prevStep={prevStep}
+                        formData={formData}
+                        setFormData={setFormData}
+                    />
+                </div>;
       case 3:
-        return <div className="body"><RecruitmentForm nextStep={nextStep} prevStep={prevStep} /></div>;
+        return <div className="body project-create">
+                    <RecruitmentForm
+                        nextStep={nextStep}
+                        prevStep={prevStep}
+                        formData={formData}
+                        setFormData={setFormData}
+                    />
+                </div>;
       case 4:
-        return <div className="body"><CompletionForm prevStep={prevStep} /></div>;
+        return <div className="body project-create">
+                    <CompletionForm
+                        prevStep={prevStep}
+                        formData={formData}
+                        setFormData={setFormData}
+                    />
+                </div>;
       default:
         return null;
     }

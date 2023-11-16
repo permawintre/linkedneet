@@ -52,10 +52,10 @@ function App() {
             <Route path="/" element={isLoggedIn ? <Home/> : <RedirectToLogIn/>}></Route>
             <Route path="/project" element={isLoggedIn ? <Project/> : <RedirectToLogIn/>}></Route>
             <Route path="/projectdetail" element={isLoggedIn ? <ProjectDetail/> : <RedirectToLogIn/>}></Route>
+            <Route path="/projectcreate" element={isLoggedIn ? <ProjectCreate/> : <RedirectToLogIn/>}></Route>
             <Route path="/neetCompany" element={isLoggedIn ? <NeetCompany/> : <RedirectToLogIn/>}></Route>
             <Route path="/profile" element={isLoggedIn ? <Profile/> : <RedirectToLogIn/>}></Route>
-            <Route path="/profiledetail" element={<ProfileDetail/>}></Route>
-            <Route path="/projectcreate" element={<ProjectCreate/>}></Route>
+            <Route path="/profiledetail" element={isLoggedIn ? <ProfileDetail/> : <RedirectToLogIn/>}></Route>
             <Route path="/profileheaderedit" element={isLoggedIn ? <ProfileHeaderEdit authObj = {authObj}/> : <RedirectToLogIn/>}></Route>
 
             <Route path="/signUp" element={<Signup/>}></Route>

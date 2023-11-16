@@ -1,5 +1,9 @@
+// 준비물, 소모임 위치 해야됨.
+// 소모임 후기: 방명록 형태 가져오기
+// 지원page 만들어야함.
+// 리더탭은 리더 프로필과 연결되도록.
 import React, { useState } from "react"
-import './Project.css'
+import style from './ProjectDetail.module.css'
 import { FcAlarmClock, FcCalendar, FcCheckmark, FcGlobe } from "react-icons/fc";
 
 const defaultImage = 'https://cdn.imweb.me/upload/S20191010288d21675b22f/e33c22faf15bc.jpg';
@@ -9,9 +13,9 @@ const defaultImage4 = 'https://upload.wikimedia.org/wikipedia/commons/6/6e/Chelo
 
 const getTagColor = (status) => {
     switch (status) {
-        case '모집중': return 'tag-recruiting';
-        case '진행중': return 'tag-in-progress';
-        case '진행완료': return 'tag-completed';
+        case '모집중': return 'tagRecruiting';
+        case '진행중': return 'tagInProgress';
+        case '진행완료': return 'tagCompleted';
     }
 }
 
@@ -28,90 +32,102 @@ function formatDate(date) {
 
 const ProjectHeader = (myProject) => {
     return (
-    <div className="project-detail">
-        <div className="project-box-detail">
-            <span className={`tag ${getTagColor(myProject.status)}`}>{myProject.status}</span>
-            <img src={myProject.image} alt={myProject.name} /> {/* alt 속성 추가 */}
-            <div className={`name ${getTagColor(myProject.status)}`}>{myProject.name}</div>
-            <div className="comment">
-                <div>{myProject.comment}</div>
+        <div className={style.projectDetail}>
+          <div className={style.projectBoxDetail}>
+            <span className={`${style.tag} ${style[getTagColor(myProject.status)]}`}>{myProject.status}</span>
+            <img src={myProject.image} alt={myProject.name} />
+            <div className={`${style.name} ${style[getTagColor(myProject.status)]}`}>{myProject.name}</div>
+            <div className={style.comment}>
+              <div>{myProject.comment}</div>
             </div>
-            <div className="info">
-                <div><FcAlarmClock/><span className="info-title">모집기간</span><span className="info-content">{formatDateKR(myProject.recruit_start_at)} ~ {formatDateKR(myProject.recruit_end_at)}</span></div>
-                <div><FcCalendar/><span className="info-title">운영기간</span><span className="info-content">{formatDateKR(myProject.run_start_at)} ~ {formatDateKR(myProject.run_end_at)}</span></div>
-                <div><FcCheckmark/><span className="info-title">분류</span><span className="info-content">{myProject.type}</span></div>
-                <div><FcGlobe/><span className="info-title">장소</span><span className="info-content">{myProject.form}</span></div>
+            <div className={style.info}>
+              <div>
+                <FcAlarmClock />
+                <span className={style.infoTitle}>모집기간</span>
+                <span className={style.infoContent}>
+                  {formatDateKR(myProject.recruit_start_at)} ~ {formatDateKR(myProject.recruit_end_at)}
+                </span>
+              </div>
+              <div>
+                <FcCalendar />
+                <span className={style.infoTitle}>운영기간</span>
+                <span className={style.infoContent}>
+                  {formatDateKR(myProject.run_start_at)} ~ {formatDateKR(myProject.run_end_at)}
+                </span>
+              </div>
+              <div>
+                <FcCheckmark />
+                <span className={style.infoTitle}>분류</span>
+                <span className={style.infoContent}>{myProject.type}</span>
+              </div>
+              <div>
+                <FcGlobe />
+                <span className={style.infoTitle}>장소</span>
+                <span className={style.infoContent}>{myProject.form}</span>
+              </div>
             </div>
-        </div>
-        <div className="project-box-buttons">
+          </div>
+          <div className={style.projectBoxButtons}>
             {myProject.status === '모집중' ? (
-                <span className="recruit-button">소모임 지원하기</span>
+              <span className={style.recruitButton}>소모임 지원하기</span>
             ) : (
-                <span className="recruit-button">모집기간이 아닙니다</span>
+              <span className={style.recruitButton}>모집기간이 아닙니다</span>
             )}
-            <span className="share-button">공유하기</span>
-        </div>
-        <div className="project-box-leader">
-            <span className="leader-image">
-                <img src={myProject.leader_image} alt={myProject.leader_name} />
+            <span className={style.shareButton}>공유하기</span>
+          </div>
+          <div className={style.projectBoxLeader}>
+            <span className={style.leaderImage}>
+              <img src={myProject.leader_image} alt={myProject.leader_name} />
             </span>
-            <span className="leader-body">
-                <div className="leader-name">
-                    <span>{myProject.leader_name}</span>
-                    <span className="leader-caption">리더</span>
-                </div>
-                <div className="leader-comment">{myProject.leader_comment}</div>
+            <span className={style.leaderBody}>
+              <div className={style.leaderName}>
+                <span>{myProject.leader_name}</span>
+                <span className={style.leaderCaption}>리더</span>
+              </div>
+              <div className={style.leaderComment}>{myProject.leader_comment}</div>
             </span>
+          </div>
         </div>
-    </div>
-    )
+      );
 }
 
 const ProjectBody = (myProject) => {
     return (
-    <div className="project-detail project-body">
-        <div className="body-title">소모임 소개</div>
-        <div className="body-content">
-            {myProject.body}
+        <div className={`${style.projectDetail} ${style.projectBody}`}>
+          <div className={style.bodyTitle}>소모임 소개</div>
+          <div className={style.bodyContent}>{myProject.body}</div>
         </div>
-    </div>
-    )
+      );
 }
 
 const ProjectInfo = (myProject) => {
     return (
-    <div className="project-detail project-body">
-        <div className="body-title">이런 멤버를 원해요</div>
-        <div className="body-content">
-            {myProject.recruit_required}
+        <div className={`${style.projectDetail} ${style.projectBody}`}>
+          <div className={style.bodyTitle}>이런 멤버를 원해요</div>
+          <div className={style.bodyContent}>{myProject.recruit_required}</div>
+          <div className={style.bodyTitle}>준비물</div>
+          <div className={style.bodyContent}>{myProject.preparation}</div>
+          <div className={style.bodyTitle}>소모임 위치</div>
+          <div className={style.bodyContent}>{myProject.location}</div>
         </div>
-        <div className="body-title">준비물</div>
-        <div className="body-content">
-            {myProject.preparation}
-        </div>
-        <div className="body-title">소모임 위치</div>
-        <div className="body-content">
-            {myProject.location}
-        </div>
-    </div>  
-    )
+      );
 }
 
 const ProjectReview = (myProject) => {
     return (
-    <div className="project-detail project-body">
-        <div className="body-title">소모임 후기</div>
-        <div className="body-content">
+        <div className={`${style.projectDetail} ${style.projectBody}`}>
+          <div className={style.bodyTitle}>소모임 후기</div>
+          <div className={style.bodyContent}>
             {myProject.reviews.map((review, index) => (
-                    <div className="review" key={index}>
-                        <span className="review-user">{review.nickname}</span>
-                        <span className="review-date">{formatDate(review.created_at)}</span>
-                        <div className="review-content">{review.content}</div>
-                    </div>
-                ))}
+              <div className={style.review} key={index}>
+                <span className={style.reviewUser}>{review.nickname}</span>
+                <span className={style.reviewDate}>{formatDate(review.created_at)}</span>
+                <div className={style.reviewContent}>{review.content}</div>
+              </div>
+            ))}
+          </div>
         </div>
-    </div>
-    )
+      );
 }
 
 export const ProjectDetail = () => {
@@ -179,49 +195,49 @@ export const ProjectDetail = () => {
     };
 
     return (
-        <div className="body" style={{overflowY: 'auto'}}>
-            {ProjectHeader(myProject)}
-            <div className="project-box-buttons">
-                <span
-                    className={`project-button ${activeSection === 'projectBodySection' ? 'active' : ''}`}
-                    onClick={() => handleButtonClick('projectBodySection')}
-                >
-                    <span className="text">소모임 소개</span>
-                </span>
-                <span
-                    className={`project-button ${activeSection === 'projectInfoSection' ? 'active' : ''}`}
-                    onClick={() => handleButtonClick('projectInfoSection')}
-                >
-                    <span className="text">이런 멤버를 원해요</span>
-                </span>
-                <span
-                    className={`project-button ${activeSection === 'projectInfoSection' ? 'active' : ''}`}
-                    onClick={() => handleButtonClick('projectInfoSection')}
-                >
-                    <span className="text">준비물</span>
-                </span>
-                <span
-                    className={`project-button ${activeSection === 'projectInfoSection' ? 'active' : ''}`}
-                    onClick={() => handleButtonClick('projectInfoSection')}
-                >
-                    <span className="text">소모임 위치</span>
-                </span>
-                <span
-                    className={`project-button ${activeSection === 'projectReviewSection' ? 'active' : ''}`}
-                    onClick={() => handleButtonClick('projectReviewSection')}
-                >
-                    <span className="text">소모임 후기</span>
-                </span>
-            </div>
-            <div id="projectBodySection">
-                {activeSection === 'projectBodySection' && ProjectBody(myProject)}
-            </div>
-            <div id="projectInfoSection">
-                {activeSection === 'projectInfoSection' && ProjectInfo(myProject)}
-            </div>
-            <div id="projectReviewSection">
-                {activeSection === 'projectReviewSection' && ProjectReview(myProject)}
-            </div>
+    <div className={style.body} style={{ overflowY: 'auto' }}>
+        {ProjectHeader(myProject)}
+        <div className={style.projectBoxButtons}>
+            <span
+            className={`${style.projectButton} ${style[activeSection === 'projectBodySection' ? 'active' : '']}`}
+            onClick={() => handleButtonClick('projectBodySection')}
+            >
+            <span className={style.text}>소모임 소개</span>
+            </span>
+            <span
+            className={`${style.projectButton} ${style[activeSection === 'projectInfoSection' ? 'active' : '']}`}
+            onClick={() => handleButtonClick('projectInfoSection')}
+            >
+            <span className={style.text}>이런 멤버를 원해요</span>
+            </span>
+            <span
+            className={`${style.projectButton} ${style[activeSection === 'projectPreparationSection' ? 'active' : '']}`}
+            onClick={() => handleButtonClick('projectPreparationSection')}
+            >
+            <span className={style.text}>준비물</span>
+            </span>
+            <span
+            className={`${style.projectButton} ${style[activeSection === 'projectLocationSection' ? 'active' : '']}`}
+            onClick={() => handleButtonClick('projectLocationSection')}
+            >
+            <span className={style.text}>소모임 위치</span>
+            </span>
+            <span
+            className={`${style.projectButton} ${style[activeSection === 'projectReviewSection' ? 'active' : '']}`}
+            onClick={() => handleButtonClick('projectReviewSection')}
+            >
+            <span className={style.text}>소모임 후기</span>
+            </span>
         </div>
+        <div id="projectBodySection">
+            {activeSection === 'projectBodySection' && ProjectBody(myProject)}
+        </div>
+        <div id="projectInfoSection">
+            {activeSection === 'projectInfoSection' && ProjectInfo(myProject)}
+        </div>
+        <div id="projectReviewSection">
+            {activeSection === 'projectReviewSection' && ProjectReview(myProject)}
+        </div>
+    </div>
     );
 }

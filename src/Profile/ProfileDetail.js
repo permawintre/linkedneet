@@ -5,7 +5,9 @@ import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
 
 import './ProfileDetail.css';
-import { ProfileEditModal, ProfileIntroEditModal, ProfileCareerEditModal } from './ProfileEditModal';
+import { ProfileEditModal, ProfileIntroEditModal } from './ProfileEditModal';
+import { Link } from "react-router-dom"
+
 
 const profileData = {
   nickname: '홍길동',
@@ -158,39 +160,27 @@ const ProfileIntro = () => {
 
 const ProfileCareer = () => {
 
-  // Profile Intro Edit
-  const [EditClicked, setEditClicked] = useState(false);
-  const EditClick = () => {
-    setEditClicked(true);
-  };
-  const EditModalClose = () => {
-    setEditClicked(false);
-  };
-
   return (
     <div className="career-container">
       <main>
-        <h2>나는 이런 <span className="highlight">경험</span>을 했어요</h2>
-        <span className="career-body">
-          {Object.keys(profileData.career).map((job, index) => (
-            <div className="career" key={index}>
-              <div className="career-title">{job}</div>
+        <h2 style={{margin: "0px 0px 10px 0px"}}>나는 이런 <span className="highlight">경험</span>을 했어요</h2>
+        {Object.keys(profileData.career).map((job, index) => (
+          <div className="career-body">
+            <div className="career-index"/>
+            <div className="career-wrapper" key={index}>
+              <div className="career-title-">{job}</div>
               <div className="career-content">
                 {profileData.career[job].map((item, i) => (
                   <li key={i}>{item}</li>
                 ))}
               </div>
             </div>
-          ))}
-        </span>
+          </div>
+        ))}
         <span className="edit-profile" style={{margin: "-10px"}}>
-          <input type="button" className="edit-button" onClick={EditClick} style={{margin: "-5px 10px"}}></input>
-          {EditClicked && (
-            <ProfileCareerEditModal
-              user={null}
-              EditModalClose={EditModalClose}
-            />
-          )}
+          <Link to="/profiledetail/career">
+            <input type="button" class="edit-button" style={{margin: "-5px 10px"}}></input>
+          </Link>
         </span>
       </main>
     </div>
@@ -293,7 +283,7 @@ const ProfileDetail = () => {
       }
   };
     return (
-    <div style={{overflowY: 'auto' }}>
+    <div style={{overflowY: 'auto'}}>
         <div>{ProfileHeader()}</div>
         <div className="buttons">
           <span onClick={() => scrollToRef(introRef)}>소개</span>

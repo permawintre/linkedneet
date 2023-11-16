@@ -23,18 +23,6 @@
   float: right;
 }
 
-.edit-add-button {
-  float: right;
-  width: 40px;
-  height: 40px;
-  margin: 20px;
-  cursor: pointer;
-  i {
-    color: #5d5d5d;
-    font-size: 30px;
-  }
-}
-
 .edit-save-button {
   float: right;
   font-size: 14px;

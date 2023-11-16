@@ -1,8 +1,10 @@
 //Modal.js
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { dbService, auth } from '../firebase'
+import { updateDoc, getDoc, doc } from "firebase/firestore"
 
 import './ProfileEditModal.css'
 import './ProfileDetail.css';
@@ -58,6 +60,73 @@ const profileData = {
 };
 
 const ProfileEditModal = ({EditModalClose}) => {
+      // user Table Attribute (need to add more)
+    const [userObj, setUserObj] = useState ({
+      nickname: "",
+      website: "",
+      instagram:"",
+      facebook:"",
+      tel:"",
+      email:"",
+    });
+
+    // 유저가 처음으로 profile edit page에 들어가면 자기 profile fetch 시킴
+    useEffect(() => {
+      const fetchUserData = async (uid) => {
+          try {
+              // get [one and only one] docReference using key
+              const userDocRef = doc(dbService, 'users', auth.currentUser.uid);
+              const userDoc = await getDoc(userDocRef);
+
+              // If the document exists, setUserData with the document data
+              if (userDoc.exists()) {
+                  setUserObj(userDoc.data());
+              } else {
+                  console.log('User not found');
+              }
+          } catch (error) {
+              console.error('Error fetching user data:', error);
+          }
+      };
+      fetchUserData();
+    }, []);
+
+    // User Input {OnChange}
+    const onChange = (e) => {
+      const { name, value } = e.target;
+      setUserObj((prevUserObj) => ({
+        ...prevUserObj,
+        [name]: value,
+      }));
+    };
+
+    // User Click Submit => Then Create a new data and store to "users" table.
+    // See Query and Update for below. This is only about "CREATING" new data.
+    const onSubmit = async(event) => {
+      event.preventDefault();
+      const userDocRef = doc(dbService, 'users', auth.currentUser.uid);
+      try {
+
+          // update DB using user input 
+          const res = await updateDoc(userDocRef, {
+              nickname: userObj.nickname,
+              website: userObj.website,
+              instagram: userObj.instagram,
+              facebook: userObj.facebook,
+              tel: userObj.tel,
+              email: userObj.email,
+          })
+
+          // if successfully edit, then refresh < 새로고침 > 
+          window.location.reload();
+      } catch (e) {
+          console.log(e);
+      }
+        //setUserObj(null);
+    };
+    // const q = query(collection(db, "users"), where("uid", "==", "etc"))로 쿼리
+    // https://velog.io/@khy226/Firestore-%EC%95%8C%EC%95%84%EB%B3%B4%EA%B8%B0 참고
+
     const closeClick = () => {
         return EditModalClose?.(); // profileEditModalClose을 실행!
     };
@@ -66,7 +135,7 @@ const ProfileEditModal = ({EditModalClose}) => {
     const [Image, setImage] = useState("https://images.pexels.com/photos/1804796/pexels-photo-1804796.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260");
     const fileInput = useRef(null);
 
-    const onChange = (e) => {
+    const onProfileImgChange = (e) => {
       if (e.target.files[0]){
         setImage(e.target.files[0])
       }
@@ -87,46 +156,49 @@ const ProfileEditModal = ({EditModalClose}) => {
 
     return (
         <div class="edit-overlay">
-          <div class="edit-modal-wrap">
-            <h1>프로필</h1>
-            <hr style={{border: "solid 1px black"}}/>
-            <div class="edit-profile-image">
-              <h3>프로필 사진</h3>
-              <div class="image-edit-button-wrapper">
-                <label for="file-search">
-                  <img class="profile-image" src={Image}  alt="Profile Photo"/>
-                  <div class="image-edit-button">✏️ 변경하기</div>
-                </label>
-                
-                <input id="file-search" type='file' 
-                    style={{display: "none",
-                            cursor: "pointer"}}
-                    accept='image/jpg, image/png, image/jpeg' 
-                    name='profile_img'
-                    onChange={onChange}
-                    ref={fileInput}/>
+          <form onSubmit={onSubmit}>
+            <hr className="body__partition"></hr>
+            <div class="edit-modal-wrap">
+              <h1>프로필</h1>
+              <hr style={{border: "solid 1px black"}}/>
+              <div class="edit-profile-image">
+                <h3>프로필 사진</h3>
+                <div class="image-edit-button-wrapper">
+                  <label for="file-search">
+                    <img class="profile-image" src={Image} alt="Profile Photo"/>
+                    <div class="image-edit-button">✏️ 변경하기</div>
+                  </label>
+                  
+                  <input id="file-search" type='file' 
+                      style={{display: "none",
+                              cursor: "pointer"}}
+                      accept='image/jpg, image/png, image/jpeg' 
+                      name='profile_img'
+                      onChange={onProfileImgChange}
+                      ref={fileInput}/>
+                </div>
+              </div>
+              <div class="edit-contents">
+                <h3>닉네임</h3>
+                  <input type="text" class="edit-section" name="nickname" placeholder="이선생" value = {userObj.nickname || ""} onChange={onChange}></input> 
+                <h3>개인 웹사이트</h3>
+                  <input type="button" class="edit-link-icon"></input>
+                  <input type="url" class="edit-section" name="website" placeholder="개인 웹사이트 URL" value = {userObj.website || ""} onChange={onChange}></input>
+                <h3>SNS</h3>
+                  <input type = "button" class="edit-link-icon"></input>
+                  <input type="url" class="edit-section" name="instagram" placeholder="Instagram URL" value = {userObj.instagram || ""} onChange={onChange}></input><br></br>
+                  <input type = "button" class="edit-link-icon"></input>
+                  <input type="url" class="edit-section" name="facebook" placeholder="Facebook URL" value = {userObj.facebook || "" } onChange={onChange}></input>
+                <div>
+                <h3>연락처</h3>
+                  <input type="text" class="edit-section" name="tel" placeholder="전화번호" value = {userObj.tel || ""} onChange={onChange}></input><br></br>
+                  <input type="text" class="edit-section" name="email" placeholder="이메일 주소" value = {userObj.email || ""} onChange={onChange}></input>
+                </div>
+                <span class="edit-back-button" onClick={closeClick}>돌아가기</span><button class="edit-save-button" type="submit">저장하기</button> 
               </div>
             </div>
-            <div class="edit-contents">
-              <h3>닉네임</h3>
-                <input type="text" class="edit-section" placeholder="이선생"></input> 
-              <h3>개인 웹사이트</h3>
-                <input type="button" class="edit-link-icon"></input>
-                <input type="url" class="edit-section" placeholder="개인 웹사이트 URL"></input>
-              <h3>SNS</h3>
-                <input type = "button" class="edit-link-icon"></input>
-                <input type="url" class="edit-section" placeholder="SNS URL"></input><br></br>
-                <input type = "button" class="edit-link-icon"></input>
-                <input type="url" class="edit-section" placeholder="SNS URL"></input>
-              <div>
-              <h3>연락처</h3>
-                <input type="text" class="edit-section" placeholder="전화번호"></input><br></br>
-                <input type="text" class="edit-section" placeholder="이메일 주소"></input>
-              </div>
-              
-              <span class="edit-back-button" onClick={closeClick}>돌아가기</span> <span class="edit-save-button" onClick={closeClick}>저장하기</span> 
-            </div>
-          </div>
+            <hr className="body__partition"></hr>
+          </form>
         </div>
     );
 };
@@ -140,7 +212,7 @@ const ProfileIntroEditModal = ({EditModalClose}) => {
   const [Image, setImage] = useState("https://images.pexels.com/photos/1804796/pexels-photo-1804796.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260");
   const fileInput = useRef(null);
 
-  const onChange = (e) => {
+  const onProfileImgChange = (e) => {
     if (e.target.files[0]){
       setImage(e.target.files[0])
     }
@@ -157,19 +229,6 @@ const ProfileIntroEditModal = ({EditModalClose}) => {
         }
     }
     reader.readAsDataURL(e.target.files[0])
-  }
-  
-  function onTestChange() {
-    var key = window.event.keyCode;
-
-    // If the user has pressed enter
-    if (key === 13) {
-        document.getElementById("txtArea").value = document.getElementById("txtArea").value + "\n*";
-        return false;
-    }
-    else {
-        return true;
-    }
   }
 
   return (
@@ -191,7 +250,7 @@ const ProfileIntroEditModal = ({EditModalClose}) => {
                           cursor: "pointer"}}
                   accept='image/jpg, image/png, image/jpeg' 
                   name='profile_img'
-                  onChange={onChange}
+                  onChange={onProfileImgChange}
                   ref={fileInput}/>
             </div>
             <h4 style={{margin: "2px"}}>본인을 자유롭게 표현해주세요!</h4>
@@ -203,50 +262,49 @@ const ProfileIntroEditModal = ({EditModalClose}) => {
   );
 };
 
+
 const ProfileCareerEditModal = ({EditModalClose}) => {
   const closeClick = () => {
       return EditModalClose?.(); // profileEditModalClose을 실행!
   };
 
-  const [AddClicked, setAddClicked] = useState(false);
-  const AddClick = () => {
-    setAddClicked(true);
-  };
-  const AddModalClose = () => {
-    setAddClicked(false);
-  };
-
   return (
       <div class="edit-overlay">
-          <div class="edit-modal-wrap">
-          <div class="edit-add-button" onClick={AddClick}>
-            <FontAwesomeIcon icon={faPlus} style={{color: "#000000",}} />
-            {AddClicked && (
-              <ProfileEditModal
-                user={null}
-                EditModalClose={EditModalClose}
-              />
-            )}
-          </div>
+        <div class="edit-modal-wrap">
+          <h1>✏️ 경력 수정하기</h1>
+          <hr style={{border: "solid 1px black"}}/>
           <div class="edit-contents">
-            <span className="career-body">
-              {Object.keys(profileData.career).map((job, index) => (
-                <div className="career" key={index}>
-                  <div className="career-title">{job}</div>
-                  <div className="career-content">
-                    {profileData.career[job].map((item, i) => (
-                      <li key={i}>{item}</li>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </span>
-            <span class="edit-back-button" onClick={closeClick}>돌아가기</span> <span class="edit-save-button" onClick={closeClick}>저장하기</span> 
+            <h4>본인을 한 줄로 소개해주세요!</h4>
+              <input type="text" class="intro-edit-section" placeholder="안녕하세요. 재미있는 일이라면 무엇이든 함께해요, 이선생입니다."></input> 
+            <h4 style={{margin: "2px"}}>본인을 자유롭게 표현해주세요!</h4>
+              <textarea class="intro-detail-edit-section" placeholder=""/>
           </div>
-          </div>
+          <span class="edit-back-button" onClick={closeClick}>돌아가기</span> <span class="edit-save-button" onClick={closeClick}>저장하기</span> 
+        </div>
       </div>
   );
 };
 
+const ProfileCareerAddModal = ({AddModalClose}) => {
+  const AddcloseClick = () => {
+      return AddModalClose?.(); // profileEditModalClose을 실행!
+  };
 
-export {ProfileEditModal, ProfileIntroEditModal, ProfileCareerEditModal};
+  return (
+      <div class="edit-overlay">
+        <div class="edit-modal-wrap">
+          <h1>➕ 경력 추가하기</h1>
+          <hr style={{border: "solid 1px black"}}/>
+          <div class="edit-contents">
+            <h4>본인을 한 줄로 소개해주세요!</h4>
+              <input type="text" class="intro-edit-section" placeholder="안녕하세요. 재미있는 일이라면 무엇이든 함께해요, 이선생입니다."></input> 
+            <h4 style={{margin: "2px"}}>본인을 자유롭게 표현해주세요!</h4>
+              <textarea class="intro-detail-edit-section" placeholder=""/>
+          </div>
+          <span class="edit-back-button" onClick={AddcloseClick}>돌아가기</span> <span class="edit-save-button" onClick={AddcloseClick}>저장하기</span> 
+        </div>
+      </div>
+  );
+};
+
+export {ProfileEditModal, ProfileIntroEditModal, ProfileCareerEditModal, ProfileCareerAddModal};

@@ -157,29 +157,37 @@ main {
     color: var(--color_4);
 }
 
+.career-index {
+    background-color: var(--color_3);
+    height: auto;
+    width: 10px; 
+    border-radius: 15px;
+    float: left;
+    margin-right: 4px;
+}
+
 .career-body {
     display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
+    flex-direction: column;
+    margin-bottom: 10px;
 }
 .career:nth-child(2n+1) {
     margin-right: 2%;
 }
-.career {
-    width: 45%;
+.career-wrapper { 
+    width: 90%;
     padding: 2px 2% 15px 2%;
     margin-bottom: 10px;
-    background-color: whitesmoke;
     border-radius: 5%
 }
-.career-title {
+.career-title- {
     font-size: 18px;
-    font-weight: 600;
+    font-weight: bold;
     line-height: 200%;
     margin-bottom: 5px;
     color: var(--color_3);
-    -webkit-text-decoration: underline wavy var(--color_1);
-    text-decoration: underline wavy var(--color_1);
+    /* -webkit-text-decoration: underline wavy var(--color_1); */
+    /* text-decoration: underline wavy var(--color_1); */
 }
 .post {
     overflow-x: auto;

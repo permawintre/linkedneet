@@ -12,13 +12,13 @@ import { defaultData } from './defaultData'
 import './ProfileDetail.css';
 
 
-const ProfileHeader = ({profileData}) => {
+const ProfileHeader = ({userData}) => {
     const bgImageStyle = {
-        backgroundImage: `url(${profileData.background_image})`
+        backgroundImage: `url(${userData.background_image})`
       };
-    const website_url = 'https://' + profileData.website;
-    const facebook_url = 'https://www.facebook.com/' + profileData.facebook;
-    const insta_url = 'https://www.instagram.com/' + profileData.instagram;
+    const website_url = 'https://' + userData.website;
+    const facebook_url = 'https://www.facebook.com/' + userData.facebook;
+    const insta_url = 'https://www.instagram.com/' + userData.instagram;
     
     // Profile Edit
     const [EditClicked, setEditClicked] = useState(false);
@@ -37,13 +37,13 @@ const ProfileHeader = ({profileData}) => {
         <div className="profile-header">
             <div className="header-left">
                 <div className="header-left1">
-                    <span className="nickname">{profileData.nickname}</span>
-                    <span className="info">니트컴퍼니 {profileData.generation}기</span>
+                    <span className="nickname">{userData.nickname}</span>
+                    <span className="info">니트컴퍼니 {userData.generation}기</span>
                 </div>
                 <div className="header-left2">
                     <Link to="/profile">
-                      <span className="info">팔로워 {profileData.followers}명</span>
-                      <span className="info">팔로잉 {profileData.following}명</span>
+                      <span className="info">팔로워 {userData.followers}명</span>
+                      <span className="info">팔로잉 {userData.following}명</span>
                     </Link>
                 </div>
                 <div className="header-left3">
@@ -51,7 +51,7 @@ const ProfileHeader = ({profileData}) => {
                 </div>
             </div>
             <div className="header-mid">
-                <img className="profile-image" src={profileData.profile_image} alt="Profile Photo"/>
+                <img className="profile-image" src={userData.profile_image} alt="Profile Photo"/>
             </div>
             <div className="header-right">
                 <div className="header-right1">
@@ -68,11 +68,11 @@ const ProfileHeader = ({profileData}) => {
                 <div className="header-right2">
                     <div className="phone-number">
                         <MdPhoneIphone size="16"/>&nbsp;
-                        {profileData.tel}
+                        {userData.tel}
                     </div>
                     <div className="email">
                         <MdEmail size="16"/>&nbsp;
-                        {profileData.email}
+                        {userData.email}
                     </div>
                     <span className="calendar">
                         <MdCalendarMonth size="16"/>&nbsp;
@@ -96,7 +96,7 @@ const ProfileHeader = ({profileData}) => {
   );
 };
 
-const ProfileIntro = ({profileData}) => {
+const ProfileIntro = ({userData}) => {
   // Profile Intro Edit
   const [EditClicked, setEditClicked] = useState(false);
   const EditClick = () => {
@@ -111,13 +111,13 @@ const ProfileIntro = ({profileData}) => {
       <main>
         <h2>나를 <span className="highlight">소개</span>합니다</h2>
         <div className="body1">
-            <img className="intro-image" src={profileData.intro_image}></img>
+            <img className="intro-image" src={userData.intro_image}></img>
             <div className="intro">
               <div className="intro-content">
-                {profileData.intro_content}
+                {userData.intro_content}
               </div>
               <span className="intro-keywords">
-                  {profileData.intro_keyword.map((keyword, index) => (
+                  {userData.intro_keyword.map((keyword, index) => (
                       <span key={index} className="keyword">{`#${keyword}`}</span>
                   ))}
               </span>
@@ -138,19 +138,19 @@ const ProfileIntro = ({profileData}) => {
   );
 };
 
-const ProfileCareer = ({profileData}) => {
+const ProfileCareer = ({userData}) => {
 
   return (
     <div className="career-container">
       <main>
         <h2 style={{margin: "0px 0px 10px 0px"}}>나는 이런 <span className="highlight">경험</span>을 했어요</h2>
-        {Object.keys(profileData.career).map((job, index) => (
+        {Object.keys(userData.career).map((job, index) => (
           <div className="career-body" key={index}>
             <div className="career-index"/>
             <div className="career-wrapper" key={index}>
               <div className="career-title-">{job}</div>
               <div className="career-content">
-                {profileData.career[job].map((item, i) => (
+                {userData.career[job].map((item, i) => (
                   <li key={i}>{item}</li>
                 ))}
               </div>
@@ -167,7 +167,7 @@ const ProfileCareer = ({profileData}) => {
   );
 };
 
-const ProfilePost = ({profileData}) => {
+const ProfilePost = ({userData}) => {
   // example posts
   const posts = [
     { id: 1, content: 'Post 1' },
@@ -196,7 +196,7 @@ const ProfilePost = ({profileData}) => {
   );
 };
 
-const ProfileComment = ({profileData}) => {
+const ProfileComment = ({userData}) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
 
@@ -209,7 +209,7 @@ const ProfileComment = ({profileData}) => {
     if (newMessage.trim() !== '') {
       const currentTime = new Date();
       const relativeTime = formatDistanceToNow(currentTime, { addSuffix: true, locale: ko });
-      const message = { text: newMessage, user: profileData.nickname, time: currentTime.toLocaleString(), relativeTime: relativeTime, userProfile: profileData.profile_image };
+      const message = { text: newMessage, user: userData.nickname, time: currentTime.toLocaleString(), relativeTime: relativeTime, userProfile: userData.profile_image };
       setMessages([...messages, message]);
       setNewMessage('');
     }
@@ -220,7 +220,7 @@ const ProfileComment = ({profileData}) => {
       <main>
       <h2>방명록</h2>
       <div className='profile-comment'>
-        <img src={profileData.profile_image} alt="프로필"/>
+        <img src={userData.profile_image} alt="프로필"/>
         <form onSubmit={handleSubmit}>
           <input
             type="text"
@@ -261,22 +261,43 @@ const ProfileDetail = () => {
   const queryParams = new URLSearchParams(location.search);
   const uid = queryParams.get('uid');
 
-  const [profileData, setProfileData] = useState({ ...defaultData });
+  const [currentUserData, setCurrentUserData] = useState({ ...defaultData });
+  const [profileUserData, setProfileUserData] = useState({ ...defaultData });
   const [isLoading, setIsLoading] = useState(true);
   
-  useEffect(() => {
-    // Fetch user data from Firebase
-    const fetchUserData = async () => {
+  // profiledetail에 접속해 있는 user의 정보(currentUserData)를 firebase에서 fetch
+  useEffect( () => {
+    const fetchCurrentUserData = async () => {
       try {
-        let userDocRef;
-        // if querystring 'uid' exists, get 'uid' user's data
-        if (uid) { userDocRef = doc(dbService, 'users', uid); }
-        // else, get current user's data
-        else { userDocRef = doc(dbService, 'users', auth.currentUser.uid); }
-        const userDoc = await getDoc(userDocRef);
+        const currentUserDocRef = doc(dbService, 'users', auth.currentUser.uid);
+        const currentUserDoc = await getDoc(currentUserDocRef);
 
-        if (userDoc.exists()) {
-          setProfileData(prevData => ({ ...prevData, ...userDoc.data() }));
+        if (currentUserDoc.exists()) {
+          setCurrentUserData(prevData => ({ ...prevData, ...currentUserDoc.data() }));
+        } else {
+          console.log('User not found');
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    fetchCurrentUserData()
+  }, []);
+
+  // profiledetail에 정보를 띄울 user의 정보(profileUserData)를 firebase에서 fetch
+  useEffect(() => {
+    const fetchProfileUserData = async () => {
+      try {
+        let profileUserDocRef;
+        // if querystring 'uid' exists, get 'uid' user's data
+        if (uid) { profileUserDocRef = doc(dbService, 'users', uid); }
+        // else, get current user's data
+        else { profileUserDocRef = doc(dbService, 'users', auth.currentUser.uid); }
+        const profileUserDoc = await getDoc(profileUserDocRef);
+
+        if (profileUserDoc.exists()) {
+          setProfileUserData(prevData => ({ ...prevData, ...profileUserDoc.data() }));
         } else {
           console.log('User not found');
         }
@@ -287,10 +308,10 @@ const ProfileDetail = () => {
       }
     };
 
-    fetchUserData();
+    fetchProfileUserData();
   }, [uid]);
 
-  // firebase에서 userdata fetch되기 전까지 Loading... 띄우기
+  // firebase에서 모든 data가 fetch되기 전까지 Loading... 띄우기
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -304,17 +325,17 @@ const ProfileDetail = () => {
   return (
     <div className='ProfileDetail'>
     <div style={{overflowY: 'auto'}}>
-        <div><ProfileHeader profileData={profileData} /></div>
+        <div><ProfileHeader userData={profileUserData} /></div>
         <div className="buttons">
           <span onClick={() => scrollToRef(introRef)}>소개</span>
           <span onClick={() => scrollToRef(careerRef)}>경험</span>
           <span onClick={() => scrollToRef(postRef)}>게시글</span>
           <span onClick={() => scrollToRef(commentRef)}>방명록</span>
         </div>
-        <div ref={introRef}><ProfileIntro profileData={profileData}/></div>
-        <div ref={careerRef}><ProfileCareer profileData={profileData}/></div>
-        <div ref={postRef}><ProfilePost profileData={profileData}/></div>
-        <div ref={commentRef}><ProfileComment profileData={profileData}/></div>
+        <div ref={introRef}><ProfileIntro userData={profileUserData}/></div>
+        <div ref={careerRef}><ProfileCareer userData={profileUserData}/></div>
+        <div ref={postRef}><ProfilePost userData={profileUserData}/></div>
+        <div ref={commentRef}><ProfileComment userData={currentUserData}/></div>
     </div>
     </div>
   )

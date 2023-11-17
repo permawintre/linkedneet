@@ -232,7 +232,6 @@ const ProfilePost = ({profileData}) => {
 const ProfileComment = ({profileData}) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
-  const [userProfile, setUserProfile] = useState('https://thumbnail.10x10.co.kr/webimage/image/add1/497/A004979805_01.jpg?cmd=thumb&w=400&h=400&fit=true&ws=false'); // 사용자 프로필 이미지
 
   const handleInputChange = (event) => {
     setNewMessage(event.target.value);
@@ -243,7 +242,7 @@ const ProfileComment = ({profileData}) => {
     if (newMessage.trim() !== '') {
       const currentTime = new Date();
       const relativeTime = formatDistanceToNow(currentTime, { addSuffix: true, locale: ko });
-      const message = { text: newMessage, user: '사용자 이름', time: currentTime.toLocaleString(), relativeTime: relativeTime, userProfile: userProfile };
+      const message = { text: newMessage, user: profileData.nickname, time: currentTime.toLocaleString(), relativeTime: relativeTime, userProfile: profileData.profile_image };
       setMessages([...messages, message]);
       setNewMessage('');
     }
@@ -253,8 +252,8 @@ const ProfileComment = ({profileData}) => {
     <div className="container">
       <main>
       <h2>방명록</h2>
-      <div className='comment'>
-        <img src={userProfile} alt="프로필"/>
+      <div className='profile-comment'>
+        <img src={profileData.profile_image} alt="프로필"/>
         <form onSubmit={handleSubmit}>
           <input
             type="text"
@@ -327,6 +326,7 @@ const ProfileDetail = () => {
       }
   };
     return (
+    <div className='ProfileDetail'>
     <div style={{overflowY: 'auto'}}>
         <div><ProfileHeader profileData={profileData} /></div>
         <div className="buttons">
@@ -339,6 +339,7 @@ const ProfileDetail = () => {
         <div ref={careerRef}><ProfileCareer profileData={profileData}/></div>
         <div ref={postRef}><ProfilePost profileData={profileData}/></div>
         <div ref={commentRef}><ProfileComment profileData={profileData}/></div>
+    </div>
     </div>
     )
 }

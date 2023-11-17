@@ -201,29 +201,29 @@ main {
     border: 1px solid #ccc;
     padding: 10px
 }
-.comment {
+.ProfileDetail .profile-comment {
     width: 100%;
     height: 100%;
     display: flex;
     align-items: center;
     padding: 0 10px;
 }
-.comment img {
+.ProfileDetail .profile-comment img {
     width: 50px;
     height: 50px;
     border-radius: 50%;
 }
-.comment form{
+.ProfileDetail .profile-comment form{
     flex: 1;
 }
-.comment input {
+.ProfileDetail .profile-comment input {
     width: 85%;
     box-sizing: border-box;
     margin-left: 2%;
     margin-right: 2%;
 }
 
-.comment button {
+.profile-comment button {
     width: 10%;
     font-size: 13px;
     font-weight: 500;

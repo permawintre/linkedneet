@@ -57,7 +57,6 @@ function App() {
             <Route path="/neetCompany" element={isLoggedIn ? <NeetCompany/> : <RedirectToLogIn/>}></Route>
             <Route path="/profile" element={isLoggedIn ? <Profile/> : <RedirectToLogIn/>}></Route>
             <Route path="/profiledetail" element={isLoggedIn ? <ProfileDetail/> : <RedirectToLogIn/>}></Route>
-            <Route path="/profiledetail" element={<ProfileDetail/>}></Route>
             <Route path="/profiledetail/career" element={<ProfileCareerDetail/>}></Route>
 
             <Route path="/profileheaderedit" element={isLoggedIn ? <ProfileHeaderEdit authObj = {authObj}/> : <RedirectToLogIn/>}></Route>

@@ -63,6 +63,10 @@ main {
     margin: auto;
 }
 
+.profile-header .header-left2 a{
+    text-decoration: none;
+}
+
 .header-left,
 .header-right {
     width: 200px
@@ -97,9 +101,6 @@ main {
     background-color: var(--color_4);
     cursor: pointer;
 }
-
-.header-right a:nth-child(1)  { color: #4267b2; }
-.header-right a:nth-child(2)  { color: #d62976; }
 
 .header-right a{
     cursor: pointer;

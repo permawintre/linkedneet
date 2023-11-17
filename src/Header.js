@@ -11,7 +11,7 @@ export const Header = () => {
                     <Link to="/" className="header__item link">HOME</Link>
                     <Link to="/project" className="header__item link">PROJECT</Link>
                     <Link to="/neetCompany" className="header__item link">NEET COMPANY</Link>
-                    <Link to="/profile" className="header__item link">PROFILE</Link>
+                    <Link to="/profiledetail" className="header__item link">PROFILE</Link>
             </ul>
             <div className='header__mid'>
                 <Link to="/" className="link">

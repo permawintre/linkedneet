@@ -15,13 +15,13 @@ import { getStorage } from "firebase/storage";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyAbc0uGNJed1FkwhfRCFdTXbdwM92sflLw",
-  authDomain: "linkedneet.firebaseapp.com",
-  projectId: "linkedneet",
-  storageBucket: "linkedneet.appspot.com",
-  messagingSenderId: "165076434428",
-  appId: "1:165076434428:web:f9645b0dde706ef1160679"
-};
+    apiKey: "AIzaSyAbc0uGNJed1FkwhfRCFdTXbdwM92sflLw",
+    authDomain: "linkedneet.firebaseapp.com",
+    projectId: "linkedneet",
+    storageBucket: "linkedneet.appspot.com",
+    messagingSenderId: "165076434428",
+    appId: "1:165076434428:web:f9645b0dde706ef1160679"
+  };
 //initialize Firebase
 export const app = initializeApp(firebaseConfig);
 // Initialize Cloud Firestore and get a reference to the service

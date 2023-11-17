@@ -109,6 +109,7 @@ export const PostContents = ({contents}) => {
 export const PostPics = ({imgs}) => {
 
   /* 리스너 설치하기 */
+  console.log({imgs})
   let [idx, setIdx] = useState(0); // 슬라이드 현재 번호
   let [moveX, setMoveX] = useState(0); // 슬라이드 위치 값
   const imgsLength = JSON.parse(JSON.stringify({imgs})).imgs.length

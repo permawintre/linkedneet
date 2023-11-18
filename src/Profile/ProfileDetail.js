@@ -14,7 +14,7 @@ import './ProfileDetail.css';
 
 const DefaultProfileImg = 'https://images.pexels.com/photos/1804796/pexels-photo-1804796.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260'
 
-const ProfileHeader = ({userData}) => {
+const ProfileHeader = ({userData, myProfile}) => {
   const bgImageStyle = {
       backgroundImage: `url(${userData.background_image})`
     };
@@ -31,6 +31,13 @@ const ProfileHeader = ({userData}) => {
     setEditClicked(false);
   };
 
+  const EditButton = () => {
+    if (myProfile) {
+      return <input type="button" className="edit-button" onClick={EditClick}/>;
+    } else {
+      return null;
+    }
+  };
 
   return (
     <div className="header-container">
@@ -82,9 +89,8 @@ const ProfileHeader = ({userData}) => {
                         비행일정 확인하기
                     </span>
                     <span className="edit-profile">
-                      <input type="button" className="edit-button" onClick={EditClick}>
-                      </input>
-                      {EditClicked && (
+                      {EditButton()}
+                      {myProfile && EditClicked && (
                         <ProfileEditModal
                           user={null}
                           EditModalClose={EditModalClose}
@@ -99,7 +105,7 @@ const ProfileHeader = ({userData}) => {
   );
 };
 
-const ProfileIntro = ({userData}) => {
+const ProfileIntro = ({userData, myProfile}) => {
   // Profile Intro Edit
   const [EditClicked, setEditClicked] = useState(false);
   const EditClick = () => {
@@ -107,6 +113,14 @@ const ProfileIntro = ({userData}) => {
   };
   const EditModalClose = () => {
     setEditClicked(false);
+  };
+
+  const EditButton = () => {
+    if (myProfile) {
+      return <input type="button" className="edit-button" onClick={EditClick}/>;
+    } else {
+      return null;
+    }
   };
 
   return (
@@ -125,15 +139,14 @@ const ProfileIntro = ({userData}) => {
                   ))}
               </span>
               <span className="edit-profile">
-                      <input type="button" className="edit-button" onClick={EditClick}>
-                      </input>
-                      {EditClicked && (
-                        <ProfileIntroEditModal
-                          user={null}
-                          EditModalClose={EditModalClose}
-                        />
-                      )}
-                    </span>
+                {EditButton()}
+                {myProfile && EditClicked && (
+                  <ProfileIntroEditModal
+                    user={null}
+                    EditModalClose={EditModalClose}
+                  />
+                )}
+              </span>
             </div>
         </div>
       </main>
@@ -141,8 +154,8 @@ const ProfileIntro = ({userData}) => {
   );
 };
 
-const ProfileCareer = ({userData}) => {
-
+const ProfileCareer = ({userData, myProfile}) => {
+  
   return (
     <div className="career-container">
       <main>
@@ -161,16 +174,18 @@ const ProfileCareer = ({userData}) => {
           </div>
         ))}
         <span className="edit-profile" style={{margin: "-10px"}}>
-          <Link to="/profiledetail/career">
-            <input type="button" className="edit-button" style={{margin: "-5px 10px"}}></input>
-          </Link>
+          {myProfile && (
+            <Link to="/profiledetail/career">
+              <input type="button" className="edit-button" style={{margin: "-5px 10px"}}></input>
+            </Link>
+          )}
         </span>
       </main>
     </div>
   );
 };
 
-const ProfilePost = ({userData}) => {
+const ProfilePost = ({userData, myProfile}) => {
   // example posts
   const posts = [
     { id: 1, content: 'Post 1' },
@@ -199,7 +214,7 @@ const ProfilePost = ({userData}) => {
   );
 };
 
-const ProfileComment = ({userData}) => {
+const ProfileComment = ({userData, myProfile}) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
 
@@ -267,6 +282,7 @@ const ProfileDetail = () => {
   const [currentUserData, setCurrentUserData] = useState({ ...defaultData });
   const [profileUserData, setProfileUserData] = useState({ ...defaultData });
   const [isLoading, setIsLoading] = useState(true);
+  const [myProfile, setMyProfile] = useState(false);
 
   // profiledetail에 정보를 띄울 user의 정보(profileUserData)를 firebase에서 fetch
   useEffect(() => {
@@ -276,7 +292,10 @@ const ProfileDetail = () => {
         // if querystring 'uid' exists, get 'uid' user's data
         if (uid) { profileUserDocRef = doc(dbService, 'users', uid); }
         // else, get current user's data
-        else { profileUserDocRef = doc(dbService, 'users', auth.currentUser.uid); }
+        else { 
+          profileUserDocRef = doc(dbService, 'users', auth.currentUser.uid); 
+          setMyProfile(true);
+        }
         const profileUserDoc = await getDoc(profileUserDocRef);
 
         if (profileUserDoc.exists()) {
@@ -311,17 +330,17 @@ const ProfileDetail = () => {
   return (
     <div className='ProfileDetail'>
     <div style={{overflowY: 'auto'}}>
-        <div><ProfileHeader userData={profileUserData} /></div>
+        <div><ProfileHeader userData={profileUserData} myProfile={myProfile}/></div>
         <div className="buttons">
           <span onClick={() => scrollToRef(introRef)}>소개</span>
           <span onClick={() => scrollToRef(careerRef)}>경험</span>
           <span onClick={() => scrollToRef(postRef)}>게시글</span>
           <span onClick={() => scrollToRef(commentRef)}>방명록</span>
         </div>
-        <div ref={introRef}><ProfileIntro userData={profileUserData}/></div>
-        <div ref={careerRef}><ProfileCareer userData={profileUserData}/></div>
-        <div ref={postRef}><ProfilePost userData={profileUserData}/></div>
-        <div ref={commentRef}><ProfileComment userData={currentUserData}/></div>
+        <div ref={introRef}><ProfileIntro userData={profileUserData} myProfile={myProfile}/></div>
+        <div ref={careerRef}><ProfileCareer userData={profileUserData} myProfile={myProfile}/></div>
+        <div ref={postRef}><ProfilePost userData={profileUserData} myProfile={myProfile}/></div>
+        <div ref={commentRef}><ProfileComment userData={currentUserData} myProfile={myProfile}/></div>
     </div>
     </div>
   )

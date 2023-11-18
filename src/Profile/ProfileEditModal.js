@@ -5,6 +5,7 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { dbService, auth } from '../firebase'
 import { updateDoc, getDoc, doc } from "firebase/firestore"
+import { uploadBytes, getStorage, ref, getDownloadURL } from 'firebase/storage';
 
 import './ProfileEditModal.css'
 import './ProfileDetail.css';
@@ -29,6 +30,8 @@ import './ProfileDetail.css';
       />
     )}
   </div> */
+
+const DefaultProfileImg = 'https://s3.amazonaws.com/37assets/svn/765-default-avatar.png'
 
 const profileData = {
   nickname: '홍길동',
@@ -63,6 +66,7 @@ const ProfileEditModal = ({EditModalClose}) => {
       // user Table Attribute (need to add more)
     const [userObj, setUserObj] = useState ({
       nickname: "",
+      profile_img: "",
       website: "",
       instagram:"",
       facebook:"",
@@ -70,26 +74,46 @@ const ProfileEditModal = ({EditModalClose}) => {
       email:"",
     });
 
-    // 유저가 처음으로 profile edit page에 들어가면 자기 profile fetch 시킴
+    const [isLoading, setIsLoading] = useState(true);
     useEffect(() => {
-      const fetchUserData = async (uid) => {
-          try {
-              // get [one and only one] docReference using key
-              const userDocRef = doc(dbService, 'users', auth.currentUser.uid);
-              const userDoc = await getDoc(userDocRef);
+      const fetchUserData = async () => {
+        try {
+            let userDocRef;
+            // get [one and only one] docReference using key
+            userDocRef = doc(dbService, 'users', auth.currentUser.uid);
+            const userDoc = await getDoc(userDocRef);
+            // If the document exists, setUserData with the document data
+            if (userDoc.exists()) {
+                setUserObj(userObj => ({...userObj, ...userDoc.data()}));
+                await updateDoc(userDoc, {
+                  profile_img: getDownloadURL(ref(userDoc, `profile_images/${userDoc.profile_img}`))
+                });
+            } else {
+                console.log('User not found');
+            }
 
-              // If the document exists, setUserData with the document data
-              if (userDoc.exists()) {
-                  setUserObj(userDoc.data());
-              } else {
-                  console.log('User not found');
-              }
           } catch (error) {
-              console.error('Error fetching user data:', error);
+            console.error('Error fetching user data:', error);
+          } finally {
+            setIsLoading(false); // Loading 끝
           }
       };
       fetchUserData();
     }, []);
+
+
+    const uploadAndReturnUrl = async (storageRef, file) => {
+      try {
+        // Upload 'file' to Firebase Storage.
+        await uploadBytes(storageRef, file);
+        // Get download url of uploaded file.
+        const imageUrl = await getDownloadURL(storageRef);
+        return imageUrl;
+      } catch (error) {
+        console.error('Error uploading file: ', error);
+        throw error;
+      }
+    };
 
     // User Input {OnChange}
     const onChange = (e) => {
@@ -106,17 +130,24 @@ const ProfileEditModal = ({EditModalClose}) => {
       event.preventDefault();
       const userDocRef = doc(dbService, 'users', auth.currentUser.uid);
       try {
-
+          const storage = getStorage();
+          const img = userObj.profile_img[0]
+          const imgName = userObj.profile_img[1]
+          const imageRef = ref(storage, `profile_images/${imgName}`);
+          const imageUrlPromise = await uploadAndReturnUrl(imageRef, img);
+          
           // update DB using user input 
           const res = await updateDoc(userDocRef, {
               nickname: userObj.nickname,
+              profile_img: imageUrlPromise,
               website: userObj.website,
               instagram: userObj.instagram,
               facebook: userObj.facebook,
               tel: userObj.tel,
               email: userObj.email,
           })
-
+          
+          alert("성공적으로 저장 되었습니다");
           // if successfully edit, then refresh < 새로고침 > 
           window.location.reload();
       } catch (e) {
@@ -132,18 +163,19 @@ const ProfileEditModal = ({EditModalClose}) => {
     };
 
     // Profile 사진 
-    const [Image, setImage] = useState("https://images.pexels.com/photos/1804796/pexels-photo-1804796.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260");
+    const [Image, setImage] = useState(userObj.profile_img);
     const fileInput = useRef(null);
 
     const onProfileImgChange = (e) => {
       if (e.target.files[0]){
         setImage(e.target.files[0])
+        setUserObj({  ...userObj, profile_img: [e.target.files[0], e.target.files[0].name]});
       }
       // 업로드 취소할 시
       else {
         return
       }
-
+      
       //화면에 프로필 사진 표시
       const reader = new FileReader();
       reader.onload = () => {
@@ -153,7 +185,7 @@ const ProfileEditModal = ({EditModalClose}) => {
       }
       reader.readAsDataURL(e.target.files[0])
     }
-
+        
     return (
         <div class="edit-overlay">
           <form onSubmit={onSubmit}>
@@ -165,7 +197,7 @@ const ProfileEditModal = ({EditModalClose}) => {
                 <h3>프로필 사진</h3>
                 <div class="image-edit-button-wrapper">
                   <label for="file-search">
-                    <img class="profile-image" src={Image} alt="Profile Photo"/>
+                    <img class="profile-image" src={userObj.profile_img}/>
                     <div class="image-edit-button">✏️ 변경하기</div>
                   </label>
                   

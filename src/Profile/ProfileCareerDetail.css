@@ -7,6 +7,7 @@
 }
 
 .back-to-profile-button{
+    cursor: pointer;
     float: left;
     margin-top: 5px;
     margin-left: -10px;

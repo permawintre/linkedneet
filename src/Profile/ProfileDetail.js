@@ -1,7 +1,8 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Link, useLocation } from "react-router-dom"
 import { dbService, auth } from '../firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { getStorage, ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { FaFacebookSquare, FaInstagramSquare} from 'react-icons/fa';
 import { IoGlobeOutline } from "react-icons/io5";
 import { MdPhoneIphone, MdEmail, MdCalendarMonth } from 'react-icons/md'
@@ -11,23 +12,25 @@ import { ProfileEditModal, ProfileIntroEditModal } from './ProfileEditModal';
 import { defaultData } from './defaultData'
 import './ProfileDetail.css';
 
+const DefaultProfileImg = 'https://images.pexels.com/photos/1804796/pexels-photo-1804796.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260'
 
 const ProfileHeader = ({userData}) => {
-    const bgImageStyle = {
-        backgroundImage: `url(${userData.background_image})`
-      };
-    const website_url = 'https://' + userData.website;
-    const facebook_url = 'https://www.facebook.com/' + userData.facebook;
-    const insta_url = 'https://www.instagram.com/' + userData.instagram;
-    
-    // Profile Edit
-    const [EditClicked, setEditClicked] = useState(false);
-    const EditClick = () => {
-      setEditClicked(true);
+  const bgImageStyle = {
+      backgroundImage: `url(${userData.background_image})`
     };
-    const EditModalClose = () => {
-      setEditClicked(false);
-    };
+  const website_url = 'https://' + userData.website;
+  const facebook_url = 'https://www.facebook.com/' + userData.facebook;
+  const insta_url = 'https://www.instagram.com/' + userData.instagram;
+  
+  // Profile Edit
+  const [EditClicked, setEditClicked] = useState(false);
+  const EditClick = () => {
+    setEditClicked(true);
+  };
+  const EditModalClose = () => {
+    setEditClicked(false);
+  };
+
 
   return (
     <div className="header-container">
@@ -51,7 +54,7 @@ const ProfileHeader = ({userData}) => {
                 </div>
             </div>
             <div className="header-mid">
-                <img className="profile-image" src={userData.profile_image} alt="Profile Photo"/>
+              <img className="profile-image" src={userData.profile_img} alt=""/>
             </div>
             <div className="header-right">
                 <div className="header-right1">
@@ -264,26 +267,6 @@ const ProfileDetail = () => {
   const [currentUserData, setCurrentUserData] = useState({ ...defaultData });
   const [profileUserData, setProfileUserData] = useState({ ...defaultData });
   const [isLoading, setIsLoading] = useState(true);
-  
-  // profiledetail에 접속해 있는 user의 정보(currentUserData)를 firebase에서 fetch
-  useEffect( () => {
-    const fetchCurrentUserData = async () => {
-      try {
-        const currentUserDocRef = doc(dbService, 'users', auth.currentUser.uid);
-        const currentUserDoc = await getDoc(currentUserDocRef);
-
-        if (currentUserDoc.exists()) {
-          setCurrentUserData(prevData => ({ ...prevData, ...currentUserDoc.data() }));
-        } else {
-          console.log('User not found');
-        }
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      }
-    };
-
-    fetchCurrentUserData()
-  }, []);
 
   // profiledetail에 정보를 띄울 user의 정보(profileUserData)를 firebase에서 fetch
   useEffect(() => {
@@ -298,6 +281,9 @@ const ProfileDetail = () => {
 
         if (profileUserDoc.exists()) {
           setProfileUserData(prevData => ({ ...prevData, ...profileUserDoc.data() }));
+          await updateDoc(profileUserDoc, {
+            profile_img: getDownloadURL(ref(profileUserDoc, `profile_images/${profileUserDoc.profile_img}`))
+          });
         } else {
           console.log('User not found');
         }

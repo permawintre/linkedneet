@@ -12,7 +12,7 @@ import { ProfileEditModal, ProfileIntroEditModal } from './ProfileEditModal';
 import { defaultData } from './defaultData'
 import './ProfileDetail.css';
 
-const DefaultProfileImg = 'https://images.pexels.com/photos/1804796/pexels-photo-1804796.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260'
+const DefaultProfileImg = 'https://s3.amazonaws.com/37assets/svn/765-default-avatar.png'
 
 const ProfileHeader = ({userData, myProfile}) => {
   const bgImageStyle = {
@@ -61,7 +61,7 @@ const ProfileHeader = ({userData, myProfile}) => {
                 </div>
             </div>
             <div className="header-mid">
-              <img className="profile-image" src={userData.profile_img} alt=""/>
+              <img className="profile-image" src={userData.profile_img || DefaultProfileImg} alt=""/>
             </div>
             <div className="header-right">
                 <div className="header-right1">
@@ -155,7 +155,7 @@ const ProfileIntro = ({userData, myProfile}) => {
 };
 
 const ProfileCareer = ({userData, myProfile}) => {
-  
+
   return (
     <div className="career-container">
       <main>

@@ -1,1 +1,6 @@
-node_modules
+.firebase/
+build/
+node_modules/
+public/
+.firebaserc
+firebase.json

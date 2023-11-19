@@ -47,10 +47,6 @@ export const Signup = () => {
                 nickname: nickname,
                 email: email,
                 generation: generation,
-                website: "",
-                instagram:"",
-                facebook:"",
-                tel:"",
             };
             
             // add initial profile for user (key = uid)
@@ -62,10 +58,6 @@ export const Signup = () => {
                 nickname: userObj.nickname,
                 email: userObj.email,
                 generation: userObj.generation,
-                website: userObj.website,
-                instagram: userObj.instagram,
-                facebook: userObj.facebook,
-                tel: userObj.tel,
             });
             
             // move to home if singup is successful

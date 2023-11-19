@@ -1,56 +1,43 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
+import { Link, useLocation } from "react-router-dom"
+import { dbService, auth } from '../firebase';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { getStorage, ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { FaFacebookSquare, FaInstagramSquare} from 'react-icons/fa';
+import { IoGlobeOutline } from "react-icons/io5";
 import { MdPhoneIphone, MdEmail, MdCalendarMonth } from 'react-icons/md'
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
-
+import { ProfileEditModal, ProfileIntroEditModal } from './ProfileEditModal';
+import { defaultData } from './defaultData'
 import './ProfileDetail.css';
-import { ProfileEditModal, ProfileIntroEditModal, ProfileCareerEditModal } from './ProfileEditModal';
 
-const profileData = {
-  nickname: '홍길동',
-  followers: 500,
-  following: 300,
-  profile_image: 'https://images.pexels.com/photos/1804796/pexels-photo-1804796.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
-  intro_image: 'https://cdn.imweb.me/upload/S20191010288d21675b22f/e33c22faf15bc.jpg',
-  intro_title: '링크 혹은 이미지 경로',
-  intro_content: `언제나 저를 이끈 건 ‘재미’입니다.\n늘 재미있는 일을 찾아다니죠.\n지금 저에게 가장 재미있는 일은 그림과 글쓰기, 그리고 영화랍니다.\n
-  삶의 다양한 선택에서 늘 저를 이끌었던 건 ‘재미’였습니다.
-제가 재미있는 일을 하며 먹고살 수 있다면, 그것이 바로 행복이 아닐까 싶습니다. 단순히, 즐거운 기분을 넘어서 좋은 성과와 보람이 가득한 재미를 느껴 보고 싶습니다.
-이번 프로젝트는 제가 좋아하는 영화와 그림, 글을 통해 재미있어 보려고 했습니다.`,
-  intro_keyword: ['글쓰기', '영화', '여행가'],
-  career: {
-    '교육공학자': ['교육공학 박사',
-                  '교육 콘텐츠 개발 및 기획',
-                  '수업 컨설턴트, 학습 컨설턴트 자격 보유'],
-    '일러스트레이터': ['동화 [나뭇잎 날개] 삽화 및 표지 작업 (출간 예정)',
-                    '도서 [어른이 되어 다시 만나는 철학] 삽화 및 표지 작업'],
-    '작가': ['시네마에듀(가제) 출판 계약 및 출간 예정(2023년 8월)']
-  },
-  calendar_id: 1,
-  background_image: 'https://images.pexels.com/photos/1731427/pexels-photo-1731427.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
-  contact_facebook: 'kakao.brandmedia',
-  contact_insta: 'kakao.today',
-  contact_email: 'user@example.com',
-  contact_phone: '010-1234-5678',
-  company_id: 13
-};
+const DefaultProfileImg = 'https://s3.amazonaws.com/37assets/svn/765-default-avatar.png'
 
-const ProfileHeader = () => {
-    const bgImageStyle = {
-        backgroundImage: `url(${profileData.background_image})`
-      };
-    const facebook_url = 'https://www.facebook.com/' + profileData.contact_facebook;
-    const insta_url = 'https://www.instagram.com/' + profileData.contact_insta
-    
-    // Profile Edit
-    const [EditClicked, setEditClicked] = useState(false);
-    const EditClick = () => {
-      setEditClicked(true);
+const ProfileHeader = ({userData, myProfile}) => {
+  const bgImageStyle = {
+      backgroundImage: `url(${userData.background_image})`
     };
-    const EditModalClose = () => {
-      setEditClicked(false);
-    };
+  const website_url = 'https://' + userData.website;
+  const facebook_url = 'https://www.facebook.com/' + userData.facebook;
+  const insta_url = 'https://www.instagram.com/' + userData.instagram;
+  
+  // Profile Edit
+  const [EditClicked, setEditClicked] = useState(false);
+  const EditClick = () => {
+    setEditClicked(true);
+  };
+  const EditModalClose = () => {
+    setEditClicked(false);
+  };
+
+  const EditButton = () => {
+    if (myProfile) {
+      return <input type="button" className="edit-button" onClick={EditClick}/>;
+    } else {
+      return null;
+    }
+  };
 
   return (
     <div className="header-container">
@@ -60,46 +47,50 @@ const ProfileHeader = () => {
         <div className="profile-header">
             <div className="header-left">
                 <div className="header-left1">
-                    <span className="nickname">{profileData.nickname}</span>
-                    <span className="info">니트컴퍼니 {profileData.company_id}기</span>
+                    <span className="nickname">{userData.nickname}</span>
+                    <span className="info">니트컴퍼니 {userData.generation}기</span>
                 </div>
                 <div className="header-left2">
-                    <span className="info">팔로워 {profileData.followers}명</span>
-                    <span className="info">팔로잉 {profileData.following}명</span>
+                    <Link to="/profile">
+                      <span className="info">팔로워 {userData.followers}명</span>
+                      <span className="info">팔로잉 {userData.following}명</span>
+                    </Link>
                 </div>
                 <div className="header-left3">
                     <button>Follow</button>
                 </div>
             </div>
             <div className="header-mid">
-                <img className="profile-image" src={profileData.profile_image} alt="Profile Photo"/>
+              <img className="profile-image" src={userData.profile_img || DefaultProfileImg} alt=""/>
             </div>
             <div className="header-right">
                 <div className="header-right1">
+                    <a href={website_url} target="_blank" rel="noopener noreferrer">
+                        <IoGlobeOutline size="30" style={{ color: 'black' }} title={website_url}/>
+                    </a>
                     <a href={facebook_url} target="_blank" rel="noopener noreferrer">
-                        <FaFacebookSquare size="30"/>
+                        <FaFacebookSquare size="30" style={{ color: '#4267b2' }} title={facebook_url}/>
                     </a>
                     <a href={insta_url} target="_blank" rel="noopener noreferrer">
-                        <FaInstagramSquare size="30"/>
+                        <FaInstagramSquare size="30" style={{ color: '#d62976' }} title={insta_url}/>
                     </a>
                 </div>
                 <div className="header-right2">
                     <div className="phone-number">
                         <MdPhoneIphone size="16"/>&nbsp;
-                        {profileData.contact_phone}
+                        {userData.tel}
                     </div>
                     <div className="email">
                         <MdEmail size="16"/>&nbsp;
-                        {profileData.contact_email}
+                        {userData.email}
                     </div>
                     <span className="calendar">
                         <MdCalendarMonth size="16"/>&nbsp;
                         비행일정 확인하기
                     </span>
                     <span className="edit-profile">
-                      <input type="button" className="edit-button" onClick={EditClick}>
-                      </input>
-                      {EditClicked && (
+                      {EditButton()}
+                      {myProfile && EditClicked && (
                         <ProfileEditModal
                           user={null}
                           EditModalClose={EditModalClose}
@@ -114,7 +105,7 @@ const ProfileHeader = () => {
   );
 };
 
-const ProfileIntro = () => {
+const ProfileIntro = ({userData, myProfile}) => {
   // Profile Intro Edit
   const [EditClicked, setEditClicked] = useState(false);
   const EditClick = () => {
@@ -122,6 +113,14 @@ const ProfileIntro = () => {
   };
   const EditModalClose = () => {
     setEditClicked(false);
+  };
+
+  const EditButton = () => {
+    if (myProfile) {
+      return <input type="button" className="edit-button" onClick={EditClick}/>;
+    } else {
+      return null;
+    }
   };
 
   return (
@@ -129,26 +128,25 @@ const ProfileIntro = () => {
       <main>
         <h2>나를 <span className="highlight">소개</span>합니다</h2>
         <div className="body1">
-            <img className="intro-image" src={profileData.intro_image}></img>
+            <img className="intro-image" src={userData.intro_image}></img>
             <div className="intro">
               <div className="intro-content">
-                {profileData.intro_content}
+                {userData.intro_content}
               </div>
               <span className="intro-keywords">
-                  {profileData.intro_keyword.map((keyword, index) => (
+                  {userData.intro_keyword.map((keyword, index) => (
                       <span key={index} className="keyword">{`#${keyword}`}</span>
                   ))}
               </span>
               <span className="edit-profile">
-                      <input type="button" className="edit-button" onClick={EditClick}>
-                      </input>
-                      {EditClicked && (
-                        <ProfileIntroEditModal
-                          user={null}
-                          EditModalClose={EditModalClose}
-                        />
-                      )}
-                    </span>
+                {EditButton()}
+                {myProfile && EditClicked && (
+                  <ProfileIntroEditModal
+                    user={null}
+                    EditModalClose={EditModalClose}
+                  />
+                )}
+              </span>
             </div>
         </div>
       </main>
@@ -156,40 +154,30 @@ const ProfileIntro = () => {
   );
 };
 
-const ProfileCareer = () => {
-
-  // Profile Intro Edit
-  const [EditClicked, setEditClicked] = useState(false);
-  const EditClick = () => {
-    setEditClicked(true);
-  };
-  const EditModalClose = () => {
-    setEditClicked(false);
-  };
+const ProfileCareer = ({userData, myProfile}) => {
 
   return (
     <div className="career-container">
       <main>
-        <h2>나는 이런 <span className="highlight">경험</span>을 했어요</h2>
-        <span className="career-body">
-          {Object.keys(profileData.career).map((job, index) => (
-            <div className="career" key={index}>
-              <div className="career-title">{job}</div>
+        <h2 style={{margin: "0px 0px 10px 0px"}}>나는 이런 <span className="highlight">경험</span>을 했어요</h2>
+        {Object.keys(userData.career).map((job, index) => (
+          <div className="career-body" key={index}>
+            <div className="career-index"/>
+            <div className="career-wrapper" key={index}>
+              <div className="career-title-">{job}</div>
               <div className="career-content">
-                {profileData.career[job].map((item, i) => (
+                {userData.career[job].map((item, i) => (
                   <li key={i}>{item}</li>
                 ))}
               </div>
             </div>
-          ))}
-        </span>
+          </div>
+        ))}
         <span className="edit-profile" style={{margin: "-10px"}}>
-          <input type="button" className="edit-button" onClick={EditClick} style={{margin: "-5px 10px"}}></input>
-          {EditClicked && (
-            <ProfileCareerEditModal
-              user={null}
-              EditModalClose={EditModalClose}
-            />
+          {myProfile && (
+            <Link to="/profiledetail/career">
+              <input type="button" className="edit-button" style={{margin: "-5px 10px"}}></input>
+            </Link>
           )}
         </span>
       </main>
@@ -197,7 +185,7 @@ const ProfileCareer = () => {
   );
 };
 
-const ProfilePost = () => {
+const ProfilePost = ({userData, myProfile}) => {
   // example posts
   const posts = [
     { id: 1, content: 'Post 1' },
@@ -226,10 +214,9 @@ const ProfilePost = () => {
   );
 };
 
-const ProfileComment = () => {
+const ProfileComment = ({userData, myProfile}) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
-  const [userProfile, setUserProfile] = useState('https://thumbnail.10x10.co.kr/webimage/image/add1/497/A004979805_01.jpg?cmd=thumb&w=400&h=400&fit=true&ws=false'); // 사용자 프로필 이미지
 
   const handleInputChange = (event) => {
     setNewMessage(event.target.value);
@@ -240,7 +227,7 @@ const ProfileComment = () => {
     if (newMessage.trim() !== '') {
       const currentTime = new Date();
       const relativeTime = formatDistanceToNow(currentTime, { addSuffix: true, locale: ko });
-      const message = { text: newMessage, user: '사용자 이름', time: currentTime.toLocaleString(), relativeTime: relativeTime, userProfile: userProfile };
+      const message = { text: newMessage, user: userData.nickname, time: currentTime.toLocaleString(), relativeTime: relativeTime, userProfile: userData.profile_image };
       setMessages([...messages, message]);
       setNewMessage('');
     }
@@ -250,8 +237,8 @@ const ProfileComment = () => {
     <div className="container">
       <main>
       <h2>방명록</h2>
-      <div className='comment'>
-        <img src={userProfile} alt="프로필"/>
+      <div className='profile-comment'>
+        <img src={userData.profile_image} alt="프로필"/>
         <form onSubmit={handleSubmit}>
           <input
             type="text"
@@ -287,26 +274,76 @@ const ProfileDetail = () => {
   const postRef = useRef(null);
   const commentRef = useRef(null);
 
+  // For querystring 'uid'
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const uid = queryParams.get('uid');
+
+  const [currentUserData, setCurrentUserData] = useState({ ...defaultData });
+  const [profileUserData, setProfileUserData] = useState({ ...defaultData });
+  const [isLoading, setIsLoading] = useState(true);
+  const [myProfile, setMyProfile] = useState(false);
+
+  // profiledetail에 정보를 띄울 user의 정보(profileUserData)를 firebase에서 fetch
+  useEffect(() => {
+    const fetchProfileUserData = async () => {
+      try {
+        let profileUserDocRef;
+        // if querystring 'uid' exists, get 'uid' user's data
+        if (uid) { profileUserDocRef = doc(dbService, 'users', uid); }
+        // else, get current user's data
+        else { 
+          profileUserDocRef = doc(dbService, 'users', auth.currentUser.uid); 
+          setMyProfile(true);
+        }
+        const profileUserDoc = await getDoc(profileUserDocRef);
+
+        if (profileUserDoc.exists()) {
+          setProfileUserData(prevData => ({ ...prevData, ...profileUserDoc.data() }));
+          await updateDoc(profileUserDoc, {
+            profile_img: getDownloadURL(ref(profileUserDoc, `profile_images/${profileUserDoc.profile_img}`))
+          });
+        } else {
+          console.log('User not found');
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      } finally {
+        setIsLoading(false); // Loading 끝
+      }
+    };
+
+    fetchProfileUserData();
+  }, [uid]);
+
+  // firebase에서 모든 data가 fetch되기 전까지 Loading... 띄우기
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   const scrollToRef = (ref) => {
       if (ref.current) {
         ref.current.scrollIntoView({ behavior: 'smooth' });
       }
   };
-    return (
-    <div style={{overflowY: 'auto' }}>
-        <div>{ProfileHeader()}</div>
+
+  return (
+    <div className='ProfileDetail'>
+    <div style={{overflowY: 'auto'}}>
+        <div><ProfileHeader userData={profileUserData} myProfile={myProfile}/></div>
         <div className="buttons">
           <span onClick={() => scrollToRef(introRef)}>소개</span>
           <span onClick={() => scrollToRef(careerRef)}>경험</span>
           <span onClick={() => scrollToRef(postRef)}>게시글</span>
           <span onClick={() => scrollToRef(commentRef)}>방명록</span>
         </div>
-        <div ref={introRef}><ProfileIntro /></div>
-        <div ref={careerRef}><ProfileCareer /></div>
-        <div ref={postRef}><ProfilePost /></div>
-        <div ref={commentRef}><ProfileComment /></div>
+        <div ref={introRef}><ProfileIntro userData={profileUserData} myProfile={myProfile}/></div>
+        <div ref={careerRef}><ProfileCareer userData={profileUserData} myProfile={myProfile}/></div>
+        <div ref={postRef}><ProfilePost userData={profileUserData} myProfile={myProfile}/></div>
+        <div ref={commentRef}><ProfileComment userData={currentUserData} myProfile={myProfile}/></div>
     </div>
-    )
+    </div>
+  )
 }
 
 export default ProfileDetail;

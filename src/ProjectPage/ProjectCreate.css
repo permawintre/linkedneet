@@ -161,6 +161,9 @@
     justify-content: center;
     align-items: center;
 }
+.project-create .form-box .form-image-box div.form-image .form-image-description {
+    font-size: 12px;
+}
 .project-create .image-names {
     white-space: pre-line;
     background-color: white;

@@ -2,30 +2,28 @@
 // naver map?
 // 임시저장 버튼
 // leader uid
+// subImage uploade 완료 후 formData reset되는 문제 해결 필요
 
 import React, { useState, useEffect } from "react"
-import style from './ProjectCreate.css'
+import './ProjectCreate.css'
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { dbService, auth } from '../firebase.js';
 import { addDoc, collection } from "firebase/firestore"
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { getStorage, ref, uploadBytes, getDownloadURL, uploadString } from 'firebase/storage';
 import moment from 'moment'
 import { useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 
 
 const BasicInfoForm = ({ nextStep, formData, setFormData }) => {
   
     const handleCategoryClick = (category) => {
-      setFormData({ ...formData, projectCategory: category });
+      setFormData({ ...formData, category: category });
     };
   
     const handleTypeClick = (type) => {
-      setFormData({ ...formData, projectType: type });
-    };
-  
-    const handleChatRoomClick = (chatRoom) => {
-      setFormData({ ...formData, openChatRoom: chatRoom });
+      setFormData({ ...formData, type: type });
     };
 
     const handleRecruitStartDateChange = (date) => {
@@ -43,12 +41,23 @@ const BasicInfoForm = ({ nextStep, formData, setFormData }) => {
 
     const handleSubmit = (e) => {
       e.preventDefault();
-      if (!formData.projectName || !formData.shortDescription
-        || !formData.projectCategory || !formData.projectType
-        || !formData.openChatRoom
+      if (!formData.name || !formData.shortDescription
+        || !formData.category || !formData.type
         || !formData.recruitStartDate || !formData.recruitEndDate
         || !formData.runningStartDate || !formData.runningEndDate) {
         alert('필수항목을 입력해주세요!');
+        return;
+      }
+      const currentDate = new Date();
+      currentDate.setHours(0, 0, 0, 0);
+      console.log(currentDate);
+      if (formData.recruitStartDate > formData.recruitEndDate
+        || formData.runningStartDate > formData.runningEndDate) {
+        alert('종료일은 시작일 이후여야 합니다!');
+        return;
+      }
+      if (formData.recruitStartDate < currentDate) {
+        alert('시작일은 오늘, 또는 이후 날짜여야 합니다!');
         return;
       }
       nextStep();
@@ -70,9 +79,9 @@ const BasicInfoForm = ({ nextStep, formData, setFormData }) => {
             <div className="form-title">모임명 *</div>
             <div className="form-content">모임명은 한글과 영문, 숫자만 입력 가능합니다.</div>
             <input
-              type="text" name="projectName" value={formData.projectName}
+              type="text" name="name" value={formData.name}
               placeholder="모임명을 입력하세요"
-              onChange={(e) => setFormData({ ...formData, projectName: e.target.value })}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             />
           </label>
         </div>
@@ -91,19 +100,19 @@ const BasicInfoForm = ({ nextStep, formData, setFormData }) => {
             <div className="form-title">소모임 분류 *</div>
             <div className="form-button-3"
                 onClick={() => handleCategoryClick('루틴')}
-                style={{ backgroundColor: formData.projectCategory === '루틴' ? 'yellowgreen' : 'silver' }}
+                style={{ backgroundColor: formData.category === '루틴' ? 'yellowgreen' : 'silver' }}
             >
                 루틴
             </div>
             <div className="form-button-3"
                 onClick={() => handleCategoryClick('관계')}
-                style={{ backgroundColor: formData.projectCategory === '관계' ? 'yellowgreen' : 'silver' }}
+                style={{ backgroundColor: formData.category === '관계' ? 'yellowgreen' : 'silver' }}
             >
                 관계
             </div>
             <div className="form-button-3"
                 onClick={() => handleCategoryClick('경험')}
-                style={{ backgroundColor: formData.projectCategory === '경험' ? 'yellowgreen' : 'silver' }}
+                style={{ backgroundColor: formData.category === '경험' ? 'yellowgreen' : 'silver' }}
             >
                 경험
             </div>
@@ -112,36 +121,21 @@ const BasicInfoForm = ({ nextStep, formData, setFormData }) => {
             <div className="form-title">모임형태 *</div>
             <div className="form-button-3"
                 onClick={() => handleTypeClick('온라인')}
-                style={{ backgroundColor: formData.projectType === '온라인' ? 'yellowgreen' : 'silver' }}
+                style={{ backgroundColor: formData.type === '온라인' ? 'yellowgreen' : 'silver' }}
             >
                 온라인
             </div>
             <div className="form-button-3"
                 onClick={() => handleTypeClick('오프라인')}
-                style={{ backgroundColor: formData.projectType === '오프라인' ? 'yellowgreen' : 'silver' }}
+                style={{ backgroundColor: formData.type === '오프라인' ? 'yellowgreen' : 'silver' }}
             >
                 오프라인
             </div>
             <div className="form-button-3"
                 onClick={() => handleTypeClick('온오프라인')}
-                style={{ backgroundColor: formData.projectType === '온오프라인' ? 'yellowgreen' : 'silver' }}
+                style={{ backgroundColor: formData.type === '온오프라인' ? 'yellowgreen' : 'silver' }}
             >
                 온오프라인
-            </div>
-        </div>
-        <div className="form-box div-style">
-            <div className="form-title">오픈채팅방 *</div>
-            <div className="form-button-2"
-                onClick={() => handleChatRoomClick('개설함')}
-                style={{ backgroundColor: formData.openChatRoom === '개설함' ? 'yellowgreen' : 'silver' }}
-            >
-                개설함
-            </div>
-            <div className="form-button-2"
-                onClick={() => handleChatRoomClick('개설 안 함')}
-                style={{ backgroundColor: formData.openChatRoom === '개설 안 함' ? 'yellowgreen' : 'silver' }}
-            >
-                개설 안 함
             </div>
         </div>
         <div className="form-box div-style">
@@ -173,9 +167,9 @@ const BasicInfoForm = ({ nextStep, formData, setFormData }) => {
                 <label>
                     <div className="form-content">시작일 *</div>
                     <DatePicker
-                    selected={formData.runningStartDate}
-                    onChange={handleRunningStartDateChange}
-                    dateFormat="yyyy-MM-dd"
+                      selected={formData.runningStartDate}
+                      onChange={handleRunningStartDateChange}
+                      dateFormat="yyyy-MM-dd"
                     placeholderText="시작일을 선택해주세요"
                     />
                 </label>
@@ -198,13 +192,48 @@ const BasicInfoForm = ({ nextStep, formData, setFormData }) => {
 };
 const DetailedInfoForm = ({ prevStep, nextStep, formData, setFormData }) => {
     
-    const handleImageChange = (e) => {
-        const selectedImage = e.target.files[0];
-        setFormData({ ...formData, image: selectedImage });
+    const [selectedImage, setSelectedImage] = useState(null);
+
+    const storage = getStorage();
+    const uploadAndReturnUrl = async (storageRef, file) => {
+      try {
+        // Upload 'file' to Firebase Storage.
+        await uploadBytes(storageRef, file);
+  
+        // Get download url of uploaded file.
+        const imageUrl = await getDownloadURL(storageRef);
+        return imageUrl;
+      } catch (error) {
+        console.error('Error uploading file: ', error);
+        throw error;
+      }
     };
-    const handleSubImagesChange = (e) => {
+    const uploadImage = async (image) => {
+        const imgUrl = uuidv4();
+        const imageRef = ref(storage, `project_images/${imgUrl}`);
+        const imageUrl = await uploadAndReturnUrl(imageRef, image);
+        setFormData({ ...formData, image: imageUrl });
+    }
+    const handleImageChange = async (e) => {
+        const selectedImage = e.target.files[0];
+        setSelectedImage(selectedImage)
+        uploadImage(selectedImage)
+    };
+
+    const handleSubImagesChange = async (e) => {
       const selectedSubImages = Array.from(e.target.files);
-      setFormData({ ...formData, subImages: selectedSubImages });
+
+      const subImagePromises = selectedSubImages.map(async (subImage) => {
+        const subimgUrl = uuidv4();
+        const subImageRef = ref(storage, `project_images/${subimgUrl}`);
+        return await uploadAndReturnUrl(subImageRef, subImage);
+      });
+
+      const subimageUrls = await Promise.all(subImagePromises)
+
+      setFormData((prevFormData) => {
+        return { ...prevFormData, subImages: subimageUrls };
+      });
     };
     const getFileNames = () => {
       return formData.subImages.map((file, index) => `추가 이미지 ${index + 1}: ${file.name}`).join('\n');
@@ -276,11 +305,14 @@ const DetailedInfoForm = ({ prevStep, nextStep, formData, setFormData }) => {
                 {formData.image ? (
                   <img
                     className="form-image"
-                    src={URL.createObjectURL(formData.image)}
+                    src={URL.createObjectURL(selectedImage)}
                     alt="대표 이미지 미리보기"
                   />
                 ) : (
-                  <div className="form-image">이미지 미리보기</div>
+                  <div className="form-image">
+                    <div>이미지 미리보기</div>
+                    <div className="form-image-description">(이미지 로딩에는 시간이 소요될 수 있습니다)</div>
+                  </div>
                 )}
               </div>
             </label>
@@ -480,48 +512,15 @@ const CompletionForm = ({ prevStep, formData, setFormData }) => {
 
   const navigate = useNavigate();
 
-  const uploadAndReturnUrl = async (storageRef, file) => {
-    try {
-      // Upload 'file' to Firebase Storage.
-      await uploadBytes(storageRef, file);
-
-      // Get download url of uploaded file.
-      const imageUrl = await getDownloadURL(storageRef);
-      return imageUrl;
-    } catch (error) {
-      console.error('Error uploading file: ', error);
-      throw error;
-    }
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       setIsSubmitting(true);
-      const storage = getStorage();
-
-      // formData.image
-      const imageRef = ref(storage, `project_images/${formData.image.name}`);
-      const imageUrlPromise = uploadAndReturnUrl(imageRef, formData.image);
-
-      // formData.subImages
-      const subImagePromises = formData.subImages.map(async (subImage) => {
-        const subImageRef = ref(storage, `project_images/${subImage.name}`);
-        return uploadAndReturnUrl(subImageRef, subImage);
-      });
-
-      // Wait for both image and subImage uploads to complete concurrently
-      const [imageUrl, subImageUrls] = await Promise.all([
-        imageUrlPromise,
-        Promise.all(subImagePromises),
-      ]);
 
       const updatedFormData = {
         ...formData,
         createdAt: moment().toDate(),
-        subImages: subImageUrls,
-        image: imageUrl,
         'leaderId': uid,
       };
 
@@ -579,11 +578,10 @@ const CompletionForm = ({ prevStep, formData, setFormData }) => {
 export const ProjectCreate = () => {
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({
-        projectName: '',
+        name: '',
         shortDescription: '',
-        projectCategory: '',
-        projectType: '',
-        openChatRoom: '',
+        category: '',
+        type: '',
         recruitStartDate: null,
         recruitEndDate: null,
         runningStartDate: null,

@@ -175,6 +175,12 @@
     padding: 10px;
     box-sizing: border-box;
 }
+.projectBody .bodyImages img {
+    width: 700px;
+    padding-left: 10px;
+    padding-right: 10px;
+    box-sizing: border-box;
+}
 .projectButton {
     display: inline-block;
     width: 130px;

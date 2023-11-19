@@ -1,13 +1,14 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import style from './Project.module.css'
 import { Link } from 'react-router-dom';
+import { getFirestore, collection, query, orderBy, getDocs } from 'firebase/firestore';
 
 const UserProject = ({ project }) => {
     return (
       <div className={style.projectBox}>
         <img src={project.image} alt={project.name} />
         <div className={style.name}>{project.name}</div>
-        <div className={style.comment}>{project.comment}</div>
+        <div className={style.comment}>{project.shortDescription}</div>
       </div>
     );
   };
@@ -23,10 +24,10 @@ const DetailedProject = ({ project }) => {
     <div className={style.projectBox}>
         <span className={`${style.tag} ${style[getTagColor(project.status)]}`}>{project.status}</span>
         <img src={project.image} alt={project.name} />
-        <Link to="/projectDetail" style={{ textDecoration: 'none' }} className={style.name}>
+        <Link to={`/projectDetail/${project.id}`} style={{ textDecoration: 'none' }} className={style.name}>
             {project.name}
         </Link>
-        <div className={style.comment}>{project.comment}</div>
+        <div className={style.comment}>{project.shortDescription}</div>
     </div>
       );
 };
@@ -40,8 +41,8 @@ const MyProject = () => {
     const myProjects = [
         { name: '느긋 느슨 그림그리기 크랍 11월', image: defaultImage, comment: '한 달 동안 우리 함께 그림 루틴 만들어 볼까요?' },
         { name: '니트니까 평일에 롯데월드', image: defaultImage2, comment: '니트의 특권으로 평일에 놀아요 :)' },
-        { name: '요리보고 채식보고', image: defaultImage, comment: '설명입니다.' },
-        { name: '달이 뜨면 오늘 하루를 마무리해요', image: defaultImage2, comment: '설명입니다.' },
+        { name: '요리보고 채식보고', image: defaultImage3, comment: '설명입니다.' },
+        { name: '달이 뜨면 오늘 하루를 마무리해요', image: defaultImage4, comment: '설명입니다.' },
         { name: '사부작 모임', image: defaultImage, comment: '설명입니다.' },
         { name: '바꿔바꿔 니트(knit) 교환 장터', image: defaultImage2, comment: '설명입니다.' },
     ];
@@ -77,20 +78,60 @@ const MyProject = () => {
     );
 };
 
+const setProjectStatus = (project) => {
+  const currentDate = new Date();
+  const timestampInSeconds = Math.floor(currentDate.getTime() / 1000);
+
+  if (timestampInSeconds >= project.recruitStartDate.seconds && timestampInSeconds <= project.recruitEndDate.seconds) {
+    project.status = '모집중';
+  }
+  else if (timestampInSeconds >= project.runningStartDate.seconds && timestampInSeconds <= project.runningEndDate.seconds) {
+    project.status = '진행중';
+  }
+  else if (timestampInSeconds > project.runningEndDate.seconds) {
+    project.status = '진행완료';
+  }
+  else {
+    project.status = '';
+  }
+}
+
 const ProjectList = () => {
-    const myProjects = [
-        { name: '느긋 느슨 그림그리기 크랍 11월', image: defaultImage4, comment: '한 달 동안 우리 함께 그림 루틴 만들어 볼까요?', type:'루틴', form:'온라인', status:'모집중'},
-        { name: '니트니까 평일에 롯데월드', image: defaultImage3, comment: '니트의 특권으로 평일에 놀아요 :)', type:'관계', form:'오프라인', status:'진행중' },
-        { name: '요리보고 채식보고', image: defaultImage4, comment: '설명입니다.', type:'관계', form:'온라인', status:'진행중' },
-        { name: '달이 뜨면 오늘 하루를 마무리해요', image: defaultImage2, comment: '설명입니다.' , type:'경험', form:'오프라인', status:'모집중' },
-        { name: '사부작 모임', image: defaultImage, comment: '설명입니다.' , type:'경험', form:'온라인', status:'모집중' },
-        { name: '바꿔바꿔 니트(knit) 교환 장터', image: defaultImage3, comment: '설명입니다.', type:'경험', form:'온라인', status:'모집중' },
-        { name: 'Firebase AND React', image: defaultImage3, comment: '구현하면서 배우는 소모임', type:'경험', form:'온오프라인', status:'모집중' },
-        { name: 'Tech for Impact', image: defaultImage4, comment: '금요일 13:00 ~ 16:00', type:'루틴', form:'온라인', status:'진행완료' },
-        { name: 'School of Computing', image: defaultImage3, comment: '전산학부에 관한 설명입니다.', type:'루틴', form:'진행완료', status:'모집중' },
-        { name: '10번째 소모임', image: defaultImage2, comment: '^_^', type:'루틴', form:'온라인', status:'모집중' },
-        { name: '11번째 소모임', image: defaultImage, comment: '이건 11번째입니다.', type:'루틴', form:'오프라인', status:'진행완료' },
-    ];
+
+    const [myProjects, setMyProjects] = useState([]);
+
+    
+    // Firestore에서 데이터를 가져오는 useEffect
+    useEffect(() => {
+      const fetchProjects = async () => {
+        const db = getFirestore(); // Firestore 인스턴스 얻기
+        const projectsCollection = collection(db, 'projects');
+        const q = query(projectsCollection, orderBy('createdAt', 'desc'));
+        
+        try {
+          const querySnapshot = await getDocs(q);
+          const projectsData = [];
+          querySnapshot.forEach((doc) => {
+            const newObj = {
+                ...doc.data(),
+                id: doc.id,
+            };
+            projectsData.push(newObj);
+          });
+          setMyProjects(projectsData);
+        } catch (error) {
+          console.error('Error fetching projects: ', error);
+        }
+      };
+
+      fetchProjects(); // 함수 호출
+
+    }, []); // 빈 배열은 컴포넌트가 마운트될 때 한 번만 실행
+
+    myProjects.forEach((project) => {
+      setProjectStatus(project);
+    });
+
     // For Search Bar
     const [searchTerm, setSearchTerm] = useState(''); // 검색어 상태 추가
     const handleSearch = (event) => {
@@ -99,27 +140,27 @@ const ProjectList = () => {
 
     // For Dropdowns
     const statuses = ['전체', '모집중', '진행중', '진행완료'];
-    const forms = ['전체', '온라인', '오프라인', '온오프라인'];
-    const types = ['전체', '루틴', '관계', '경험'];
+    const types = ['전체', '온라인', '오프라인', '온오프라인'];
+    const categories = ['전체', '루틴', '관계', '경험'];
     const [selectedStatus, setSelectedStatus] = useState('전체'); // 모집중, 진행중, 진행완료
-    const [selectedForm, setSelectedForm] = useState('전체'); // 온라인, 오프라인, 온오프라인
-    const [selectedType, setSelectedType] = useState('전체'); // 루틴, 관계, 경험
+    const [selectedType, setSelectedType] = useState('전체'); // 온라인, 오프라인, 온오프라인
+    const [selectedCategory, setSelectedCategory] = useState('전체'); // 루틴, 관계, 경험
     const filteredProjects = myProjects.filter(project => {
         return (
-            (selectedType === '전체' || project.type === selectedType) &&
-            (selectedForm === '전체' || project.form === selectedForm) &&
             (selectedStatus === '전체' || project.status === selectedStatus) &&
+            (selectedType === '전체' || project.type === selectedType) &&
+            (selectedCategory === '전체' || project.category === selectedCategory) &&
             (project.name.toLowerCase().includes(searchTerm.toLowerCase())) // 검색어 필터링 추가
         );
     });
+    const handleStatusChange = (e) => {
+        setSelectedStatus(e.target.value);
+    };
     const handleTypeChange = (e) => {
         setSelectedType(e.target.value);
     };
-    const handleFormChange = (e) => {
-        setSelectedForm(e.target.value);
-    };
-    const handleStatusChange = (e) => {
-        setSelectedStatus(e.target.value);
+    const handleCategoryChange = (e) => {
+        setSelectedCategory(e.target.value);
     };
 
     // For Navigation Button
@@ -177,8 +218,8 @@ const ProjectList = () => {
                 </span>
                 <span className={style.dropdown}>
                   <div>소모임 분류</div>
-                  <select onChange={handleFormChange}>
-                    {forms.map((form, index) => (
+                  <select onChange={handleCategoryChange}>
+                    {categories.map((form, index) => (
                       <option key={index} value={form}>{form}</option>
                     ))}
                   </select>

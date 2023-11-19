@@ -58,13 +58,46 @@ export const Signup = () => {
                 nickname: userObj.nickname,
                 email: userObj.email,
                 generation: userObj.generation,
+                facebook: "",
+                instagram: "",
+                tel: "",
+                followers: [],
+                followings: [],
+                uid: auth.currentUser.uid
             });
+            
+            const relationRef = collection(dbService, "relations");
+            await setDoc(doc(relationRef, auth.currentUser.uid), {
+                follower_number: 0,
+                follower: [],
+                following_number: 0,
+                following: [],
+            });
+            
             
             // move to home if singup is successful
             document.location.href="/";
         })
         .catch((error) => {
-            console.log(error);
+            switch (error.code) {
+                case "auth/user-not-found" || "auth/wrong-password":
+                  alert("이메일 혹은 비밀번호가 일치하지 않습니다.");
+                  break;
+                case "auth/email-already-in-use":
+                  alert("이미 사용 중인 이메일입니다.");
+                  break;
+                case "auth/weak-password":
+                  alert("비밀번호는 6글자 이상이어야 합니다.");
+                  break;
+                case "auth/network-request-failed":
+                  alert("네트워크 연결에 실패 하였습니다.");
+                  break;
+                case "auth/invalid-email":
+                  alert("잘못된 이메일 형식입니다.");
+                  break;
+                case "auth/internal-error":
+                  alert("잘못된 요청입니다.");
+            }
         });
     }
 
@@ -79,7 +112,7 @@ export const Signup = () => {
                 </div>
                 <div className="signup__body__inputline">
                     <p className="signup__body__inputline--description">비밀번호</p>
-                    <input className="signup__body__inputline--input" type="text" value={password} placeholder="비밀번호를 입력해 주세요" onChange={onChangePassword} />
+                    <input className="signup__body__inputline--input" type="password" value={password} placeholder="비밀번호를 입력해 주세요" onChange={onChangePassword} />
                 </div>
 
                 <div className="signup__body__inputline">
@@ -143,7 +176,7 @@ export class Login extends React.Component {
                     </div>
                     <div className="body__inputline">
                         <p className="body__inputline--description">비밀번호</p>
-                        <input className="body__inputline--input" type="text" value={this.state.pw} placeholder="비밀번호를 입력해 주세요" onChange={this.handlePw} />
+                        <input className="body__inputline--input" type="password" value={this.state.pw} placeholder="비밀번호를 입력해 주세요" onChange={this.handlePw} />
                     </div>
                     
                     <button type="submit" className="body__submitbtn">로그인</button>

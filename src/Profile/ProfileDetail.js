@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Link, useLocation } from "react-router-dom"
 import { dbService, auth } from '../firebase';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { getStorage, ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { FaFacebookSquare, FaInstagramSquare} from 'react-icons/fa';
 import { IoGlobeOutline } from "react-icons/io5";
@@ -21,7 +21,7 @@ const ProfileHeader = ({userData, myProfile}) => {
   const website_url = 'https://' + userData.website;
   const facebook_url = 'https://www.facebook.com/' + userData.facebook;
   const insta_url = 'https://www.instagram.com/' + userData.instagram;
-  
+
   // Profile Edit
   const [EditClicked, setEditClicked] = useState(false);
   const EditClick = () => {
@@ -39,6 +39,34 @@ const ProfileHeader = ({userData, myProfile}) => {
     }
   };
 
+
+  // Following Handle 
+  /* TODO!
+   * IsFollowed() 구현 => 이미 Follow 된 사람들에 한해서 Follow 비활성화
+   * 자기 페이지 Follow 비활성화
+   * Optimistic Following 구현 
+   */
+
+  const handleFollow = async () => {
+    try {
+      const currentUserID = auth.currentUser.uid;
+      const otherUserID = userData.uid;
+
+      const otherUserRef = doc(dbService, "users", otherUserID);
+      await updateDoc(otherUserRef, {
+        followers: arrayUnion(currentUserID),
+      })
+      
+      const userRef = doc(dbService, "users", currentUserID);
+      await updateDoc(userRef, {
+        followings: arrayUnion(otherUserID),
+      })
+
+    } catch(error) {
+      console.log(error);
+    }
+  }
+
   return (
     <div className="header-container">
         <div className="bg-image" style={bgImageStyle}>
@@ -52,12 +80,16 @@ const ProfileHeader = ({userData, myProfile}) => {
                 </div>
                 <div className="header-left2">
                     <Link to="/profile">
-                      <span className="info">팔로워 {userData.followers}명</span>
-                      <span className="info">팔로잉 {userData.following}명</span>
+                      <span className="info">팔로워 {userData.followers.length - 1}명</span>
+                      <span className="info">팔로잉 {userData.followings.length - 1}명</span>
                     </Link>
                 </div>
                 <div className="header-left3">
-                    <button>Follow</button>
+                  {myProfile ? (
+                    <h3> </h3>
+                  ) : (
+                    <button onClick={handleFollow}>Follow</button>
+                  )}
                 </div>
             </div>
             <div className="header-mid">
@@ -296,13 +328,16 @@ const ProfileDetail = () => {
           profileUserDocRef = doc(dbService, 'users', auth.currentUser.uid); 
           setMyProfile(true);
         }
+
         const profileUserDoc = await getDoc(profileUserDocRef);
 
         if (profileUserDoc.exists()) {
           setProfileUserData(prevData => ({ ...prevData, ...profileUserDoc.data() }));
+          /*
           await updateDoc(profileUserDoc, {
             profile_img: getDownloadURL(ref(profileUserDoc, `profile_images/${profileUserDoc.profile_img}`))
           });
+          */
         } else {
           console.log('User not found');
         }

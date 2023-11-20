@@ -5,33 +5,36 @@ export const defaultData = {
   followers: 0, // 팔로워 수
   following: 0, // 팔로잉 수
   
-  profile_image: 'https://images.pexels.com/photos/1804796/pexels-photo-1804796.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
+  profile_image: 'https://s3.amazonaws.com/37assets/svn/765-default-avatar.png',
   background_image: 'https://images.pexels.com/photos/1731427/pexels-photo-1731427.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
   
   website: 'github.com/kakao',
   facebook: 'kakao.brandmedia',
   instagram: 'kakao.today',
-  email: 'user@example.com',
-  tel: '000-0000-0000',
+  email: '[default]user@example.com',
+  tel: '[default]000-0000-0000',
   
   // ProfileIntro
   intro_image: 'https://cdn.imweb.me/upload/S20191010288d21675b22f/e33c22faf15bc.jpg',
-  intro_content: `언제나 저를 이끈 건 ‘재미’입니다.\n늘 재미있는 일을 찾아다니죠.\n지금 저에게 가장 재미있는 일은 그림과 글쓰기, 그리고 영화랍니다.\n
+  intro_content: `[default] 언제나 저를 이끈 건 ‘재미’입니다.\n늘 재미있는 일을 찾아다니죠.\n지금 저에게 가장 재미있는 일은 그림과 글쓰기, 그리고 영화랍니다.\n
   삶의 다양한 선택에서 늘 저를 이끌었던 건 ‘재미’였습니다.
 제가 재미있는 일을 하며 먹고살 수 있다면, 그것이 바로 행복이 아닐까 싶습니다. 단순히, 즐거운 기분을 넘어서 좋은 성과와 보람이 가득한 재미를 느껴 보고 싶습니다.
 이번 프로젝트는 제가 좋아하는 영화와 그림, 글을 통해 재미있어 보려고 했습니다.`,
-  intro_keyword: ['글쓰기', '영화', '여행가'],
+  intro_keyword: ['[default]글쓰기', '[default] 영화', '[default] 여행가'],
 
   //ProfileCareer
   career: {
-    '교육공학자': ['교육공학 박사',
+    '[default] 교육공학자': ['교육공학 박사',
                   '교육 콘텐츠 개발 및 기획',
                   '수업 컨설턴트, 학습 컨설턴트 자격 보유'],
-    '일러스트레이터': ['동화 [나뭇잎 날개] 삽화 및 표지 작업 (출간 예정)',
+    '[default] 일러스트레이터': ['동화 [나뭇잎 날개] 삽화 및 표지 작업 (출간 예정)',
                     '도서 [어른이 되어 다시 만나는 철학] 삽화 및 표지 작업'],
-    '작가': ['시네마에듀(가제) 출판 계약 및 출간 예정(2023년 8월)']
+    '[default] 작가': ['시네마에듀(가제) 출판 계약 및 출간 예정(2023년 8월)']
   },
-  friendInfo: '홍길동님과 알고 있습니다. (default text)'
+  friendInfo: '홍길동님과 알고 있습니다. (default text)',
+
+  followers: [""],
+  followings: [""],
 };
 
 const defaultImage = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'

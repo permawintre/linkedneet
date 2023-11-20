@@ -12,8 +12,6 @@ import { ProfileEditModal, ProfileIntroEditModal } from './ProfileEditModal';
 import { defaultData } from './defaultData'
 import './ProfileDetail.css';
 
-const DefaultProfileImg = 'https://s3.amazonaws.com/37assets/svn/765-default-avatar.png'
-
 const ProfileHeader = ({userData, myProfile}) => {
   const bgImageStyle = {
       backgroundImage: `url(${userData.background_image})`
@@ -93,7 +91,7 @@ const ProfileHeader = ({userData, myProfile}) => {
                 </div>
             </div>
             <div className="header-mid">
-              <img className="profile-image" src={userData.profile_img || DefaultProfileImg} alt=""/>
+              <img className="profile-image" src={userData.profile_image} alt=""/>
             </div>
             <div className="header-right">
                 <div className="header-right1">
@@ -313,46 +311,65 @@ const ProfileDetail = () => {
 
   const [currentUserData, setCurrentUserData] = useState({ ...defaultData });
   const [profileUserData, setProfileUserData] = useState({ ...defaultData });
-  const [isLoading, setIsLoading] = useState(true);
+  const [currentUserDataLoaded, setCurrentUserDataLoaded] = useState(false);
+  const [profileUserDataLoaded, setProfileUserDataLoaded] = useState(false);
   const [myProfile, setMyProfile] = useState(false);
 
-  // profiledetail에 정보를 띄울 user의 정보(profileUserData)를 firebase에서 fetch
-  useEffect(() => {
-    const fetchProfileUserData = async () => {
+  // profiledetail에 접속해 있는 user의 정보(currentUserData)를 firebase에서 fetch
+  useEffect( () => {
+    const fetchCurrentUserData = async () => {
       try {
-        let profileUserDocRef;
-        // if querystring 'uid' exists, get 'uid' user's data
-        if (uid) { profileUserDocRef = doc(dbService, 'users', uid); }
-        // else, get current user's data
-        else { 
-          profileUserDocRef = doc(dbService, 'users', auth.currentUser.uid); 
-          setMyProfile(true);
-        }
+        const currentUserDocRef = doc(dbService, 'users', auth.currentUser.uid);
+        const currentUserDoc = await getDoc(currentUserDocRef);
 
-        const profileUserDoc = await getDoc(profileUserDocRef);
-
-        if (profileUserDoc.exists()) {
-          setProfileUserData(prevData => ({ ...prevData, ...profileUserDoc.data() }));
-          /*
-          await updateDoc(profileUserDoc, {
-            profile_img: getDownloadURL(ref(profileUserDoc, `profile_images/${profileUserDoc.profile_img}`))
-          });
-          */
+        if (currentUserDoc.exists()) {
+          setCurrentUserData(prevData => ({ ...prevData, ...currentUserDoc.data() }));
         } else {
           console.log('User not found');
         }
       } catch (error) {
         console.error('Error fetching user data:', error);
       } finally {
-        setIsLoading(false); // Loading 끝
+        setCurrentUserDataLoaded(true);
       }
     };
 
-    fetchProfileUserData();
-  }, [uid]);
+    fetchCurrentUserData()
+  }, []);
+
+
+
+// profiledetail에 정보를 띄울 user의 정보(profileUserData)를 firebase에서 fetch
+useEffect(() => {
+  const fetchProfileUserData = async () => {
+    try {
+      // uid가 현재 사용자의 uid와 같거나, uid가 없는 경우
+      if (!uid || uid === auth.currentUser.uid) {
+        setProfileUserData(currentUserData);
+        setMyProfile(true);
+      } else {
+        // uid가 다른 경우 별도로 fetch
+        const profileUserDocRef = doc(dbService, 'users', uid);
+        const profileUserDoc = await getDoc(profileUserDocRef);
+
+        if (profileUserDoc.exists()) {
+          setProfileUserData(prevData => ({ ...prevData, ...profileUserDoc.data() }));
+        } else {
+          console.log('User not found');
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    } finally {
+      setProfileUserDataLoaded(true);
+    }
+  };
+
+  fetchProfileUserData();
+}, [uid, currentUserData]);
 
   // firebase에서 모든 data가 fetch되기 전까지 Loading... 띄우기
-  if (isLoading) {
+  if (!currentUserDataLoaded || !profileUserDataLoaded) {
     return <div>Loading...</div>;
   }
 

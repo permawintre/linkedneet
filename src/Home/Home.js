@@ -1,6 +1,8 @@
-import { getDayMinuteCounter, PostContents, PostPics, LikeBtn, CommentBtn } from './supportFunctions'
+import React from "react"
+import { getDayMinuteCounter, PostContents, PostPics, LikeBtn, CommentBtn, PlusBtn, Comments,CommentsContainer } from './supportFunctions'
 import './Home.css'
-import { db, auth } from '../firebase.js'
+import { initializeApp } from 'firebase/app';
+import { db , auth } from '../firebase.js'
 import {
     collection,
     query,
@@ -8,47 +10,38 @@ import {
     limit,
     getDocs,
     addDoc,
-    startAfter
+    startAfter,
+    doc,
+    getDoc
 } from "firebase/firestore"
 import { useEffect, useState } from 'react'
 import close from '../images/close.png'
 import moment from 'moment'
 import styled from 'styled-components'
-import { getStorage, ref, uploadString, getDownloadURL } from 'firebase/storage';
+import { getStorage, ref, uploadString, listAll, getDownloadURL } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid'; // 랜덤 식별자를 생성해주는 라이브러리
-import { storage } from '../firebase.js'
-
-
+import { storage } from '../firebase.js';
 
 
 
 import profile1Img from '../images/profile1Img.jpg'
-/*
-import img1 from '../images/img1.jpg'
-import img2 from '../images/img2.jpg'
-import img3 from '../images/img3.jpg'
-import img4 from '../images/img4.jpg'
-import img5 from '../images/img5.jpg'
-import img6 from '../images/img6.jpg'
-const imgUrls = [img1, img2, img3, img4, img5, img6]
-const postedAt = "2023-11-05 20:00:00"
-const contents = "지난달 초 우리 학교의 상징과도 같은 거위들이 6마리나 태어났다. 그러나 탄생의 기쁨이 채 가시기도 전에 6마리 중 2마리가 각각실종 및 사망한 것으로 확인되었으며, 1마리는 목숨이 위험할 정도의 상처를 입어 생명과학과 허원도 교수가 보호 중이라는 소식이 대학생 커뮤니티 서비스 <에브리타임>(이하 에타) 등지에 퍼지기 시작했다. 한때 고양이, 너구리와 같은 동물들이 습격해 어린 거위들이 변을 당하게 되었다는 여론이 주를 이루며, 어린 거위를 물고 가는 동물을 봤다는 목격담이 퍼지기도 했으나 확실한 사실이 밝혀지지는 않았다. 이에 본지는 자세한 사건의 내막과 여러 낭설의 진위를 파악하기 위해평소 남다른 거위 사랑으로 유명한 허 교수를 인터뷰했다."
-const numOfLikes = 26
-const numOfComments = 2
-*/
+
+const user = auth.currentUser;
 const userName = "홍길동"
 const companyClass = 14
 const moims = ['모임 a', '모임 b', '모임 c']
 
 
-
 function Post(props) {
-
     const postedAt = props.postedAt
     const numOfComments = props.numOfComments
-    const numOfLikes = props.numOfLikes
+    const numOfLikes = props.numOfLikes;
     const [imgUrls, setImgUrls] = useState([])
     const contents = props.contents
+    const [showComments, setShowComments] = useState(false);
+    const toggleComments = () => {
+        setShowComments(!showComments);
+    };
 
     useEffect(() => {
         setImgUrls([])
@@ -62,7 +55,6 @@ function Post(props) {
             })()
         }
     },[])
-
 
     return (
         <div className="homePost">
@@ -78,14 +70,33 @@ function Post(props) {
                 <PostContents contents={contents} />
             </div>
             {imgUrls.length === 0 ? null : <PostPics imgs={imgUrls} />}
-            <div className='numOfLikesNComments'>
-                {numOfLikes===0? <span></span> : <span>좋아요 {numOfLikes}개 </span>}
-                {numOfComments===0? <span></span> : <span>댓글 {numOfComments}개</span>}
-            </div>
-            <hr></hr>
             <div className='postFooter'>
                 <LikeBtn />
                 <CommentBtn />
+            </div>
+            <hr></hr>
+            <div className='numOfLikes'>
+                {numOfLikes===0? <span></span> : <span>{numOfLikes}명이 응원합니다 </span>}
+            </div>
+            <div className='numOfComments' onClick={toggleComments}>
+                {numOfComments===0? <span></span> : <span>댓글 {numOfComments}개 모두 보기</span>}
+            </div>
+            {showComments && (
+                <div className='commentcontainer'>
+                   <CommentsContainer />
+                </div>
+            )}
+            <div className='commentcontainer'>
+                
+                <div className='postcomment'>
+                    <img src={profile1Img} alt="프로필"/>
+                        <input
+                            type="text"
+                            placeholder="댓글을 남겨 주세요"
+                        />
+                    <button type="submit">보내기</button>
+                </div>
+                
             </div>
         </div>
     )
@@ -93,8 +104,7 @@ function Post(props) {
 
 
 
-const Posts = () => {
-
+const Posts=() =>{
     const [posts, setPosts] = useState([]);
     const [lastKey, setLastKey] = useState(0);
     const [nextPosts_loading, setNextPostsLoading] = useState(false);
@@ -123,7 +133,6 @@ const Posts = () => {
             console.log(e);
         }
     }
-    
     const moreFetch = async (key) => {
         
         try {
@@ -148,7 +157,6 @@ const Posts = () => {
             console.log(e);
         }
     }
-
     useEffect(() => {
         initFetch()
             .then((res) => {
@@ -159,7 +167,6 @@ const Posts = () => {
                 console.log(err);
             });
     }, [])
-
     const fetchMorePosts = (key) => {
         console.log(key)
         if (key > 0) {
@@ -177,7 +184,6 @@ const Posts = () => {
             });
         }
     };
-    
     const allPosts = (
         <div>
           {posts.map((post) => {
@@ -188,19 +194,20 @@ const Posts = () => {
                 <Post
                     contents = {post.contents}
                     postedAt = {date}
-                    numOfComments = {post.numOfComments}
-                    numOfLikes = {post.numOfLikes}
                     imgUrls = {post.imgUrls}
+                    numOfLikes = {post.numOfLikes}
+                    numOfComments = {post.numOfComments}
                 />
+                <div className='postFooter'>
+                </div>
+            
+            
               </div>
+              
             );
           })}
         </div>
       );
-
-
-
-
       useEffect(() => {
         const handleScroll = () => {
           const { scrollTop, offsetHeight } = document.documentElement
@@ -218,17 +225,6 @@ const Posts = () => {
         else if (!(lastKey>0)) setNextPostsLoading(false)
       }, [nextPosts_loading])
 
-
-
-
-
-
-
-
-
-
-
-
       return (
         <div>
             <div>{allPosts}</div>
@@ -244,6 +240,7 @@ const Posts = () => {
         </div>
       );
 
+    
 }
 
 
@@ -294,15 +291,7 @@ function DndBox(props) {
         }
         setIsDragging(false);
       };
-/*
-      const onContentImageChange = (e) => {
-        if (e.target.files) {
-          readImage(e.target.files[0]);
-          readImage(e.target.files[1]);
-        }
-        console.log(e.target.files)
-      };
-*/
+      
       const StyledCpnt = styled.div`
         border: ${(props) => props.$isDragging ? '3px dotted #808080' : '3px solid #bbbbbb'}
       `
@@ -362,7 +351,7 @@ function Write() {
     useEffect( () => {
         if(async) {
             
-            addDoc(collection(db, "posts"), values)
+            addDoc(collection(db , "posts"), values)
             setAsync(false)
         }
         else {
@@ -389,11 +378,14 @@ function Write() {
             'postedAt': moment().unix(),
             'userId': uid,
             'imgUrls': imgUrls
+        
         })
         
+        
+
         setIsOpen(false)
 
-        const storage = getStorage();
+        //const storage = getStorage();
 
         for(let i=0;i<contentImages.length;i++) {
             const fileRef = ref(storage, imgUrls[i]);
@@ -442,11 +434,76 @@ function Write() {
 
 export const Home = () => {
 
+    const [users, setUsers] = useState([]);
+    const [userInfo, setUserInfo] = useState(null);
+
+    useEffect(() => { //오른쪽 사이드 바 코드
+        const fetchUsers = async () => {
+            const usersCollectionRef = collection(db, 'users');
+            const data = await getDocs(usersCollectionRef);
+            // 모든 사용자 정보를 배열로 변환
+            const allUsers = data.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+            // 현재 로그인한 사용자의 uid 확인
+            const currentUserId = auth.currentUser ? auth.currentUser.uid : null;
+            // 현재 로그인한 사용자를 제외한 사용자들 필터링
+            const otherUsers = allUsers.filter(user => user.id !== currentUserId);
+            // 랜덤하게 사용자 3명 선택
+            const selectedUsers = otherUsers.sort(() => 0.5 - Math.random()).slice(0, 3);
+
+            setUsers(selectedUsers); // 선택된 사용자들로 상태 업데이트
+        };
+    
+        fetchUsers();
+    }, []);
+
+    useEffect(() => { // 유저 정보 코드
+        const fetchUserInfo = async () => {
+            if (auth.currentUser) {
+                const userRef = doc(db, "users", auth.currentUser.uid);
+                const docSnap = await getDoc(userRef);
+
+                if (docSnap.exists()) {
+                    setUserInfo(docSnap.data());
+                } else {
+                    console.log("No such document!");
+                }
+            }
+        };
+
+        fetchUserInfo();
+    }, []);
+
     return(
         <div className='home'>
+            <aside className="left-sidebar">
+                <div className="background-img-container">
+                    <img src={userInfo?.imgUrls} alt="background" className="background-img"/> 
+                    {/*임시*/}
+                </div>
+                <img src={userInfo?.imgUrls|| profile1Img} alt="profile" className="profile-img1" />
+                <div className="profile-info">
+                    <h3>{userInfo?.nickname}</h3>
+                </div>
+                <button>내 그룹</button>
+            </aside>
             
-            <Write/>
-            <Posts/>
+            <div className='postsContainer'>
+                <Write/>
+                <Posts/>
+            </div>
+
+            <aside className="right-sidebar">
+                <ul className="interestList">
+                    {users.map(user => (
+                        <li key={user.id} className="interestItem">
+                            <img src={user.imgUrls || profile1Img} alt={user.nickname || 'User'}/>
+                            <span className="interestTitle">{user.nickname || 'Unknown User'}</span>
+                            <PlusBtn/>
+                        </li>
+                    ))}
+                </ul>
+            </aside>
+
         </div>
     )
 

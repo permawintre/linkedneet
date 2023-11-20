@@ -1,9 +1,14 @@
 import moment from 'moment'
 import { useState } from 'react'
+
 import arrow from '../images/arrow.png'
 import filledStar from '../images/filledStar.png'
 import emptyStar from '../images/emptyStar.png'
 import comments from '../images/comments.png'
+import React from 'react'
+import { db , auth } from '../firebase.js'
+
+
 
 /**
  * 몇시간 전에 게시된건지 텍스트로 반환하는 함수입니다(moment.js 설치필요)
@@ -62,6 +67,8 @@ export const getDayMinuteCounter = (date) => {
  */
 export const PostContents = ({contents}) => {
 
+  const validContents = typeof contents === 'string' ? contents : '';
+
   const [state,setState] = useState(true);
 
   const handler = () => {
@@ -69,8 +76,8 @@ export const PostContents = ({contents}) => {
     setState((e) => !e)
   }
 
-  const contentsLength = JSON.parse(JSON.stringify({contents})).contents.length
-  if(contentsLength<=220) {
+  
+  if(validContents.length<=220) {
     return(
       <div className='postContents'>{contents}</div>
     )
@@ -151,7 +158,7 @@ export const PostPics = ({imgs}) => {
  * 반응형 애니메이션은 css로 구현
  * @returns 좋아요 버튼 렌더링
  */
-export const LikeBtn = () => {
+ export const LikeBtn = () => {
 
   let [state, setState] = useState(false)
 
@@ -184,7 +191,92 @@ export const CommentBtn = () => {
 
   return(
     <div>
-      <img src={comments} alt='comment' className='comment' />
+      <img src={comments} alt='commentbtn' className='commentbtn' />
     </div>
   )
+}
+
+export const Comments= ( profilePic, author, timestamp, content )=> {
+  return (
+    <div className="comment">
+        <img src={profilePic} alt="Profile" className="commentProfilePic" />
+        <div className="commentDetails">
+            <span className="commentAuthor">{author}</span>
+            <span className="commentTimestamp">{timestamp}</span>
+            <p className="commentContent">{content}</p>
+        </div>
+    </div>
+  );  
+}
+
+export const CommentsContainer = (comments) => {
+  return (
+    <div className="commentsContainer">
+        {comments.map((comment, index) => (
+            <Comments
+                key={index}
+                profilePic={comment.profilePic}
+                author={comment.author}
+                timestamp={comment.timestamp}
+                content={comment.content}
+            />
+        ))}
+    </div>
+);
+}
+
+
+export const PlusBtn = () => {
+
+  let [activeClass, setActiveClass] = useState("")
+
+  const toggleActive = () => {
+    setActiveClass(activeClass === '' ? 'active' : '');
+  };
+
+  return (
+    <div className={`plusSign ${activeClass}`} onClick={toggleActive}>
+      +
+    </div>
+  )
+  
+}
+
+export const WritePost = ({profile})  =>{
+  const [showPopup, setShowPopup] = useState(false);
+
+  const handlePostClick = () => {
+    setShowPopup(true);
+  };
+
+  const closePopup = () => {
+    setShowPopup(false);
+  };
+
+  return (
+    <>
+      <div className="write-post" onClick={handlePostClick}>
+        <img src={profile} alt="profile-img" className="profile-img1"/>
+        <input type="text" placeholder="당신의 일상을 공유해주세요!" readOnly />
+      </div>
+      
+      {showPopup && (
+        <div className="modal-overlay">
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <img src={profile} alt="profile-img" className="profile-img2"/>
+              <h5 className="modal-title">홍길동</h5>
+              <button onClick={closePopup}>닫기</button>
+            </div>
+            <div className="modal-body">
+              <textarea id="textArea" placeholder="나누고 싶은 생각이 있으세요?" />
+            </div>
+            <div className="modal-footer">
+              <button onClick={closePopup}>업데이트</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
 }

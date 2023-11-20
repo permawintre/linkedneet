@@ -332,6 +332,12 @@ hr {
     margin: 10px 0 10px 560px;
 }
 
+
+
+
+.imgsAboveDnd {
+    margin-left: 10px;
+}
 .dndBox {
     display: flex;
     height: 100px;
@@ -364,8 +370,10 @@ hr {
     width: 100px;
     height: 100px;
     object-fit: cover;
-
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;200;300;400;500;600;700;800;900&display=swap');
+}
+.write .previewImg:hover {
+    
+    filter: blur(1px) grayscale(100%)
 }
 
 .home {

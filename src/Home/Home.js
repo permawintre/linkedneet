@@ -248,6 +248,7 @@ const Posts=() =>{
 function DndBox(props) {
 
     const [isDragging, setIsDragging] = useState(false);
+    const [deleted, setDeleted] = useState(false);
     
     // 부모 컴포넌트에서 내려준 contentImage state
     const contentImages = props.contentImages;
@@ -295,13 +296,26 @@ function DndBox(props) {
       const StyledCpnt = styled.div`
         border: ${(props) => props.$isDragging ? '3px dotted #808080' : '3px solid #bbbbbb'}
       `
+      
+      const handleClick = (e) => {
+        setDeleted(e)
+      }
 
+      useEffect(() => {
+        const deleteImg = (e) => {
+            let tmpImgs = contentImages;
+            tmpImgs.splice(e.target.dataset.key, 1);
+            setContentImages(tmpImgs);
+            setDeleted(false)
+        }
+        if(deleted) deleteImg(deleted)
+      }, [deleted])
     return(
         <div>
         {contentImages.length > 0 &&
-        <div>
-            {contentImages.map((img) => 
-                <img src={img} alt='preview' className='previewImg' />
+        <div className="imgsAboveDnd">
+            {contentImages.map((img, idx) => 
+                <img src={img} alt='preview' className='previewImg' data-key={idx} onClick={handleClick}/>
             )}
         </div>
         }
@@ -477,12 +491,12 @@ export const Home = () => {
         <div className='home'>
             <aside className="left-sidebar">
                 <div className="background-img-container">
-                    <img src={userInfo?.imgUrls} alt="background" className="background-img"/> 
+                    <img src={userInfo?.imgUrls || profile1Img} alt="background" className="background-img"/> 
                     {/*임시*/}
                 </div>
-                <img src={userInfo?.imgUrls|| profile1Img} alt="profile" className="profile-img1" />
+                <img src={userInfo?.imgUrls || profile1Img} alt="profile" className="profile-img1" />
                 <div className="profile-info">
-                    <h3>{userInfo?.nickname}</h3>
+                    <h3>{userInfo?.nickname || 'undefined'}</h3>
                 </div>
                 <button>내 그룹</button>
             </aside>

@@ -4,11 +4,11 @@
 .homePost {
     width: 550px;
     background-color: white;
-    border: solid 1px #AAAAAA;
     border-radius: 20px;
     font-family: 'Noto Sans KR', sans-serif;
     margin: auto;
     margin-top: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 .paddingDiv {
     padding: 10px;
@@ -103,7 +103,7 @@
     position: relative;
     top: 15px;
     left: 15px;
-    filter: grayscale(100%) brightness(400%) opacity(70%);
+    filter: grayscale(100%) brightness(300%) opacity(70%);
 }
 .placeHolder {
     height: 50px;
@@ -375,14 +375,14 @@ hr {
   }
   
 .left-sidebar, .right-sidebar {
-width: 250px; /* 또는 원하는 폭에 따라 조정 */
-position: sticky;
-top: 118px; /* 항상 상단에 고정 */
+    width: 250px; /* 또는 원하는 폭에 따라 조정 */
+    position: sticky;
+    top: 118px; /* 항상 상단에 고정 */
 }
 
 .postsContainer {
     width: 550px;
-    margin: 10px;
+    margin: 0 10px;
     display: flex;
     flex-direction: column;
 }

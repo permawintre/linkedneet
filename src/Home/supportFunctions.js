@@ -1,5 +1,6 @@
 import moment from 'moment'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { doc, updateDoc } from 'firebase/firestore'
 
 import arrow from '../images/arrow.png'
 import filledStar from '../images/filledStar.png'
@@ -158,15 +159,58 @@ export const PostPics = ({imgs}) => {
  * 반응형 애니메이션은 css로 구현
  * @returns 좋아요 버튼 렌더링
  */
- export const LikeBtn = () => {
+ export const LikeBtn = (props) => {
 
-  let [state, setState] = useState(false)
+  let [on, setOn] = useState(false)
+  let [clicked, setClicked] = useState(false)
+  const postId = props.postId
+  const numOfLikes = props.numOfLikes
+  const setNumOfLikes = props.setNumOfLikes
+  const whoLikes = props.whoLikes
+  const setWhoLikes = props.setWhoLikes
+  let [uid, setUid] = useState("")
+
+  useEffect(() => {
+        if(auth.currentUser) {
+          setUid(auth.currentUser.uid)
+        }
+  }, [])
+
+  useEffect(() => {
+    if(uid && whoLikes.includes(uid)){
+      setOn(true)
+    }
+  }, [uid])
+
+  useEffect(() => {
+    if(uid && clicked){
+      setOn(!on)
+      setClicked(false)
+      const postRef = doc(db, "posts", postId);
+      if(on){
+        setNumOfLikes(numOfLikes-1)
+        let tmparr = whoLikes
+        setWhoLikes(tmparr.filter(e => e !== uid))
+        updateDoc( postRef, {
+          "whoLikes": tmparr.filter(e => e !== uid)
+        } )
+      }
+      else{
+        setNumOfLikes(numOfLikes+1)
+        let tmparr = whoLikes
+        setWhoLikes(tmparr.concat(uid))
+        updateDoc( postRef, {
+          "whoLikes": tmparr.concat(uid)
+        } )
+      }
+    }
+  }, [clicked])
 
   const handler = () => {
-    setState(!state)
+    setClicked(!clicked)
   }
 
-  if(state) {
+  if(on) {
     return(
       <div className='like on'>
         <img src={filledStar} alt='like' onClick={handler} className='forColoredImg'/>

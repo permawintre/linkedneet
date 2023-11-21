@@ -33,9 +33,11 @@ const moims = ['모임 a', '모임 b', '모임 c']
 
 
 function Post(props) {
+    const postId = props.postId
     const postedAt = props.postedAt
     const numOfComments = props.numOfComments
-    const numOfLikes = props.numOfLikes;
+    const [numOfLikes, setNumOfLikes] = useState(props.numOfLikes);
+    const [whoLikes, setWhoLikes] = useState(props.whoLikes);
     const [imgUrls, setImgUrls] = useState([])
     const contents = props.contents
     const [showComments, setShowComments] = useState(false);
@@ -71,7 +73,13 @@ function Post(props) {
             </div>
             {imgUrls.length === 0 ? null : <PostPics imgs={imgUrls} />}
             <div className='postFooter'>
-                <LikeBtn />
+                <LikeBtn
+                    postId = {postId}
+                    numOfLikes = {numOfLikes}
+                    setNumOfLikes = {setNumOfLikes}
+                    whoLikes = {whoLikes}
+                    setWhoLikes = {setWhoLikes}
+                />
                 <CommentBtn />
             </div>
             <hr></hr>
@@ -197,6 +205,8 @@ const Posts=() =>{
                     imgUrls = {post.imgUrls}
                     numOfLikes = {post.numOfLikes}
                     numOfComments = {post.numOfComments}
+                    whoLikes = {post.whoLikes}
+                    postId = {post.postId}
                 />
                 <div className='postFooter'>
                 </div>
@@ -344,7 +354,8 @@ function Write() {
         contents: '',
         numOfComments: 0,
         numOfLikes: 0,
-        postedAt: null
+        postedAt: null,
+        whoLikes: []
     }
     let [isOpen, setIsOpen] = useState(false)
     let [values, setValues] = useState(defaultValues)

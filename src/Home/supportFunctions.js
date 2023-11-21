@@ -1,5 +1,6 @@
 import moment from 'moment'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { doc, getDoc, addDoc, collection } from 'firebase/firestore';
 
 import arrow from '../images/arrow.png'
 import filledStar from '../images/filledStar.png'
@@ -7,6 +8,9 @@ import emptyStar from '../images/emptyStar.png'
 import comments from '../images/comments.png'
 import React from 'react'
 import { db , auth } from '../firebase.js'
+
+const currentUserId = auth.currentUser ? auth.currentUser.uid : null;
+
 
 
 
@@ -196,33 +200,147 @@ export const CommentBtn = () => {
   )
 }
 
-export const Comments= ( profilePic, author, timestamp, content )=> {
+export const Comments= ({ userPic, userName, postedAt, contents})=> {
+  console.log(postedAt);
   return (
-    <div className="comment">
-        <img src={profilePic} alt="Profile" className="commentProfilePic" />
+    <div className="postComment">
+        <img src={userPic} alt="Profile" className="commentUserPic" />
         <div className="commentDetails">
-            <span className="commentAuthor">{author}</span>
-            <span className="commentTimestamp">{timestamp}</span>
-            <p className="commentContent">{content}</p>
+          <div className="commentHeader">
+            <span className="commentUsername">{userName}</span>
+            <span className="commentPosetedAt">{getDayMinuteCounter(postedAt)}</span>
+          </div>
+          <p className="commentContents">{contents}</p>
         </div>
     </div>
   );  
 }
 
-export const CommentsContainer = (comments) => {
+export const CommentsWindow = ({comments, numOfComments}) => {
+  console.log("Initial comments: ", comments);
+  const [state,setState] = useState(true);
+  const [commentsWithUserInfo, setCommentsWithUserInfo] = useState([]);
+
+  useEffect(() => {
+    const fetchUserInfos = async () => {
+      const updatedComments = [];
+      for (const comment of comments) {
+        const userRef = doc(db, 'users', comment.userId);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+          console.log("User data: ", userSnap.data());
+          updatedComments.push({
+            ...comment,
+            userPic: userSnap.data().profile_image,
+            userName: userSnap.data().nickname,
+          });
+        }
+      }
+      setCommentsWithUserInfo(updatedComments);
+      console.log("Updated comments with user info: ", updatedComments);
+    };
+
+    fetchUserInfos();
+  }, [comments]);
+
+
+  const handler = () => {
+
+    setState(!state);
+  }
+  const renderComments = () => {
+    return commentsWithUserInfo.map((comment, index) => {
+      console.log("Rendering comment: ", comment);
+      return(
+        <Comments
+          key={index}
+          userPic={comment.userPic}
+          userName={comment.userName}
+          postedAt={comment.postedAt}
+          contents={comment.contents}
+        />
+      );
+    }) 
+  };
   return (
-    <div className="commentsContainer">
-        {comments.map((comment, index) => (
-            <Comments
-                key={index}
-                profilePic={comment.profilePic}
-                author={comment.author}
-                timestamp={comment.timestamp}
-                content={comment.content}
-            />
-        ))}
+    <div className='commentsWindow'>
+      {state ? (
+        <div className='numOfComments' onClick={handler}>
+          {numOfComments === 0 ? <span></span> : <span>댓글 {numOfComments}개 모두 보기</span>}
+        </div>
+      ) : (
+        <div>
+          <div className='unfolded'>
+            {renderComments()}
+          </div>
+          <div className="commentfoldBtn" onClick={handler}>접기</div>
+        </div>
+      )}
     </div>
-);
+  );
+}
+
+export const WriteCommentContainer = ({ postId, userId })=> {
+  console.log(userId)
+  const [commentInput, setCommentInput] = useState('');
+  const [userProfileImage, setUserProfileImage] = useState('');
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const userRef = doc(db, 'users', userId);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+            setUserProfileImage(userSnap.data().profile_image);
+        } else {
+            console.log('User not found');
+        }
+      } catch (error) {
+        console.error('Error fetching user profile: ', error);
+      }
+    };
+    fetchUserProfile();
+  }, [userId]);
+
+  const handleSubmit = async (e) => {
+      e.preventDefault();
+
+      if (commentInput.trim() === '') {
+          alert('댓글을 입력하세요.');
+          return;
+      }
+
+      try {
+          // Firebase에 댓글 추가
+          await addDoc(collection(db, 'comments'), {
+              postId: postId,       // 현재 게시글의 ID
+              userId: userId,       // 현재 로그인한 사용자의 ID
+              content: commentInput, // 댓글 내용
+              postedAt: new Date()   // 현재 시간
+          });
+
+          setCommentInput(''); // 입력 필드 초기화
+      } catch (error) {
+          console.error('Error adding comment: ', error);
+      }
+  };
+
+  return (
+      <div className='writecommentcontainer'>
+          <form onSubmit={handleSubmit} className='writeComment'>
+              <img src={auth.currentUser.photoUrl} alt="프로필"/>
+              <input
+                  type="text"
+                  placeholder="댓글을 남겨 주세요"
+                  value={commentInput}
+                  onChange={(e) => setCommentInput(e.target.value)}
+              />
+              <button type="submit">보내기</button>
+          </form>
+      </div>
+  );
 }
 
 

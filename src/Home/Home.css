@@ -142,18 +142,73 @@ hr {
     margin: 0px 0px 5px 0px;
 }
 
-.commentcontainer {
+.postComment {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    margin-left: 10px;
+}
+
+.commentHeader {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* 두 요소 사이의 간격 조정 */
+}
+
+.commentUsername, .commentPostedAt {
+    margin: 0;
+}
+
+.commentUserPic {
+    width: 40px;
+    height: 40px;
+    border-radius: 20px; /* 원형 이미지 */
+    margin-right: 10px;
+}
+
+.commentDetails {
+    flex-grow: 1;
+}
+
+.commentUsername {
+    font-weight: bold;
+    display: block; /* 블록 레벨 요소로 설정 */
+}
+
+.commentContents {
+    margin: 5px 0;
+}
+
+.commentPosetedAt {
+    font-size: 0.8em;
+    color: gray;
+}
+.commentsWindow {
+    position: relative; /* 상대적 위치 설정 */
+    /* 기타 스타일 */
+}
+
+.commentfoldBtn {
+    position: absolute; /* 절대적 위치 설정 */
+    bottom: 10px; /* 아래에서 10px의 위치에 배치 */
+    right: 10px; /* 오른쪽에서 10px의 위치에 배치 */
+    cursor: pointer; /* 마우스 오버시 커서 변경 */
+    /* 기타 스타일 */
+}
+
+
+.writecommentcontainer {
     width: 100%;
     margin: auto;
     padding: 5px;
   }
   
-  .postcomment {
+  .writeComment {
     display: flex;
     justify-content: flex-start;
   }
   
-  .postcomment img {
+  .writeComment img {
     width: 40px; /* Adjust the size as necessary */
     height: 40px;
     border-radius: 90%; /* Circular profile picture */
@@ -162,7 +217,7 @@ hr {
     margin-left: 5px;
   }
   
-  .postcomment input[type="text"] {
+  .writeComment input[type="text"] {
     flex-grow: 1;
     height: 20px;
     padding: 10px;
@@ -171,7 +226,7 @@ hr {
     margin-right: 10px;
   }
   
-  .postcomment button {
+  .writeComment button {
     width: 70px;
     height: 40px;
     border: none;

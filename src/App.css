@@ -33,7 +33,7 @@ ul {
 .background {
 
     background-color: var(--color_2);
-    width: 100vw;
+    
 }
 
 
@@ -49,83 +49,76 @@ ul {
     background-color: var(--color_3);
     width: 100%;
     color: var(--color_2);
+}
 
-    .header__inner {
+.header__inner {
 
-        padding-top: 15px;
-        padding-bottom: 30px;
-        width: 1100px;
-        display: flex;
+    padding-top: 15px;
+    padding-bottom: 30px;
+    width: 1100px;
+    display: flex;
+}
 
-        .header__left {
+.header__left {
 
-            flex: 3;
-            display: flex;
-            padding-top: 15px;
-            .header__item {
+    flex: 3;
+    display: flex;
+    padding-top: 15px;
+}
+.header__item {
 
-                flex-grow: 1;
-                padding: 10px;
-            }
-            :hover{
-                color: white;
-            }
-            
-        }
-        .header__mid {
+    flex-grow: 1;
+    padding: 10px;
+}
+.header__left:hover{
+    color: white;
+}
 
-            flex: 2;
-            text-align: center;
-            .logo {
+        
+.header__mid {
 
-                font-size: 3rem;
-                font-family: 'Gabarito', cursive;
-            }
-        }
-        .header__right {
+    flex: 2;
+    text-align: center;
+}
+.linkedneet_logo {
+    font-size: 3rem;
+    font-family: 'Gabarito', cursive;
+    margin-top: 0;
+}
+ 
 
-            flex: 3;
-            display: flex;
+.header__right {
+    flex: 3;
+    display: flex;
+}
+.header__searchbar {
+    flex: 3;
+    padding: 10px;
+    margin-top: 5px;
+}
+.searchbar {
 
-            .header__searchbar {
+    height: 5px;
+    border-radius: 20px;
+    border-color: var(--color_2);
+    background-color: var(--color_3);
+}
+.header__searchbar :focus {
 
-                .searchbar {
+    background-color: var(--color_2);
+    outline: none;
+}
+.header__searchbar :hover {
 
-                    height: 5px;
-                    border-radius: 20px;
-                    border-color: var(--color_2);
-                    background-color: var(--color_3);
-                }
-                :focus {
-
-                    background-color: var(--color_2);
-                    outline: none;
-                }
-                :hover {
-
-                    border-color: white;
-                }
-
-                flex: 3;
-                padding: 10px;
-                margin-top: 5px;
-            }
-            .header__notice {
-
-                flex: 1;
-                padding: 10px;
-                margin-top: 15px;
-            }
-            .header__loginout {
-
-                flex: 1;
-                padding: 10px;
-                margin-top: 15px
-            }
-            
-
-        }
-
-    }
-
+    border-color: white;
+}
+.header__notice {
+    flex: 1;
+    padding: 10px;
+    margin-top: 15px;
+}
+.header__loginout {
+    flex: 1;
+    padding: 10px;
+    margin-top: 15px
 }

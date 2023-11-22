@@ -19,7 +19,7 @@ import { useEffect, useState } from 'react'
 import close from '../images/close.png'
 import moment from 'moment'
 import styled from 'styled-components'
-import { getStorage, ref, uploadString, listAll, getDownloadURL } from 'firebase/storage';
+import { getStorage, ref, uploadString, listAll, getDownloadURL, connectStorageEmulator } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid'; // 랜덤 식별자를 생성해주는 라이브러리
 import { storage } from '../firebase.js';
 
@@ -99,7 +99,6 @@ function Post(props) {
     
         fetchComments();
     }, [postId]);
-    console.log(postUserInfo.nickname);
 
     return (
         <div className="homePost">
@@ -124,14 +123,14 @@ function Post(props) {
                 {numOfLikes===0? <span></span> : <span>{numOfLikes}명이 응원합니다 </span>}
             </div>
             <CommentsWindow comments={comments} numOfComments={comments.length}/>
-            <WriteCommentContainer postId = {postId} userId ={auth.currentUser}/>
+            <WriteCommentContainer userProfileImage = {props.userInfo?.profile_image} postId = {postId} userId ={auth.currentUser.uid}/>
         </div>
     )
 }
 
 
 
-const Posts=() =>{
+const Posts=({ userInfo }) =>{
     const [posts, setPosts] = useState([]);
     const [lastKey, setLastKey] = useState(0);
     const [nextPosts_loading, setNextPostsLoading] = useState(false);
@@ -226,6 +225,7 @@ const Posts=() =>{
                     numOfComments = {post.numOfComments}
                     postId={post.postId}
                     userId={post.userId}
+                    userInfo={userInfo}
                 />
                 <div className='postFooter'>
                 </div>
@@ -353,7 +353,7 @@ function DndBox(props) {
     )
 }
 
-function Write() {
+function Write({ userInfo }) {
 
     const defaultValues = {
         contents: '',
@@ -429,7 +429,7 @@ function Write() {
     return(
         <div className='homePost write'>
             <div className='postHeader'>
-                <div className='profileImg'><img src={profile1Img} alt="profileImg"/></div>
+                <div className='profileImg'><img src={userInfo?.profile_image ||profile1Img} alt="profileImg"/></div>
                 <div className='popModal' onClick={ () => setIsOpen(true) }>당신의 일상을 공유해주세요!</div>
             </div>
             {isOpen ?
@@ -493,6 +493,7 @@ export const Home = () => {
 
                 if (docSnap.exists()) {
                     setUserInfo(docSnap.data());
+                    console.log(setUserInfo);
                 } else {
                     console.log("No such document!");
                 }
@@ -500,6 +501,7 @@ export const Home = () => {
         };
 
         fetchUserInfo();
+        
     }, []);
 
     return(
@@ -509,7 +511,7 @@ export const Home = () => {
                     <img src={userInfo?.imgUrls} alt="background" className="background-img"/> 
                     {/*임시*/}
                 </div>
-                <img src={userInfo?.imgUrls|| profile1Img} alt="profile" className="profile-img1" />
+                <img src={userInfo?.profile_image} alt="profile" className="profile-img1" />
                 <div className="profile-info">
                     <h3>{userInfo?.nickname}</h3>
                 </div>
@@ -517,8 +519,8 @@ export const Home = () => {
             </aside>
             
             <div className='postsContainer'>
-                <Write/>
-                <Posts/>
+                <Write userInfo={userInfo}/>
+                <Posts userInfo={userInfo}/>
             </div>
 
             <aside className="right-sidebar">

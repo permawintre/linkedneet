@@ -281,28 +281,10 @@ export const CommentsWindow = ({comments, numOfComments}) => {
   );
 }
 
-export const WriteCommentContainer = ({ postId, userId })=> {
+export const WriteCommentContainer = ({ userProfileImage, postId, userId })=> {
   console.log(userId)
   const [commentInput, setCommentInput] = useState('');
-  const [userProfileImage, setUserProfileImage] = useState('');
-
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const userRef = doc(db, 'users', userId);
-        const userSnap = await getDoc(userRef);
-
-        if (userSnap.exists()) {
-            setUserProfileImage(userSnap.data().profile_image);
-        } else {
-            console.log('User not found');
-        }
-      } catch (error) {
-        console.error('Error fetching user profile: ', error);
-      }
-    };
-    fetchUserProfile();
-  }, [userId]);
+  
 
   const handleSubmit = async (e) => {
       e.preventDefault();
@@ -317,7 +299,7 @@ export const WriteCommentContainer = ({ postId, userId })=> {
           await addDoc(collection(db, 'comments'), {
               postId: postId,       // 현재 게시글의 ID
               userId: userId,       // 현재 로그인한 사용자의 ID
-              content: commentInput, // 댓글 내용
+              contents: commentInput, // 댓글 내용
               postedAt: new Date()   // 현재 시간
           });
 
@@ -330,7 +312,7 @@ export const WriteCommentContainer = ({ postId, userId })=> {
   return (
       <div className='writecommentcontainer'>
           <form onSubmit={handleSubmit} className='writeComment'>
-              <img src={auth.currentUser.photoUrl} alt="프로필"/>
+              <img src={userProfileImage} alt="프로필"/>
               <input
                   type="text"
                   placeholder="댓글을 남겨 주세요"

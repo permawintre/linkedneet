@@ -15,9 +15,11 @@ const UserProject = ({ project }) => {
 const DetailedProject = ({ project }) => {
     const getTagColor = (status) => {
         switch (status) {
+            case '모집전': return 'tagBeforeRecruiting';
             case '모집중': return 'tagRecruiting';
             case '진행중': return 'tagInProgress';
             case '진행완료': return 'tagCompleted';
+            case '진행전': return 'tagBeforeRunning';
         }
     }
     return (
@@ -90,6 +92,12 @@ const setProjectStatus = (project) => {
   }
   else if (timestampInSeconds > project.runningEndDate.seconds) {
     project.status = '진행완료';
+  }
+  else if (timestampInSeconds < project.recruitStartDate.seconds) {
+    project.status = '모집전';
+  }
+  else if (timestampInSeconds < project.runningStartDate) {
+    project.status = '진행전';
   }
   else {
     project.status = '';

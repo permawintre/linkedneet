@@ -172,7 +172,7 @@ export const Profile = () => {
   }
 
   return (
-    <div className="body">
+    <div className="profile__body">
       <div className="friend-profiles">
         <div className="friend-texts">
           <h2>팔로워 친구들의 프로필을 구경해보세요!</h2>

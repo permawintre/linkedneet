@@ -446,7 +446,6 @@ hr {
 .postsContainer {
     width: 550px;
     margin: 0 10px;
-    margin-top: 108px;
     display: flex;
     flex-direction: column;
 }

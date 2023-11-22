@@ -65,26 +65,53 @@ const UserProfile = ({ uid }) => {
 const renderFollowerProfiles = (followerList) => {  
   // 유효한 userId만 필터링
   const validFollowers = followerList.filter(uid => uid);
-  return validFollowers.slice(0, 4).map((uid, index) => (
-    <UserProfile key={uid} uid={uid} />
-  ));
+  const slicedFollowers = validFollowers.slice(0, 4)
+
+  if (validFollowers.length === 0) {
+    return (
+      <h1 className="profiles-row-center">아직 팔로워가 없어요... T^T</h1>
+    )
+  }
+
+  return  (
+    <div className="profiles-row">
+      { validFollowers.map((uid, index) => (
+        <UserProfile key={uid} uid={uid} />
+      )) }
+    </div>
+  )
 };
 
 const renderFollowingProfiles = (followingList) => {
   // 유효한 userId만 필터링
   const validFollowings = followingList.filter(uid => uid);
-  
-  return validFollowings.slice(0, 4).map((uid, index) => (
-    <UserProfile key={uid} uid={uid} />
-  ));
+
+  if (validFollowings.length === 0) {
+    return (<h1 className="profiles-row-center">새로운 팔로잉을 추가해보세요!</h1>)
+  }
+
+  const slicedFollowings = validFollowings.slice(0, 4)  
+  return (
+    <div className="profiles-row">
+      { validFollowings.map((uid, index) => (
+        <UserProfile key={uid} uid={uid} />
+      )) }
+    </div>
+  )
 };
 
 const renderRecommendProfiles = (recommendList) => {
   // 유효한 userId만 필터링
   const validRecommends = recommendList.filter(uid => uid);
-  return validRecommends.slice(0, 8).map((uid, index) => (
-    <UserProfile key={uid} uid={uid} />
-  ));
+
+  const slicedFollowings = validRecommends.slice(0, 4) 
+  return (
+    <div className="profiles-row">
+      { validRecommends.map((uid, index) => (
+        <UserProfile key={uid} uid={uid} />
+      )) }
+    </div>
+  )
 };
 
 export const Profile = () => {
@@ -124,25 +151,19 @@ export const Profile = () => {
         <div className="friend-texts">
           <h2>팔로워 친구들의 프로필을 구경해보세요!</h2>
         </div>
-        <div className="profiles-row">
-          {renderFollowerProfiles(currentUserData.followers)}
-        </div>
+        {renderFollowerProfiles(currentUserData.followers)}
       </div>
       <div className="friend-profiles">
         <div className="friend-texts">
           <h2>팔로잉 친구들의 프로필을 구경해보세요!</h2>
         </div>
-        <div className="profiles-row">
-          {renderFollowingProfiles(currentUserData.followings)}
-        </div>
+        {renderFollowingProfiles(currentUserData.followings)}
       </div>
-      <div className="friend-profiles">
+      <div className="friend-profiles-last">
         <div className="friend-texts">
           <h2>더 많은 친구를 찾아보세요!</h2>
         </div>
-        <div className="profiles-row">
-          {renderRecommendProfiles(tempFriendList)}
-        </div>
+        {renderRecommendProfiles(tempFriendList)}
       </div>
     </div>
   );

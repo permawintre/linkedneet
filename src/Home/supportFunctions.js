@@ -1,9 +1,15 @@
 import moment from 'moment'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { doc, updateDoc,getDoc, addDoc, collection } from 'firebase/firestore'
+
 import arrow from '../images/arrow.png'
 import filledStar from '../images/filledStar.png'
 import emptyStar from '../images/emptyStar.png'
 import comments from '../images/comments.png'
+import React from 'react'
+import { dbService , auth } from '../firebase.js'
+
+
 
 /**
  * 몇시간 전에 게시된건지 텍스트로 반환하는 함수입니다(moment.js 설치필요)
@@ -62,6 +68,8 @@ export const getDayMinuteCounter = (date) => {
  */
 export const PostContents = ({contents}) => {
 
+  const validContents = typeof contents === 'string' ? contents : '';
+
   const [state,setState] = useState(true);
 
   const handler = () => {
@@ -69,8 +77,8 @@ export const PostContents = ({contents}) => {
     setState((e) => !e)
   }
 
-  const contentsLength = JSON.parse(JSON.stringify({contents})).contents.length
-  if(contentsLength<=220) {
+  
+  if(validContents.length<=220) {
     return(
       <div className='postContents'>{contents}</div>
     )
@@ -102,6 +110,7 @@ export const PostContents = ({contents}) => {
 export const PostPics = ({imgs}) => {
 
   /* 리스너 설치하기 */
+  console.log({imgs})
   let [idx, setIdx] = useState(0); // 슬라이드 현재 번호
   let [moveX, setMoveX] = useState(0); // 슬라이드 위치 값
   const imgsLength = JSON.parse(JSON.stringify({imgs})).imgs.length
@@ -150,15 +159,58 @@ export const PostPics = ({imgs}) => {
  * 반응형 애니메이션은 css로 구현
  * @returns 좋아요 버튼 렌더링
  */
-export const LikeBtn = () => {
+ export const LikeBtn = (props) => {
 
-  let [state, setState] = useState(false)
+  let [on, setOn] = useState(false)
+  let [clicked, setClicked] = useState(false)
+  const postId = props.postId
+  const numOfLikes = props.numOfLikes
+  const setNumOfLikes = props.setNumOfLikes
+  const whoLikes = props.whoLikes
+  const setWhoLikes = props.setWhoLikes
+  let [uid, setUid] = useState("")
+
+  useEffect(() => {
+        if(auth.currentUser) {
+          setUid(auth.currentUser.uid)
+        }
+  }, [])
+
+  useEffect(() => {
+    if(uid && whoLikes.includes(uid)){
+      setOn(true)
+    }
+  }, [uid])
+
+  useEffect(() => {
+    if(uid && clicked){
+      setOn(!on)
+      setClicked(false)
+      const postRef = doc(dbService, "posts", postId);
+      if(on){
+        setNumOfLikes(numOfLikes-1)
+        let tmparr = whoLikes
+        setWhoLikes(tmparr.filter(e => e !== uid))
+        updateDoc( postRef, {
+          "whoLikes": tmparr.filter(e => e !== uid)
+        } )
+      }
+      else{
+        setNumOfLikes(numOfLikes+1)
+        let tmparr = whoLikes
+        setWhoLikes(tmparr.concat(uid))
+        updateDoc( postRef, {
+          "whoLikes": tmparr.concat(uid)
+        } )
+      }
+    }
+  }, [clicked])
 
   const handler = () => {
-    setState(!state)
+    setClicked(!clicked)
   }
 
-  if(state) {
+  if(on) {
     return(
       <div className='like on'>
         <img src={filledStar} alt='like' onClick={handler} className='forColoredImg'/>
@@ -183,7 +235,202 @@ export const CommentBtn = () => {
 
   return(
     <div>
-      <img src={comments} alt='comment' className='comment' />
+      <img src={comments} alt='commentbtn' className='commentbtn' />
     </div>
   )
+}
+
+export const Comments= ({ userPic, userName, postedAt, contents})=> {
+  console.log(postedAt);
+  return (
+    <div className="postComment">
+        <img src={userPic} alt="Profile" className="commentUserPic" />
+        <div className="commentDetails">
+          <div className="commentHeader">
+            <span className="commentUsername">{userName}</span>
+            <span className="commentPosetedAt">{getDayMinuteCounter(postedAt)}</span>
+          </div>
+          <p className="commentContents">{contents}</p>
+        </div>
+    </div>
+  );  
+}
+
+export const CommentsWindow = ({comments, numOfComments, updateComments}) => {
+  console.log("Initial comments: ", comments);
+  const [state,setState] = useState(true);
+  const [commentsWithUserInfo, setCommentsWithUserInfo] = useState(comments);
+
+  useEffect(() => {
+    const fetchUserInfos = async () => {
+      const updatedComments = [];
+      for (const comment of comments) {
+        console.log("Comment userId:", comment.userId);
+        const userRef = doc(dbService, 'users', comment.userId);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+          console.log("User data: ", userSnap.data());
+          updatedComments.push({
+            ...comment,
+            userPic: userSnap.data().profile_image,
+            userName: userSnap.data().nickname,
+          });
+        }
+      }
+      setCommentsWithUserInfo(updatedComments);
+      console.log("Updated comments with user info: ", updatedComments);
+    };
+
+    fetchUserInfos();
+  }, [comments]);
+
+
+
+  const handler = () => {
+
+    setState(!state);
+  }
+  const renderComments = () => {
+    return commentsWithUserInfo.map((comment, index) => {
+      console.log("Rendering comment: ", comment);
+      return(
+        <Comments
+          key={index}
+          userPic={comment.userPic}
+          userName={comment.userName}
+          postedAt={comment.postedAt}
+          contents={comment.contents}
+        />
+      );
+    }) 
+  };
+  return (
+    <div className='commentsWindow'>
+      {state ? (
+        <div className='numOfComments' onClick={handler}>
+          {numOfComments === 0 ? <span></span> : <span>댓글 {numOfComments}개 모두 보기</span>}
+        </div>
+      ) : (
+        <div>
+          <div className='unfolded'>
+            {renderComments()}
+          </div>
+          <div className="commentfoldBtn" onClick={handler}>접기</div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export const WriteCommentContainer = ({ userProfileImage, postId, userId, addNewComment })=> {
+  console.log(userId)
+  const [commentInput, setCommentInput] = useState('');
+  
+
+  const handleSubmit = async (e) => {
+      e.preventDefault();
+
+      if (commentInput.trim() === '') {
+          alert('댓글을 입력하세요.');
+          return;
+      }
+
+      try {
+          // Firebase에 댓글 추가
+          const newComment = await addDoc(collection(dbService, 'comments'), {
+              postId: postId,       // 현재 게시글의 ID
+              userId: userId,       // 현재 로그인한 사용자의 ID
+              contents: commentInput, // 댓글 내용
+              postedAt: moment().unix()*1000   // 현재 시간
+          });
+
+          const newCommentData = {
+            postId: postId,       // 현재 게시글의 ID
+            userId: userId,       // 현재 로그인한 사용자의 ID
+            contents: commentInput, // 댓글 내용
+            postedAt: moment().unix()*1000  //
+        };
+  
+          addNewComment(newCommentData); // 댓글 목록 업데이트
+  
+          setCommentInput(''); // 입력 필드 초기화
+      } catch (error) {
+          console.error('Error adding comment: ', error);
+      }
+  };
+
+  return (
+      <div className='writecommentcontainer'>
+          <form onSubmit={handleSubmit} className='writeComment'>
+              <img src={userProfileImage} alt="프로필"/>
+              <input
+                  type="text"
+                  placeholder="댓글을 남겨 주세요"
+                  value={commentInput}
+                  onChange={(e) => setCommentInput(e.target.value)}
+              />
+              <button type="submit">보내기</button>
+          </form>
+      </div>
+  );
+}
+
+
+
+
+
+export const PlusBtn = () => {
+
+  let [activeClass, setActiveClass] = useState("")
+
+  const toggleActive = () => {
+    setActiveClass(activeClass === '' ? 'active' : '');
+  };
+
+  return (
+    <div className={`plusSign ${activeClass}`} onClick={toggleActive}>
+      +
+    </div>
+  )
+  
+}
+
+export const WritePost = ({profile})  =>{
+  const [showPopup, setShowPopup] = useState(false);
+
+  const handlePostClick = () => {
+    setShowPopup(true);
+  };
+
+  const closePopup = () => {
+    setShowPopup(false);
+  };
+
+  return (
+    <>
+      <div className="write-post" onClick={handlePostClick}>
+        <img src={profile} alt="profile-img" className="profile-img1"/>
+        <input type="text" placeholder="당신의 일상을 공유해주세요!" readOnly />
+      </div>
+      
+      {showPopup && (
+        <div className="modal-overlay">
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <img src={profile} alt="profile-img" className="profile-img2"/>
+              <h5 className="modal-title">홍길동</h5>
+              <button onClick={closePopup}>닫기</button>
+            </div>
+            <div className="modal-body">
+              <textarea id="textArea" placeholder="나누고 싶은 생각이 있으세요?" />
+            </div>
+            <div className="modal-footer">
+              <button onClick={closePopup}>업데이트</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
 }

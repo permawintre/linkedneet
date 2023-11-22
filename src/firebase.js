@@ -9,6 +9,7 @@ import {
     signOut // 로그아웃
 } from "firebase/auth";
 import { getFirestore } from "firebase/firestore"
+import { getStorage } from "firebase/storage";
 
 
 
@@ -27,9 +28,10 @@ const firebaseConfig = {
 
 // Initialize Firebase
 initializeApp(firebaseConfig);
+export const app = initializeApp(firebaseConfig);
 export const auth = getAuth();
-export const dbService = getFirestore();
-
+export const dbService = getFirestore(app);
+export const storage = getStorage(app);
 
 //Email 로그인
 export const loginEmail = (email, password) => {

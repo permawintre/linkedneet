@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { dbService, auth } from '../firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs } from 'firebase/firestore';
 import { defaultData } from './defaultData'
 import './Profile.css'
 
@@ -118,8 +118,10 @@ export const Profile = () => {
   // profiledetail에 접속해 있는 user의 정보(currentUserData)를 firebase에서 fetch
   const [currentUserData, setCurrentUserData] = useState({ ...defaultData });
   const [currentUserDataLoaded, setCurrentUserDataLoaded] = useState(false);
+  const [randomUserIds, setRandomUserIds] = useState([]);
+  const [randomUserDataLoaded, setCurrentRandomDataLoaded] = useState(false);
 
-  useEffect( () => {
+  useEffect( () => { // Current User Data Fetch
     const fetchCurrentUserData = async () => {
       try {
         const currentUserDocRef = doc(dbService, 'users', auth.currentUser.uid);
@@ -140,8 +142,32 @@ export const Profile = () => {
     fetchCurrentUserData()
   }, []);
 
-  // firebase에서 currentUserData가 fetch되기 전까지 Loading... 띄우기
-  if (!currentUserDataLoaded) {
+  useEffect(() => {  // Random User IDs Fetch
+    const fetchUserIds = async () => {
+      const usersCollectionRef = collection(dbService, 'users');
+      const data = await getDocs(usersCollectionRef);
+
+      // 모든 사용자의 ID를 배열로 변환
+      const allUserIds = data.docs.map(doc => doc.id);
+
+      // 현재 로그인한 사용자의 ID 제외
+      const currentUserId = auth.currentUser ? auth.currentUser.uid : null;
+      const otherUserIds = allUserIds.filter(id => id !== currentUserId);
+
+      // 랜덤하게 사용자 ID 선택 (여기서는 6개를 선택)
+      const selectedUserIds = otherUserIds.sort(() => 0.5 - Math.random()).slice(0, 6);
+
+      setRandomUserIds(selectedUserIds);
+
+      setCurrentRandomDataLoaded(true);
+    };
+
+    fetchUserIds();
+  }, []);
+
+  
+  // firebase에서 모든 Data가 fetch되기 전까지 Loading... 띄우기
+  if (!currentUserDataLoaded || !randomUserDataLoaded) {
     return <div>Loading...</div>;
   }
 
@@ -163,7 +189,7 @@ export const Profile = () => {
         <div className="friend-texts">
           <h2>더 많은 친구를 찾아보세요!</h2>
         </div>
-        {renderRecommendProfiles(tempFriendList)}
+        {renderRecommendProfiles(randomUserIds)}
       </div>
     </div>
   );

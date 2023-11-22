@@ -1,14 +1,14 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;200;300;400;500;600;700;800;900&display=swap');
-
-
+  
 .homePost {
     width: 550px;
     background-color: white;
-    border: solid 1px #AAAAAA;
     border-radius: 20px;
     font-family: 'Noto Sans KR', sans-serif;
     margin: auto;
     margin-top: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 .paddingDiv {
     padding: 10px;
@@ -103,7 +103,7 @@
     position: relative;
     top: 15px;
     left: 15px;
-    filter: grayscale(100%) brightness(400%) opacity(70%);
+    filter: grayscale(100%) brightness(300%) opacity(70%);
 }
 .placeHolder {
     height: 50px;
@@ -126,15 +126,125 @@
     transform: rotate(90deg)
 }
 
-.numOfLikesNComments {
+.numOfLikes {
+    margin-left: 10px;
+    font-weight: 400;
+    font-size: 15px;
+}
+
+.numOfComments {
     margin-left: 10px;
     font-weight: 400;
     font-size: 15px;
 }
 
 hr {
-    margin: 5px 10px 0px 10px;
+    margin: 0px 0px 5px 0px;
 }
+
+.postComment {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    margin-left: 10px;
+}
+
+.commentHeader {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* 두 요소 사이의 간격 조정 */
+}
+
+.commentUsername, .commentPostedAt {
+    margin: 0;
+}
+
+.commentUserPic {
+    width: 40px;
+    height: 40px;
+    border-radius: 20px; /* 원형 이미지 */
+    margin-right: 10px;
+}
+
+.commentDetails {
+    flex-grow: 1;
+}
+
+.commentUsername {
+    font-weight: bold;
+    display: block; /* 블록 레벨 요소로 설정 */
+}
+
+.commentContents {
+    margin: 5px 0;
+}
+
+.commentPosetedAt {
+    font-size: 0.8em;
+    color: gray;
+}
+.commentsWindow {
+    position: relative; /* 상대적 위치 설정 */
+    /* 기타 스타일 */
+}
+
+.commentfoldBtn {
+    position: absolute; /* 절대적 위치 설정 */
+    bottom: 10px; /* 아래에서 10px의 위치에 배치 */
+    right: 10px; /* 오른쪽에서 10px의 위치에 배치 */
+    cursor: pointer; /* 마우스 오버시 커서 변경 */
+    /* 기타 스타일 */
+}
+
+
+.writecommentcontainer {
+    width: 100%;
+    margin: auto;
+    padding: 5px;
+  }
+  
+  .writeComment {
+    display: flex;
+    justify-content: flex-start;
+  }
+  
+  .writeComment img {
+    width: 40px; /* Adjust the size as necessary */
+    height: 40px;
+    border-radius: 90%; /* Circular profile picture */
+    margin-right: 10px;
+    margin-top: 10px;
+    margin-left: 5px;
+  }
+  
+  .writeComment input[type="text"] {
+    flex-grow: 1;
+    height: 20px;
+    padding: 10px;
+    border: 1px solid #ccc; /* Example input border color */
+    border-radius: 10px;
+    margin-right: 10px;
+  }
+  
+  .writeComment button {
+    width: 70px;
+    height: 40px;
+    border: none;
+    color: #808080;
+    background-color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 15px;
+    margin-top: 10px;
+    transform: none;
+    padding: 0;
+    border: 1px solid #ccc; /* Example input border color */
+    border-radius: 10px;
+  }
+  
+  .postcomment button:hover {
+    background-color: #808080;
+  }
 
 
 @keyframes clickReaction {
@@ -155,7 +265,7 @@ hr {
     transform: scale(1);
 }
 .postFooter {
-    padding: 10px;
+    padding: 10px 10px 5px 10px;
     display: flex;
 }
 .like {
@@ -177,16 +287,15 @@ hr {
     filter: invert(85%) sepia(39%) saturate(4810%) hue-rotate(2deg) brightness(108%) contrast(104%);
     /** https://codepen.io/sosuke/pen/Pjoqqp */
 }
-.comment {
+.commentbtn {
     width: 25px;
     height: 25px;
     transition: 0.3s;
 }
-.comment:hover{
+.commentbtn:hover{
     -webkit-transform: scale(0.9);
     transform: scale(0.9);
 }
-
 
 
 
@@ -278,6 +387,12 @@ hr {
     margin: 10px 0 10px 560px;
 }
 
+
+
+
+.imgsAboveDnd {
+    margin-left: 10px;
+}
 .dndBox {
     display: flex;
     height: 100px;
@@ -310,4 +425,249 @@ hr {
     width: 100px;
     height: 100px;
     object-fit: cover;
+}
+.write .previewImg:hover {
+    
+    filter: blur(1px) grayscale(100%)
+}
+
+.home {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+  
+.left-sidebar, .right-sidebar {
+    width: 250px; /* 또는 원하는 폭에 따라 조정 */
+    position: sticky;
+    top: 118px; /* 항상 상단에 고정 */
+}
+
+.postsContainer {
+    width: 550px;
+    margin: 0 10px;
+    margin-top: 108px;
+    display: flex;
+    flex-direction: column;
+}
+
+.write-post {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 15px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.write-post .profile-img1 {
+    width: 40px; 
+    height: 40px; 
+    border-radius: 50%; 
+    margin-right: 10px; 
+    object-fit: cover; 
+}
+.write-post input[type="text"] {
+    flex-grow: 1;
+    padding: 10px;
+    border-radius: 20px; 
+    border: solid 1px black;
+}
+.write-post input[type="text"]::placeholder {
+    color: #999; 
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 15px;
+    width: 90%;
+    height: 60%;
+    max-width: 500px;
+    z-index: 1001;
+    justify-content: center;
+  }
+
+  .modal-header {
+    display: grid;
+    grid-template-columns: auto 1fr auto; /* 프로필 이미지, 제목, 닫기 버튼 순으로 자리를 잡습니다 */
+    grid-template-rows: auto auto; 
+    grid-template-areas: 
+      ". . close"
+      "profile title ."; 
+    align-items: center; 
+    gap: 10px; 
+    padding-bottom: 15px;
+    border-bottom: 1px solid #ccc;
+  }
+  
+  .modal-header .profile-img2 {
+    grid-area: profile; 
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    
+  }
+  
+  .modal-header button {
+    grid-area: close; 
+    justify-self: end; 
+    padding: 0px; 
+    border: none;
+    background-color: white;
+    color: black;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .modal-title {
+    grid-area: title;
+    font-weight: bold;
+    
+  }
+
+  .modal-body textarea {
+    flex-grow: 1;
+    height: 300px; 
+    width: 100%;
+    border: none;
+    resize: none; 
+    padding: 10px; 
+    box-sizing: border-box; 
+    outline: none; 
+}
+
+.modal-body textarea::placeholder {
+    color: #999;
+}
+
+  .modal-footer {
+    border-top: 1px solid #ccc;
+    align-items:flex-end;
+  }
+  .modal-footer button {
+    padding: 10px 20px;
+    margin-top:10px;
+    border: none;
+    background-color: #6c5ce7;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 320px;
+  }
+
+.left-sidebar {
+    z-index: 0;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    border: solid 1px #ccc;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    padding: 20px;
+    padding-top: 0;
+    box-sizing: border-box;
+    align-items: center;
+  }
+  .background-img-container {
+    width: calc(100% + 40px);
+    height: 150px; 
+    overflow: hidden;
+    display: flex;
+  }
+  .background-img {
+    width: 100%;
+    height: 100%; 
+    object-fit: cover;
+  }
+  .profile-img1 {
+    top: 110px;
+    width: 80px; 
+    height: 80px; 
+    left: 90px;
+    border-radius: 50%; 
+    object-fit: cover; 
+    position: absolute;
+  }
+  
+  .profile-info { 
+    width: 100%; 
+    text-align: center; 
+    margin-top: 10px; 
+    position: relative;
+  }
+
+  .profile-info h3 {
+    margin: 0;
+    margin-top: 50px; 
+    color: #000000;
+    font-size: 1.2em; 
+
+  }
+  
+
+.right-sidebar {
+    z-index: 0;
+    background-color: white;
+    border: solid 1px #ccc;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.interestList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.interestItem {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.interestItem:hover {
+    background-color: #ccc;
+}
+
+.interestItem:last-child {
+    margin-bottom: 0;
+}
+
+.interestItem img {
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    margin-right: 10px;
+}
+
+.interestTitle {
+    flex-grow: 1;
+}
+
+.plusSign {
+    font-weight: bold;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.plusSign.active {
+    color: #ccc; 
 }

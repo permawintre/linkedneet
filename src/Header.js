@@ -1,3 +1,4 @@
+import React from 'react'
 import { Link } from "react-router-dom"
 import { logOut } from "./firebase.js"
 
@@ -11,11 +12,11 @@ export const Header = () => {
                     <Link to="/" className="header__item link">HOME</Link>
                     <Link to="/project" className="header__item link">PROJECT</Link>
                     <Link to="/neetCompany" className="header__item link">NEET COMPANY</Link>
-                    <a href="/profiledetail" className="header__item link">PROFILE</a>
+                    <Link to="/profile" className="header__item link">PROFILE</Link>
             </ul>
             <div className='header__mid'>
                 <Link to="/" className="link">
-                    <h1 className="logo">linked<span className="color1">neet</span></h1>
+                    <h1 className="linkedneet_logo">linked<span className="color1">neet</span></h1>
                 </Link>
             </div>
             <div className="header__right">
@@ -30,4 +31,3 @@ export const Header = () => {
         </div>
     )
 }
-

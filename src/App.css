@@ -1,128 +1,99 @@
 @import url('https://fonts.googleapis.com/css2?family=Gabarito:wght@600&family=Noto+Sans+KR:wght@500&display=swap');
 * {
-
     font-family: 'Noto Sans KR', sans-serif;
-    
 }
-
-
 :root {
-
     --color_1: #FFA500;
     --color_2: #DFE0DF;
     --color_3: #1e1f38;
     --color_4: #FF4B2B;
-
 }
-
 .link {
-
     text-decoration: none;
     color: inherit;
 }
 ul {
-
     margin: 0;
     padding: 0;
     list-style-type: none;
 }
 .color1 {
-
     color: var(--color_1);
 }
 .background {
-
     background-color: var(--color_2);
-    width: 100vw;
 }
-
-
-
-
 .header {
-
     display: flex;
+    z-index: 1000;
+    position: fixed;
     justify-content: center;
     height: 108px;
     background-color: var(--color_3);
+    width: 100%;
     color: var(--color_2);
+    top: 0;
 
-    .header__inner {
+}
+.header__inner {
+    padding-top: 15px;
+    padding-bottom: 30px;
+    width: 1100px;
+    display: flex;
+}
+.header__left {
+    flex: 3;
+    display: flex;
+    padding-top: 15px;
+}
+.header__item {
+    flex-grow: 1;
+    padding: 10px;
+}
+.header__left:hover{
+    color: white;
+}
+.header__mid {
+    flex: 2;
+    text-align: center;
+}
+.linkedneet_logo {
+    font-size: 3rem;
+    font-family: 'Gabarito', cursive;
+    margin-top: 0;
+}
+.header__right {
+    flex: 3;
+    display: flex;
+}
+.header__searchbar {
+    flex: 3;
+    padding: 10px;
+    margin-top: 5px;
+}
+.searchbar {
 
-        padding-top: 15px;
-        padding-bottom: 30px;
-        width: 1100px;
-        display: flex;
+    height: 5px;
+    border-radius: 20px;
+    border-color: var(--color_2);
+    background-color: var(--color_3);
+}
+.header__searchbar :focus {
 
-        .header__left {
+    background-color: var(--color_2);
+    outline: none;
+}
+.header__searchbar :hover {
 
-            flex: 3;
-            display: flex;
-            padding-top: 15px;
-            .header__item {
-
-                flex-grow: 1;
-                padding: 10px;
-            }
-            :hover{
-                color: white;
-            }
-            
-        }
-        .header__mid {
-
-            flex: 2;
-            text-align: center;
-            .logo {
-
-                font-size: 3rem;
-                font-family: 'Gabarito', cursive;
-            }
-        }
-        .header__right {
-
-            flex: 3;
-            display: flex;
-
-            .header__searchbar {
-
-                .searchbar {
-
-                    height: 5px;
-                    border-radius: 20px;
-                    border-color: var(--color_2);
-                    background-color: var(--color_3);
-                }
-                :focus {
-
-                    background-color: var(--color_2);
-                    outline: none;
-                }
-                :hover {
-
-                    border-color: white;
-                }
-
-                flex: 3;
-                padding: 10px;
-                margin-top: 5px;
-            }
-            .header__notice {
-
-                flex: 1;
-                padding: 10px;
-                margin-top: 15px;
-            }
-            .header__loginout {
-
-                flex: 1;
-                padding: 10px;
-                margin-top: 15px
-            }
-            
-
-        }
-
-    }
-
+    border-color: white;
+}
+.header__notice {
+    flex: 1;
+    padding: 10px;
+    margin-top: 15px;
+}
+.header__loginout {
+    flex: 1;
+    padding: 10px;
+    margin-top: 15px
 }

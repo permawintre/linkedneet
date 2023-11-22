@@ -33,8 +33,15 @@ background: var(--60, #FFF);
 display: flex;
 flex-direction: column;
 align-items: center;
-margin-top: 15px;
+padding-top: 15px;
 }
+
+.friend-profiles-last {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px 0px;
+  }
 
 .profiles-row {
 overflow-x: auto; /*가로 스크롤 활성화*/
@@ -44,6 +51,10 @@ padding: 15px 0px 0px 0px;
 justify-content: left;
 width: 730px; /* 두 개의 카드가 들어갈 수 있는 너비 */
 gap: 20px; /* 프로필 사이의 간격 설정 */
+}
+
+.profiles-row-center {
+  padding-top: 15px;
 }
 
 /* 스크롤 바 스타일링 */
@@ -58,7 +69,7 @@ gap: 20px; /* 프로필 사이의 간격 설정 */
 
 .profiles-row::-webkit-scrollbar-track {
   background-color: transparent; /* 트랙 색상 */
-} 
+}
 
 .user-profile {
 position: relative;
@@ -104,7 +115,6 @@ font-weight: 500;
 
 .profile-name {
 position: absolute;
-top: 212px;
 left: 29px;
 margin: 5px 0;
 text-decoration: none;
@@ -116,7 +126,7 @@ font-weight: bold;
 
 .profile-group {
 position: absolute;
-top: 264px;
+top: 50px;
 left: 29px;
 margin: 5px 0;
 
@@ -126,7 +136,7 @@ color: var(--text-grey, #6C6C6C);
 
 .profile-friend {
 position: absolute;
-top: 304px;
+top: 90px;
 left: 29px;
 margin: 5px 0;
 

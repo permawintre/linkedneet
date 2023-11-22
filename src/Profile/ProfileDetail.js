@@ -2,7 +2,6 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Link, useLocation } from "react-router-dom"
 import { dbService, auth } from '../firebase';
 import { doc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
-import { getStorage, ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { FaFacebookSquare, FaInstagramSquare} from 'react-icons/fa';
 import { IoGlobeOutline } from "react-icons/io5";
 import { MdPhoneIphone, MdEmail, MdCalendarMonth } from 'react-icons/md'
@@ -11,6 +10,10 @@ import { ko } from 'date-fns/locale';
 import { ProfileEditModal, ProfileIntroEditModal } from './ProfileEditModal';
 import { defaultData } from './defaultData'
 import './ProfileDetail.css';
+import { Bars } from "react-loader-spinner";
+
+const DefaultProfileImg = 'https://s3.amazonaws.com/37assets/svn/765-default-avatar.png'
+const DefaultIntroImg = 'https://cdn.imweb.me/upload/S20191010288d21675b22f/e33c22faf15bc.jpg'
 
 const ProfileHeader = ({userData, myProfile}) => {
   const bgImageStyle = {
@@ -77,10 +80,10 @@ const ProfileHeader = ({userData, myProfile}) => {
                     <span className="info">니트컴퍼니 {userData.generation}기</span>
                 </div>
                 <div className="header-left2">
-                    <Link to="/profile">
-                      <span className="info">팔로워 {userData.followers.length - 1}명</span>
-                      <span className="info">팔로잉 {userData.followings.length - 1}명</span>
-                    </Link>
+                  <Link to="/profile">
+                    <span className="info">팔로워 {userData.followers.length - 1}명</span>
+                    <span className="info">팔로잉 {userData.followings.length - 1}명</span>
+                  </Link>
                 </div>
                 <div className="header-left3">
                   {myProfile ? (
@@ -118,7 +121,7 @@ const ProfileHeader = ({userData, myProfile}) => {
                         <MdCalendarMonth size="16"/>&nbsp;
                         비행일정 확인하기
                     </span>
-                    <span className="edit-profile">
+                    <span className="edit-profile-header">
                       {EditButton()}
                       {myProfile && EditClicked && (
                         <ProfileEditModal
@@ -152,23 +155,37 @@ const ProfileIntro = ({userData, myProfile}) => {
       return null;
     }
   };
+  
+  const [IntroTitle, setIntroTitle] = useState(`안녕하세요. 니트컴퍼니 ${userData.generation}기 ${userData.nickname}입니다.`);
+  const [IntroImage, setIntroImage] = useState(DefaultIntroImg);
+  const [IntroContent, setIntroContent] = useState(`안녕하세요. 니트컴퍼니 ${userData.generation}기 ${userData.nickname}입니다.`);
+  useEffect(() => {
+    if (("intro_title" in userData)) {
+      if (userData.intro_title !== "" && userData.intro_title !== null) {
+        setIntroTitle(userData.intro_title);
+      }
+    }
+    if (("intro_image" in userData)) {
+      setIntroImage(userData.intro_image);
+    }
+    if (("intro_content" in userData && userData.intro_title.length !== 0)) {
+      setIntroContent(userData.intro_content);
+    }
+  })
+
 
   return (
     <div className="container">
       <main>
         <h2>나를 <span className="highlight">소개</span>합니다</h2>
+        <div className="intro-title">{IntroTitle}</div>
         <div className="body1">
-            <img className="intro-image" src={userData.intro_image}></img>
+            <img className="intro-image" src={IntroImage}></img>
             <div className="intro">
               <div className="intro-content">
-                {userData.intro_content}
+                {IntroContent}
               </div>
-              <span className="intro-keywords">
-                  {userData.intro_keyword.map((keyword, index) => (
-                      <span key={index} className="keyword">{`#${keyword}`}</span>
-                  ))}
-              </span>
-              <span className="edit-profile">
+              <div className="edit-profile-intro">
                 {EditButton()}
                 {myProfile && EditClicked && (
                   <ProfileIntroEditModal
@@ -176,7 +193,7 @@ const ProfileIntro = ({userData, myProfile}) => {
                     EditModalClose={EditModalClose}
                   />
                 )}
-              </span>
+              </div>
             </div>
         </div>
       </main>
@@ -203,9 +220,9 @@ const ProfileCareer = ({userData, myProfile}) => {
             </div>
           </div>
         ))}
-        <span className="edit-profile" style={{margin: "-10px"}}>
+        <span className="edit-profile-career" style={{margin: "-10px"}}>
           {myProfile && (
-            <Link to="/profiledetail/career">
+            <Link to="/profiledetail/career" state={{userData: userData}}>
               <input type="button" className="edit-button" style={{margin: "-5px 10px"}}></input>
             </Link>
           )}
@@ -370,7 +387,15 @@ useEffect(() => {
 
   // firebase에서 모든 data가 fetch되기 전까지 Loading... 띄우기
   if (!currentUserDataLoaded || !profileUserDataLoaded) {
-    return <div>Loading...</div>;
+    return (
+    <div className="loadingContainer">
+      <Bars
+        type="ThreeDots"
+        color="#00b22d"
+        height={100}
+        width={100}
+      />
+    </div>);
   }
 
   const scrollToRef = (ref) => {

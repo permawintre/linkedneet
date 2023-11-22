@@ -6,12 +6,49 @@
 
 }
 
+.loadingContainer{
+    position: fixed;
+    top: 50%;
+    left:50%;
+    transform: translate(-50%,50%);
+}
+
 .back-to-profile-button{
     cursor: pointer;
     float: left;
     margin-top: 5px;
     margin-left: -10px;
     margin-right: 15px;
+}
+
+.career-delete-button {
+    background-image: url("../images/delete.png");
+    background-color: transparent; /* make the button transparent */
+    background-repeat: no-repeat;  /* make the background image appear only once */
+    background-size: contain;
+    background-position: 50% 50%;
+    border: none;
+    cursor: pointer;
+    height: 20px;
+    width: 35px;
+    padding: 10px;
+    margin: 10px;
+    margin-left: -5px;
+    float: right;
+}
+
+.career-edit-button {
+    background-image: url("../images/8666681_edit_icon.png");
+    background-color: transparent; /* make the button transparent */
+    background-repeat: no-repeat;  /* make the background image appear only once */
+    background-size: contain;
+    background-position: 50% 50%;
+    border: none;
+    cursor: pointer;
+    margin-left: -20px;
+    height: 16px;
+    width: 16px;
+    float: right;
 }
 
 .edit-add-button {

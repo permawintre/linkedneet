@@ -133,26 +133,42 @@ main {
     margin-right: 30px;
 }
 
+.intro-title {
+    margin-left: 10px;
+    height: 40px;
+    overflow: auto;
+    font-size: large;
+    font-weight: bold;
+}
+.intro {
+    margin-top: -10px;
+}
 .intro-content {
     line-height: 150%;
     height: 170px;
     overflow: auto;
     white-space: pre-line;
 }
-.intro-keywords {
-    margin-top: 10px;
+.intro-keyword-wrapper {
+    font-weight: bold;
+    color:#FFF;
 }
-.intro-keywords span:hover,
-.buttons span:hover {
-    background-color: var(--color_1);
-    transition: 0.7s;
+
+.intro-keywords {
+    margin-bottom: 10px;
 }
 .intro-keywords span {
-    background-color: var(--color_2);
+    background-color: var(--color_3);
     padding: 1px 10px;
     margin: 5px;
     border-radius: 5px;
 }
+.intro-keywords span:hover,
+.buttons span:hover {
+    background-color: var(--color_3);
+    transition: 0.7s;
+}
+
 
 .highlight {
     color: var(--color_4);

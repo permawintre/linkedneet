@@ -15,14 +15,15 @@ export const defaultData = {
   tel: '[default]000-0000-0000',
   
   // ProfileIntro
+  intro_title: "",
   intro_image: 'https://cdn.imweb.me/upload/S20191010288d21675b22f/e33c22faf15bc.jpg',
   intro_content: `[default] 언제나 저를 이끈 건 ‘재미’입니다.\n늘 재미있는 일을 찾아다니죠.\n지금 저에게 가장 재미있는 일은 그림과 글쓰기, 그리고 영화랍니다.\n
   삶의 다양한 선택에서 늘 저를 이끌었던 건 ‘재미’였습니다.
 제가 재미있는 일을 하며 먹고살 수 있다면, 그것이 바로 행복이 아닐까 싶습니다. 단순히, 즐거운 기분을 넘어서 좋은 성과와 보람이 가득한 재미를 느껴 보고 싶습니다.
 이번 프로젝트는 제가 좋아하는 영화와 그림, 글을 통해 재미있어 보려고 했습니다.`,
-  intro_keyword: ['[default]글쓰기', '[default] 영화', '[default] 여행가'],
+  intro_keyword: [],
 
-  //ProfileCareer
+  // ProfileCareer
   career: {
     '[default] 교육공학자': ['교육공학 박사',
                   '교육 콘텐츠 개발 및 기획',

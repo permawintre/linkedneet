@@ -97,8 +97,8 @@ const ProjectHeader = (project) => {
               </div>
             </div>
             <div className={style.tags}>
-              {project.tags.map((tag) => (
-                <div className={style.tagItem}>
+              {project.tags.map((tag, index) => (
+                <div className={style.tagItem} key={index}>
                   # {tag}
                 </div>
               ))}
@@ -135,7 +135,7 @@ const ProjectBody = (project) => {
         <div className={`${style.projectDetail} ${style.projectBody}`}>
           <div className={style.bodyTitle}>소모임 소개</div>
           <div className={style.bodyImages}>
-              {project.subImages.map((image, index) => (
+              {project.subImages.slice().reverse().map((image, index) => (
                   <img key={index} src={image} alt={`Subimage ${index + 1}`} />
               ))}
           </div>

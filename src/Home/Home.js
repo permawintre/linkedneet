@@ -1,5 +1,5 @@
 import React from "react"
-import { getDayMinuteCounter, PostContents, PostPics, LikeBtn, CommentBtn, PlusBtn, CommentsWindow, WriteCommentContainer } from './supportFunctions'
+import { getDayMinuteCounter, PostContents, PostPics, LikeBtn, CommentBtn, PlusBtn, CommentsWindow, WriteCommentContainer, addNewComment } from './supportFunctions'
 import './Home.css'
 import { initializeApp } from 'firebase/app';
 import { db , auth } from '../firebase.js'
@@ -42,11 +42,11 @@ function Post(props) {
     const [whoLikes, setWhoLikes] = useState(props.whoLikes);
     const [imgUrls, setImgUrls] = useState([])
     const contents = props.contents
-    const [showComments, setShowComments] = useState(false);
-    const toggleComments = () => {
-        setShowComments(!showComments);
-    };
     const [postUserInfo, setPostUserInfo] = useState({ profileImage: '', nickname: '' });
+
+    const addNewComment = (newComment) => {
+        setComments(prevComments => [...prevComments, newComment]);
+    };
 
     useEffect(() => {
         const fetchPostUserInfo = async () => {
@@ -134,7 +134,7 @@ function Post(props) {
                 {numOfLikes===0? <span></span> : <span>{numOfLikes}명이 응원합니다 </span>}
             </div>
             <CommentsWindow comments={comments} numOfComments={comments.length}/>
-            <WriteCommentContainer userProfileImage = {props.userInfo?.profile_image} postId = {postId} userId ={auth.currentUser.uid}/>
+            <WriteCommentContainer userProfileImage = {props.userInfo?.profile_image} postId = {postId} userId ={auth.currentUser.uid} addNewComment={addNewComment}/>
         </div>
     )
 }
@@ -465,7 +465,7 @@ function Write({ userInfo }) {
                     <div className='modalWrite'>
                         <div className='modalHeader'>
                             <div className='modalProfile'>
-                                <div className='profileImg'><img src={profile1Img} alt="profileImg"/></div>
+                                <div className='profileImg'><img src={userInfo?.profile_image ||profile1Img} alt="profileImg"/></div>
                                 <div className="userName">{userName}</div>
                             </div>
                             <img src={close} alt='x' className='close' onClick={ () => setIsOpen(false) }/>

@@ -256,15 +256,16 @@ export const Comments= ({ userPic, userName, postedAt, contents})=> {
   );  
 }
 
-export const CommentsWindow = ({comments, numOfComments}) => {
+export const CommentsWindow = ({comments, numOfComments, updateComments}) => {
   console.log("Initial comments: ", comments);
   const [state,setState] = useState(true);
-  const [commentsWithUserInfo, setCommentsWithUserInfo] = useState([]);
+  const [commentsWithUserInfo, setCommentsWithUserInfo] = useState(comments);
 
   useEffect(() => {
     const fetchUserInfos = async () => {
       const updatedComments = [];
       for (const comment of comments) {
+        console.log("Comment userId:", comment.userId);
         const userRef = doc(db, 'users', comment.userId);
         const userSnap = await getDoc(userRef);
 
@@ -283,6 +284,7 @@ export const CommentsWindow = ({comments, numOfComments}) => {
 
     fetchUserInfos();
   }, [comments]);
+
 
 
   const handler = () => {
@@ -321,7 +323,7 @@ export const CommentsWindow = ({comments, numOfComments}) => {
   );
 }
 
-export const WriteCommentContainer = ({ userProfileImage, postId, userId })=> {
+export const WriteCommentContainer = ({ userProfileImage, postId, userId, addNewComment })=> {
   console.log(userId)
   const [commentInput, setCommentInput] = useState('');
   
@@ -336,13 +338,22 @@ export const WriteCommentContainer = ({ userProfileImage, postId, userId })=> {
 
       try {
           // Firebase에 댓글 추가
-          await addDoc(collection(db, 'comments'), {
+          const newComment = await addDoc(collection(db, 'comments'), {
               postId: postId,       // 현재 게시글의 ID
               userId: userId,       // 현재 로그인한 사용자의 ID
               contents: commentInput, // 댓글 내용
-              postedAt: new Date()   // 현재 시간
+              postedAt: moment().unix()*1000   // 현재 시간
           });
 
+          const newCommentData = {
+            postId: postId,       // 현재 게시글의 ID
+            userId: userId,       // 현재 로그인한 사용자의 ID
+            contents: commentInput, // 댓글 내용
+            postedAt: moment().unix()*1000  //
+        };
+  
+          addNewComment(newCommentData); // 댓글 목록 업데이트
+  
           setCommentInput(''); // 입력 필드 초기화
       } catch (error) {
           console.error('Error adding comment: ', error);

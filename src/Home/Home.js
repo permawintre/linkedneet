@@ -533,7 +533,7 @@ export const Home = () => {
         <div className='home'>
             <aside className="left-sidebar">
                 <div className="background-img-container">
-                    <img src={userInfo?.imgUrls || profile1Img} alt="background" className="background-img"/> 
+                    <img src={userInfo?.imgUrls || profile1Img} alt="background" className="homeProfile-background-img"/> 
                     {/*임시*/}
                 </div>
                 <img src={userInfo?.profile_image} alt="profile" className="profile-img1" />

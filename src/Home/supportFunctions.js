@@ -192,7 +192,8 @@ export const PostPics = ({imgs}) => {
         let tmparr = whoLikes
         setWhoLikes(tmparr.filter(e => e !== uid))
         updateDoc( postRef, {
-          "whoLikes": tmparr.filter(e => e !== uid)
+          "whoLikes": tmparr.filter(e => e !== uid),
+          "numOfLikes": (numOfLikes-1)
         } )
       }
       else{
@@ -200,7 +201,8 @@ export const PostPics = ({imgs}) => {
         let tmparr = whoLikes
         setWhoLikes(tmparr.concat(uid))
         updateDoc( postRef, {
-          "whoLikes": tmparr.concat(uid)
+          "whoLikes": tmparr.concat(uid),
+          "numOfLikes": (numOfLikes+1)
         } )
       }
     }

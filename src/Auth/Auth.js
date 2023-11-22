@@ -209,7 +209,7 @@ export const Google = () => {
             .catch((error) => console.log(error));
         }}>
             <div class="google-icon-wrapper">
-                <img class="google-icon" src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" alt="google icon"/>
+                <img class="google-icon" src="https://lh3.googleusercontent.com/COxitqgJr1sJnIDe8-jiKhxDx1FrYbtRHKJ9z_hELisAlapwE9LUPh6fcXIfb5vwpbMl4xl9H9TRFPc5NOO8Sb3VSgIBrfRYvW6cUA" alt="google icon"/>
             </div>
             <p class="btn-text"><b>Sign in with google</b></p>
         </div>

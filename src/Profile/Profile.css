@@ -37,17 +37,35 @@ margin-top: 15px;
 }
 
 .profiles-row {
+overflow-x: auto; /*가로 스크롤 활성화*/
+white-space: nowrap; /*가로로 이어지게 설정*/
 display: flex;
-padding: 15px 10px 0px 10px;
-justify-content: center;
+padding: 15px 0px 0px 0px;
+justify-content: left;
+width: 730px; /* 두 개의 카드가 들어갈 수 있는 너비 */
+gap: 20px; /* 프로필 사이의 간격 설정 */
 }
+
+/* 스크롤 바 스타일링 */
+.profiles-row::-webkit-scrollbar {
+  height: 8px; /* 스크롤 바 높이 */
+}
+
+.profiles-row::-webkit-scrollbar-thumb {
+  background-color: #c0c0c0; /* 스크롤 바 색상 */
+  border-radius: 4px;
+}
+
+.profiles-row::-webkit-scrollbar-track {
+  background-color: transparent; /* 트랙 색상 */
+} 
 
 .user-profile {
 position: relative;
 width: 350px;
 height: 350px;
-margin-left: 10px;
-margin-right: 10px;
+/* margin-left: 10px; */
+/* margin-right: 10px; */
 
 border: 1px solid var(--grey, #989898);
 border-radius: 15px;

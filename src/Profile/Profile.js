@@ -6,16 +6,16 @@ import { defaultData } from './defaultData'
 import './Profile.css'
 
 const tempFriendList = [
-  { userId: '4Zpw6VfUknNgwo9QPZ9hvc7ZXJE3' },
-  { userId: 'fqHAh2MftcVReUYWAwVZLkDCSbH2' },
-  { userId: 'TXP0lyGl2dQ9oj74PLX6PfVDu3y2' },
-  { userId: 'jBFK5qORLBVnorvbvShyCdOQ4kp2' },
-  { userId: 'uk5FJzl6mRVg3mnoRBxsJMvKyZs1' },
-  { userId: 'sBrmGtAJgtZB1xHzF0bgtImAVNa2' },
+  'fqHAh2MftcVReUYWAwVZLkDCSbH2',
+  'TXP0lyGl2dQ9oj74PLX6PfVDu3y2',
+  '4Zpw6VfUknNgwo9QPZ9hvc7ZXJE3',
+  'sBrmGtAJgtZB1xHzF0bgtImAVNa2',
+  'jBFK5qORLBVnorvbvShyCdOQ4kp2',
+  'uk5FJzl6mRVg3mnoRBxsJMvKyZs1',
 ];
 
 // UserProfile 컴포넌트는 각 사용자의 ID를 받아 해당 사용자의 데이터를 Firebase에서 가져옴.
-const UserProfile = ({ userId }) => {
+const UserProfile = ({ uid }) => {
   const [profileData, setProfileData] = useState(defaultData);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -23,7 +23,7 @@ const UserProfile = ({ userId }) => {
     // Fetch user data from Firebase
     const fetchUserData = async () => {
       try {
-        const userDocRef = doc(dbService, 'users', userId);
+        const userDocRef = doc(dbService, 'users', uid);
         const userDoc = await getDoc(userDocRef);
 
         if (userDoc.exists()) {
@@ -39,7 +39,7 @@ const UserProfile = ({ userId }) => {
     };
 
     fetchUserData();
-  }, [userId]);
+  }, [uid]);
   
 
   // firebase에서 data fetch되기 전까지 Loading... 띄우기
@@ -49,12 +49,12 @@ const UserProfile = ({ userId }) => {
 
   return (
     <div className="user-profile">
-        <Link to={`/profiledetail?uid=${userId}`}>
+        <Link to={`/profiledetail?uid=${uid}`}>
           <img className="background-img" src={profileData.background_image}/>
           <img className="profile-img" src={profileData.profile_image} alt={profileData.nickname} />
         </Link>
         <div className="profile-info">
-          <Link to={`/profiledetail?uid=${userId}`} className="profile-name">{profileData.nickname}</Link>
+          <Link to={`/profiledetail?uid=${uid}`} className="profile-name">{profileData.nickname}</Link>
           <p className="profile-group">니트컴퍼니 {profileData.generation}기</p>
           <p className="profile-friend">{profileData.friendInfo}</p>
         </div>
@@ -63,24 +63,61 @@ const UserProfile = ({ userId }) => {
 };
 
 const renderFollowerProfiles = (followerList) => {  
-  return followerList.slice(0, 2).map((friend, index) => (
-    <UserProfile key={friend.userId} userId = {friend.userId}/>
+  // 유효한 userId만 필터링
+  const validFollowers = followerList.filter(uid => uid);
+  return validFollowers.slice(0, 4).map((uid, index) => (
+    <UserProfile key={uid} uid={uid} />
   ));
 };
 
 const renderFollowingProfiles = (followingList) => {
-  return followingList.slice(2, 4).map((friend, index) => (
-    <UserProfile key={friend.userId} userId = {friend.userId}/>
+  // 유효한 userId만 필터링
+  const validFollowings = followingList.filter(uid => uid);
+  
+  return validFollowings.slice(0, 4).map((uid, index) => (
+    <UserProfile key={uid} uid={uid} />
   ));
 };
 
 const renderRecommendProfiles = (recommendList) => {
-  return recommendList.slice(4, 6).map((friend, index) => (
-    <UserProfile key={friend.userId} userId = {friend.userId}/>
+  // 유효한 userId만 필터링
+  const validRecommends = recommendList.filter(uid => uid);
+  return validRecommends.slice(0, 8).map((uid, index) => (
+    <UserProfile key={uid} uid={uid} />
   ));
 };
 
 export const Profile = () => {
+  // profiledetail에 접속해 있는 user의 정보(currentUserData)를 firebase에서 fetch
+  const [currentUserData, setCurrentUserData] = useState({ ...defaultData });
+  const [currentUserDataLoaded, setCurrentUserDataLoaded] = useState(false);
+
+  useEffect( () => {
+    const fetchCurrentUserData = async () => {
+      try {
+        const currentUserDocRef = doc(dbService, 'users', auth.currentUser.uid);
+        const currentUserDoc = await getDoc(currentUserDocRef);
+
+        if (currentUserDoc.exists()) {
+          setCurrentUserData(prevData => ({ ...prevData, ...currentUserDoc.data() }));
+        } else {
+          console.log('User not found');
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      } finally {
+        setCurrentUserDataLoaded(true);
+      }
+    };
+
+    fetchCurrentUserData()
+  }, []);
+
+  // firebase에서 currentUserData가 fetch되기 전까지 Loading... 띄우기
+  if (!currentUserDataLoaded) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="body">
       <div className="friend-profiles">
@@ -88,7 +125,7 @@ export const Profile = () => {
           <h2>팔로워 친구들의 프로필을 구경해보세요!</h2>
         </div>
         <div className="profiles-row">
-          {renderFollowerProfiles(tempFriendList)}
+          {renderFollowerProfiles(currentUserData.followers)}
         </div>
       </div>
       <div className="friend-profiles">
@@ -96,7 +133,7 @@ export const Profile = () => {
           <h2>팔로잉 친구들의 프로필을 구경해보세요!</h2>
         </div>
         <div className="profiles-row">
-          {renderFollowingProfiles(tempFriendList)}
+          {renderFollowingProfiles(currentUserData.followings)}
         </div>
       </div>
       <div className="friend-profiles">

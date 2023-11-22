@@ -1,8 +1,6 @@
 //Modal.js
 
 import React, { useState, useRef, useEffect } from "react";
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { dbService, auth } from '../firebase'
 import { updateDoc, getDoc, doc } from "firebase/firestore"
 import { uploadBytes, getStorage, ref, getDownloadURL } from 'firebase/storage';

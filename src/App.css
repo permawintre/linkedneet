@@ -32,6 +32,7 @@ ul {
     background-color: var(--color_3);
     width: 100%;
     color: var(--color_2);
+    top: 0;
 
 }
 .header__inner {

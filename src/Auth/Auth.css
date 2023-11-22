@@ -40,6 +40,7 @@ input {
     display: flex;
     justify-content: center;
     box-shadow: 3px #000000;
+    padding: 150px;
 }
 .body__inner{
   margin: auto;

@@ -183,50 +183,50 @@ hr {
     font-size: 0.8em;
     color: gray;
 }
-.commentsWindow {
+.writedow {
     position: relative; /* 상대적 위치 설정 */
     /* 기타 스타일 */
 }
 
 .commentfoldBtn {
-    position: absolute; /* 절대적 위치 설정 */
-    bottom: 10px; /* 아래에서 10px의 위치에 배치 */
-    right: 10px; /* 오른쪽에서 10px의 위치에 배치 */
     cursor: pointer; /* 마우스 오버시 커서 변경 */
+    text-align: right;
+    padding-right: 15px;
+
     /* 기타 스타일 */
 }
 
 
 .writecommentcontainer {
     width: 100%;
-    margin: auto;
+    margin-bottom: -15px;
     padding: 5px;
-  }
+}
   
-  .writeComment {
+.writeComment {
     display: flex;
     justify-content: flex-start;
-  }
+}
   
-  .writeComment img {
+.writeComment img {
     width: 40px; /* Adjust the size as necessary */
     height: 40px;
     border-radius: 90%; /* Circular profile picture */
     margin-right: 10px;
     margin-top: 10px;
     margin-left: 5px;
-  }
+}
   
-  .writeComment input[type="text"] {
+.writeComment input[type="text"] {
     flex-grow: 1;
     height: 20px;
     padding: 10px;
     border: 1px solid #ccc; /* Example input border color */
     border-radius: 10px;
     margin-right: 10px;
-  }
+}
   
-  .writeComment button {
+.writeComment button {
     width: 70px;
     height: 40px;
     border: none;
@@ -240,11 +240,11 @@ hr {
     padding: 0;
     border: 1px solid #ccc; /* Example input border color */
     border-radius: 10px;
-  }
+}
   
-  .postcomment button:hover {
+.postcomment button:hover {
     background-color: #808080;
-  }
+}
 
 
 @keyframes clickReaction {
@@ -335,7 +335,7 @@ hr {
     border-radius: 20px;
     width: 700px;
     background-color: #FFFFFF;
-    margin: 40px auto 0 auto;
+    margin: 140px auto 0 auto;
 }
 .modalHeader {
     display: flex;
@@ -588,10 +588,11 @@ hr {
     overflow: hidden;
     display: flex;
   }
-  .background-img {
+  .homeProfile-background-img {
     width: 100%;
     height: 100%; 
     object-fit: cover;
+    border-radius: 10px 10px 0 0;
   }
   .profile-img1 {
     top: 110px;

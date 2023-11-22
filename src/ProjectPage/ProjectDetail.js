@@ -17,9 +17,11 @@ const defaultImage4 = 'https://upload.wikimedia.org/wikipedia/commons/6/6e/Chelo
 
 const getTagColor = (status) => {
     switch (status) {
+        case '모집전': return 'tagBeforeRecruiting';
         case '모집중': return 'tagRecruiting';
         case '진행중': return 'tagInProgress';
         case '진행완료': return 'tagCompleted';
+        case '진행전': return 'tagBeforeRunning';
     }
 }
 
@@ -35,6 +37,12 @@ const setProjectStatus = (project) => {
   }
   else if (timestampInSeconds > project.runningEndDate.seconds) {
     project.status = '진행완료';
+  }
+  else if (timestampInSeconds < project.recruitStartDate.seconds ) {
+    project.status = '모집전';
+  }
+  else if (timestampInSeconds < project.runningStartDate) {
+    project.status = '진행전';
   }
   else {
     project.status = '';
@@ -88,6 +96,13 @@ const ProjectHeader = (project) => {
                 <span className={style.infoContent}>{project.type}</span>
               </div>
             </div>
+            <div className={style.tags}>
+              {project.tags.map((tag) => (
+                <div className={style.tagItem}>
+                  # {tag}
+                </div>
+              ))}
+            </div>
           </div>
           <div className={style.projectBoxButtons}>
             {project.status === '모집중' ? (
@@ -125,19 +140,6 @@ const ProjectBody = (project) => {
               ))}
           </div>
           <div className={style.bodyContent}>{project.introduction}</div>
-        </div>
-      );
-}
-
-const ProjectInfo = (project) => {
-    return (
-        <div className={`${style.projectDetail} ${style.projectBody}`}>
-          <div className={style.bodyTitle}>이런 멤버를 원해요</div>
-          <div className={style.bodyContent}>{project.desiredCrew}</div>
-          <div className={style.bodyTitle}>준비물</div>
-          <div className={style.bodyContent}>{project.preparation}</div>
-          <div className={style.bodyTitle}>소모임 위치</div>
-          <div className={style.bodyContent}>{project.location}</div>
         </div>
       );
 }
@@ -270,8 +272,6 @@ export const ProjectDetail = () => {
               <div className={style.bodyContent}>{project.location}</div>
             </div>
             }
-
-            {/* {activeSection === 'projectInfoSection' && ProjectInfo(project)} */}
         </div>
         <div id="projectReviewSection">
             {activeSection === 'projectReviewSection' && ProjectReview(project)}

@@ -6,14 +6,16 @@ import { Header } from "./Header.js"
 import { Home } from "./Home/Home.js"
 import { Signup, Login} from "./Auth/Auth.js"
 import { NotFound } from "./etc/Notfound.js"
-import { Project } from "./ProjectPage/Project.js"
 import { NeetCompany } from "./Neetcompany/NeetCompany.js"
 import { Profile } from "./Profile/Profile.js"
 import ProfileDetail from './Profile/ProfileDetail.js'
 import { ProfileHeaderEdit } from './Profile/ProfileEdit.js'
+
+import { Project } from "./ProjectPage/Project.js"
 import { ProjectDetail } from './ProjectPage/ProjectDetail.js'
 import { ProjectCreate } from './ProjectPage/ProjectCreate.js'
 import { ProjectJoin } from './ProjectPage/ProjectJoin.js'
+import { ProjectManage } from './ProjectPage/ProjectManage.js'
 
 import ProfileCareerDetail from './Profile/ProfileCareerDetail.js'
 
@@ -56,6 +58,8 @@ function App() {
             <Route path="/projectdetail/:projectId" element={isLoggedIn ? <ProjectDetail/> : <RedirectToLogIn/>}></Route>
             <Route path="/projectjoin/:projectId" element={isLoggedIn ? <ProjectJoin/> : <RedirectToLogIn/>}></Route>
             <Route path="/projectcreate" element={isLoggedIn ? <ProjectCreate/> : <RedirectToLogIn/>}></Route>
+            <Route path="/projectmanage/:projectId" element={isLoggedIn ? <ProjectManage/>: <RedirectToLogIn/>}></Route>
+
             <Route path="/neetCompany" element={isLoggedIn ? <NeetCompany/> : <RedirectToLogIn/>}></Route>
             <Route path="/profile" element={isLoggedIn ? <Profile/> : <RedirectToLogIn/>}></Route>
             <Route path="/profiledetail" element={isLoggedIn ? <ProfileDetail/> : <RedirectToLogIn/>}></Route>

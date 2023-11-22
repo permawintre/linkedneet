@@ -119,29 +119,73 @@
     font-size: 25px;
     padding: 10px;
 }
-.projectBody .formItem {
-    margin-top: 25px;
-    padding: 0 15px;
-    box-sizing: border-box;
+/* Buttons */
+.Buttons {
+    width: 700px;
+    text-align: center;
+    margin: 10px auto;
 }
-.projectBody .formItem .formTitle {
+.buttonItem {
+    display: inline-block;
+    width: 130px;
+    margin: 0 2px;
+}
+.buttonItem .text {
+    cursor: pointer;
+}
+.buttonItem.active .text {
     font-weight: bold;
 }
-.projectBody .formItem textarea {
-    margin-top: 7px;
-    width: 100%;
-    height: 70px;
-    padding: 5px;
-    border: 1px solid gray;
-    border-radius: 10px;
-    box-sizing: border-box;
-    resize: none;
+/* ApplyForm */
+.bodyBox .applicantBox {
+    margin-bottom: 10px;
+    border: 1px dotted;
+    padding: 10px;
 }
-.projectBody button {
-    width: 96%;
-    margin: 0 auto;
-    border-radius: 10px;
-    margin-top: 20px;
+.bodyBox .applicantBox .userInfo {
+    display: flex;
+}
+.bodyBox .applicantBox .applicantName,
+.bodyBox .applicantBox .applicantEmail {
+    display: inline-block;
+}
+.bodyBox .applicantBox .applicantName {
+    font-weight: bold;
+    font-size: 18px;
+    margin-right: 10px;
+}
+.bodyBox .applicantBox .applicantEmail {
+    padding-top: 6px;
+    font-size: 13px;
+}
+.bodyBox .applicantBox .formItem {
+    margin: 10px auto;
+}
+.bodyBox .applicantBox .formTitle {
+    font-weight: bold;
+    margin-bottom: 5px;
     font-size: 15px;
+}
+.bodyBox .applicantBox .formAnswer {
+    border: 2px solid lightgray;
+    border-radius: 5px;
+    padding: 7px 10px;
+    font-size: 15px;
+}
+.bulkActionButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.bulkActionButton button {
+    margin: 5px;
     cursor: pointer;
+    padding: 10px 40px;
+    font-size: 15px;
+}
+.applicantButton input {
+    margin-right: 4px;
+}
+.applicantButton {
+    font-size: 13px;
 }

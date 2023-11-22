@@ -70,9 +70,12 @@ export const ProjectJoin = () => {
     const { projectId } = useParams();
     const [project, setProject] = useState(null);
     const [uid, setUid] = useState("");
+    const [userDetails, setUserDetails] = useState(null);
     const [formData, setFormData] = useState({
       projectId: '',
       userId: '',
+      userNickname: '',
+      userEmail: '',
       applyReason: '',
       applyForm: '',
       status: '승인전'
@@ -108,6 +111,29 @@ export const ProjectJoin = () => {
     
         fetchProject();
     }, [db, projectId]);
+    useEffect(() => {
+      const fetchUserDetails = async () => {
+        try {
+          if (uid) {
+            const userDoc = await getDoc(doc(db, 'users', uid));
+  
+            if (userDoc.exists()) {
+              const userData = userDoc.data();
+              setUserDetails(userData);
+            } else {
+              console.log('사용자를 찾을 수 없습니다.');
+            }
+          }
+        } catch (error) {
+          console.error('사용자 정보를 가져오는 동안 오류 발생:', error);
+        }
+      };
+  
+      fetchUserDetails();
+    }, [db, uid]);
+    const handleReasonChange = (e) => {
+      setFormData({...formData, applyReason: e.target.value})
+    }
     const handleFormChange = (e, index) => {
         const updatedForm = [...formData.applyForm]
         updatedForm[index] = e.target.value
@@ -125,6 +151,9 @@ export const ProjectJoin = () => {
         const applyRef = await addDoc(collection(db, 'projectApply'), {
           projectId: projectId,
           userId: uid,
+          userNickname: userDetails?.nickname || '',
+          userEmail: userDetails?.email || '',
+          applyReason: formData.applyReason,
           applyForm: formData.applyForm,
           status: formData.status,
           createdAt: moment().toDate(),
@@ -154,6 +183,13 @@ export const ProjectJoin = () => {
         <div className={`${style.projectDetail} ${style.projectBody}`}>
           <div className={style.bodyTitle}>소모임 지원서</div>
           <div className={style.bodyForm}>
+              <div className={style.formItem}>
+                <div className={style.formTitle}>▶ 지원동기</div>
+                <textarea
+                  value={formData.applyReason}
+                  onChange={handleReasonChange}
+                />
+              </div>
             {project.recruitForm.map((form, index) => (
               <div key={index} className={style.formItem}>
                 <div className={style.formTitle}>▶ {form}</div>

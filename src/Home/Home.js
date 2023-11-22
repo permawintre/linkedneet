@@ -1,5 +1,5 @@
 import React from "react"
-import { getDayMinuteCounter, PostContents, PostPics, LikeBtn, CommentBtn, PlusBtn, Comments,CommentsContainer } from './supportFunctions'
+import { getDayMinuteCounter, PostContents, PostPics, LikeBtn, CommentBtn, PlusBtn, CommentsWindow, WriteCommentContainer } from './supportFunctions'
 import './Home.css'
 import { initializeApp } from 'firebase/app';
 import { db , auth } from '../firebase.js'
@@ -12,7 +12,8 @@ import {
     addDoc,
     startAfter,
     doc,
-    getDoc
+    getDoc,
+    where
 } from "firebase/firestore"
 import { useEffect, useState } from 'react'
 import close from '../images/close.png'
@@ -33,9 +34,10 @@ const moims = ['모임 a', '모임 b', '모임 c']
 
 
 function Post(props) {
+    const userId = props.userId;
     const postId = props.postId
     const postedAt = props.postedAt
-    const numOfComments = props.numOfComments
+    const [comments, setComments] = useState([]);
     const [numOfLikes, setNumOfLikes] = useState(props.numOfLikes);
     const [whoLikes, setWhoLikes] = useState(props.whoLikes);
     const [imgUrls, setImgUrls] = useState([])
@@ -44,6 +46,32 @@ function Post(props) {
     const toggleComments = () => {
         setShowComments(!showComments);
     };
+    const [postUserInfo, setPostUserInfo] = useState({ profileImage: '', nickname: '' });
+
+    useEffect(() => {
+        const fetchPostUserInfo = async () => {
+            try {
+                if (userId) {
+                    const userRef = doc(db, 'users', userId);
+                    const userSnap = await getDoc(userRef);
+    
+                    if (userSnap.exists()) {
+                        setPostUserInfo({
+                            profileImage: userSnap.data().profile_image,
+                            nickname: userSnap.data().nickname,
+                            generation: userSnap.data().generation
+
+                        });
+                    } else {
+                        console.log("User not found!");
+                    }
+                }
+            } catch (error) {
+                console.error("Error fetching user data: ", error);
+            }
+        };
+        fetchPostUserInfo();
+    }, [userId]);
 
     useEffect(() => {
         setImgUrls([])
@@ -58,14 +86,33 @@ function Post(props) {
         }
     },[])
 
+    useEffect(() => {
+        const fetchComments = async () => {
+            if (postId) { // postId가 유효한 경우에만 쿼리 실행
+                const q = query(collection(db, 'comments'), where('postId', '==', postId));
+                const querySnapshot = await getDocs(q);
+                const commentsData = querySnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                setComments(commentsData); // 상태 업데이트
+            }
+            else{
+                console.error('Value is undefined!');
+            }
+        };
+    
+        fetchComments();
+    }, [postId]);
+
     return (
         <div className="homePost">
             <div className='paddingDiv'>
                 <div className="postHeader">
-                    <div className='profileImg'><img src={profile1Img} alt="profileImg"/></div>
+                    <div className='profileImg'><img src={postUserInfo.profileImage || profile1Img} alt="profileImg"/></div>
                     <div className='postInfo'>
-                        <div className="userName">{userName}</div>
-                        <div className='inGroup'>{companyClass+'기'}{moims.map((moim, idx)=>(<span key={idx}>{', '}{moim}</span>))}</div>
+                        <div className="userName">{postUserInfo.nickname || userName}</div>
+                        <div className='inGroup'>{postUserInfo.generation+'기' || companyClass+'기'}{moims.map((moim, idx)=>(<span key={idx}>{', '}{moim}</span>))}</div>
                         <div className="postedWhen">{getDayMinuteCounter(postedAt)}</div>
                     </div>
                 </div>
@@ -86,33 +133,15 @@ function Post(props) {
             <div className='numOfLikes'>
                 {numOfLikes===0? <span></span> : <span>{numOfLikes}명이 응원합니다 </span>}
             </div>
-            <div className='numOfComments' onClick={toggleComments}>
-                {numOfComments===0? <span></span> : <span>댓글 {numOfComments}개 모두 보기</span>}
-            </div>
-            {showComments && (
-                <div className='commentcontainer'>
-                   <CommentsContainer />
-                </div>
-            )}
-            <div className='commentcontainer'>
-                
-                <div className='postcomment'>
-                    <img src={profile1Img} alt="프로필"/>
-                        <input
-                            type="text"
-                            placeholder="댓글을 남겨 주세요"
-                        />
-                    <button type="submit">보내기</button>
-                </div>
-                
-            </div>
+            <CommentsWindow comments={comments} numOfComments={comments.length}/>
+            <WriteCommentContainer userProfileImage = {props.userInfo?.profile_image} postId = {postId} userId ={auth.currentUser.uid}/>
         </div>
     )
 }
 
 
 
-const Posts=() =>{
+const Posts=({ userInfo }) =>{
     const [posts, setPosts] = useState([]);
     const [lastKey, setLastKey] = useState(0);
     const [nextPosts_loading, setNextPostsLoading] = useState(false);
@@ -207,6 +236,8 @@ const Posts=() =>{
                     numOfComments = {post.numOfComments}
                     whoLikes = {post.whoLikes}
                     postId = {post.postId}
+                    userId={post.userId}
+                    userInfo={userInfo}
                 />
                 <div className='postFooter'>
                 </div>
@@ -348,7 +379,7 @@ function DndBox(props) {
     )
 }
 
-function Write() {
+function Write({ userInfo }) {
 
     const defaultValues = {
         contents: '',
@@ -425,7 +456,7 @@ function Write() {
     return(
         <div className='homePost write'>
             <div className='postHeader'>
-                <div className='profileImg'><img src={profile1Img} alt="profileImg"/></div>
+                <div className='profileImg'><img src={userInfo?.profile_image ||profile1Img} alt="profileImg"/></div>
                 <div className='popModal' onClick={ () => setIsOpen(true) }>당신의 일상을 공유해주세요!</div>
             </div>
             {isOpen ?
@@ -505,7 +536,7 @@ export const Home = () => {
                     <img src={userInfo?.imgUrls || profile1Img} alt="background" className="background-img"/> 
                     {/*임시*/}
                 </div>
-                <img src={userInfo?.imgUrls || profile1Img} alt="profile" className="profile-img1" />
+                <img src={userInfo?.profile_image} alt="profile" className="profile-img1" />
                 <div className="profile-info">
                     <h3>{userInfo?.nickname || 'undefined'}</h3>
                 </div>
@@ -513,8 +544,8 @@ export const Home = () => {
             </aside>
             
             <div className='postsContainer'>
-                <Write/>
-                <Posts/>
+                <Write userInfo={userInfo}/>
+                <Posts userInfo={userInfo}/>
             </div>
 
             <aside className="right-sidebar">

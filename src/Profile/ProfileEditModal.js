@@ -470,7 +470,7 @@ const ProfileCareerEditModal = ({job, EditModalClose}) => {
         })
         alert("성공적으로 저장되었습니다");
         // if successfully edit, then refresh < 새로고침 > 
-        window.location.reload();
+        window.location.replace('/profiledetail')
     } catch (e) {
         console.log(e);
     }
@@ -576,7 +576,7 @@ const ProfileCareerAddModal = ({AddModalClose}) => {
         })
         alert("성공적으로 저장되었습니다");
         // if successfully edit, then refresh < 새로고침 > 
-        window.location.reload();
+        window.location.replace('/profiledetail')
     } catch (e) {
         console.log(e);
     }

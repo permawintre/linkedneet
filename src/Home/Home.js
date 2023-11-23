@@ -2,6 +2,7 @@ import React from "react"
 import { getDayMinuteCounter, PostContents, PostPics, LikeBtn, CommentBtn, PlusBtn, CommentsWindow, WriteCommentContainer, addNewComment } from './supportFunctions'
 import './Home.css'
 import { initializeApp } from 'firebase/app';
+import { Link } from "react-router-dom"
 import { dbService , auth } from '../firebase.js'
 import {
     collection,
@@ -109,11 +110,20 @@ function Post(props) {
         <div className="homePost">
             <div className='paddingDiv'>
                 <div className="postHeader">
-                    <div className='profileImg'><img src={postUserInfo.profileImage || profile1Img} alt="profileImg"/></div>
+                    <Link to={`/profiledetail?uid=${props.userId}`}>
+                        <div className='profileImg'><img src={postUserInfo.profileImage || profile1Img} alt="profileImg"/></div>
+                    </Link>
                     <div className='postInfo'>
-                        <div className="userName">{postUserInfo.nickname || userName}</div>
-                        <div className='inGroup'>{postUserInfo.generation+'기' || companyClass+'기'}{moims.map((moim, idx)=>(<span key={idx}>{', '}{moim}</span>))}</div>
-                        <div className="postedWhen">{getDayMinuteCounter(postedAt)}</div>
+                        <Link to={`/profiledetail?uid=${props.userId}`}>
+                            <div className="userName">
+                                    {postUserInfo.nickname || userName}
+                                
+                            </div>
+                            <div className='inGroup'>
+                                    {postUserInfo.generation+'기' || companyClass+'기'}{moims.map((moim, idx)=>(<span key={idx}>{', '}{moim}</span>))}
+                            </div>
+                            <div className="postedWhen">{getDayMinuteCounter(postedAt)}</div>
+                        </Link>
                     </div>
                 </div>
                 <PostContents contents={contents} />
@@ -530,18 +540,20 @@ export const Home = () => {
     }, []);
 
     return(
+        
         <div className='home'>
-            <aside className="left-sidebar">
-                <div className="background-img-container">
-                    <img src={userInfo?.imgUrls || profile1Img} alt="background" className="homeProfile-background-img"/> 
-                    {/*임시*/}
-                </div>
-                <img src={userInfo?.profile_image} alt="profile" className="profile-img1" />
-                <div className="profile-info">
-                    <h3>{userInfo?.nickname || 'undefined'}</h3>
-                </div>
-                <button>내 그룹</button>
-            </aside>
+            <Link to={`/profiledetail?uid=${auth.currentUser.uid}`}>
+                <aside className="left-sidebar">
+                    <div className="background-img-container">
+                        <img src={userInfo?.imgUrls || profile1Img} alt="background" className="homeProfile-background-img"/> 
+                    </div>
+                    <img src={userInfo?.profile_image} alt="profile" className="profile-img1" />
+                    <div className="profile-info">
+                        <h3>{userInfo?.nickname || 'undefined'}</h3>
+                    </div>
+                    <button>내 프로필</button>
+                </aside>
+            </Link>
             
             <div className='postsContainer'>
                 <Write userInfo={userInfo}/>

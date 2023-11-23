@@ -33,6 +33,7 @@
 .userName {
     font-weight: bold;
     line-height: 25px;
+    color: black;  
 }
 .inGroup {
     color: #808080;
@@ -173,6 +174,7 @@ hr {
 .commentUsername {
     font-weight: bold;
     display: block; /* 블록 레벨 요소로 설정 */
+    color: black; 
 }
 
 .commentContents {
@@ -367,6 +369,7 @@ hr {
 .modalProfile .userName {
     font-size: 20px;
     padding-left: 10px;
+    color: black;  
 }
 
 .modalForm textarea {
@@ -671,3 +674,8 @@ hr {
 .plusSign.active {
     color: #ccc; 
 }
+
+a {
+    text-decoration: none; /* 링크의 밑줄을 제거 */
+  }
+  

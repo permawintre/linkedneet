@@ -38,7 +38,7 @@ const ProfileEditModal = ({EditModalClose}) => {
       // user Table Attribute (need to add more)
     const [userObj, setUserObj] = useState ({
       nickname: "",
-      profile_img: "",
+      profile_image: "",
       website: "",
       instagram:"",
       facebook:"",
@@ -57,7 +57,7 @@ const ProfileEditModal = ({EditModalClose}) => {
             if (userDoc.exists()) {
                 setUserObj(userObj => ({...userObj, ...userDoc.data()}));
                 await updateDoc(userDoc, {
-                  profile_img: getDownloadURL(ref(userDoc, `profile_images/${userDoc.profile_img}`))
+                  profile_image: getDownloadURL(ref(userDoc, `profile_images/${userDoc.profile_image}`))
                 });
             } else {
                 console.log('User not found');
@@ -98,7 +98,7 @@ const ProfileEditModal = ({EditModalClose}) => {
     };
     
     // Profile 사진 
-    const [Image, setImage] = useState(userObj.profile_img);
+    const [Image, setImage] = useState(userObj.profile_image);
     const [ImageChanged, setImageChanged] = useState(false);
     const fileInput = useRef(null);
     
@@ -106,7 +106,7 @@ const ProfileEditModal = ({EditModalClose}) => {
       if (e.target.files[0]){
         setImage(e.target.files[0]);
         setImageChanged(true);
-        setUserObj({  ...userObj, profile_img: [e.target.files[0], e.target.files[0].name]});
+        setUserObj({  ...userObj, profile_image: [e.target.files[0], e.target.files[0].name]});
       }
       // 업로드 취소할 시
       else {
@@ -130,12 +130,12 @@ const ProfileEditModal = ({EditModalClose}) => {
       try {
           if (ImageChanged && (userObj.intro_image !== undefined || userObj.intro_image !== null)){
             const storage = getStorage();
-            const img = userObj.profile_img[0]
-            const imgName = userObj.profile_img[1]
+            const img = userObj.profile_image[0]
+            const imgName = userObj.profile_image[1]
             const imageRef = ref(storage, `profile_images/${imgName}`);
             const imageUrlPromise = await uploadAndReturnUrl(imageRef, img);
             await updateDoc(userDocRef, {
-              profile_img: imageUrlPromise
+              profile_image: imageUrlPromise
             })
           }
           // update DB using user input 
@@ -170,7 +170,7 @@ const ProfileEditModal = ({EditModalClose}) => {
                 <h3>프로필 사진</h3>
                 <div class="image-edit-button-wrapper">
                   <label for="file-search">
-                    <img class="profile-image" src={Image || userObj.profile_img} alt=""/>
+                    <img class="profile-image" src={Image || userObj.profile_image} alt=""/>
                     <div class="image-edit-button">✏️ 변경하기</div>
                   </label>
                   
@@ -178,7 +178,7 @@ const ProfileEditModal = ({EditModalClose}) => {
                       style={{display: "none",
                               cursor: "pointer"}}
                       accept='image/jpg, image/png, image/jpeg' 
-                      name='profile_img'
+                      name='profile_image'
                       onChange={onProfileImgChange}
                       ref={fileInput}/>
                 </div>

@@ -1,5 +1,3 @@
-// image upload error
-
 import React, { useState, useEffect } from "react"
 import './ProjectCreate.css'
 import DatePicker from 'react-datepicker';
@@ -612,7 +610,7 @@ export const ProjectCreate = () => {
   
     switch (step) {
       case 1:
-        return <div className="body project-create">
+        return <div className="project-create">
                     <BasicInfoForm
                         nextStep={nextStep}
                         formData={formData}

@@ -6,10 +6,6 @@
     --color_4: #FF4B2B;
 
 }
-.project-create {
-    margin-top: -108px;
-    margin-bottom: -108px;
-}
 .project-create .form-header {
     margin: 0 auto;
     background-color: #73C6B6;
@@ -23,6 +19,10 @@
     text-decoration: underline;
     text-underline-offset: 5px;
     text-align: center;
+}
+.project-create .form-header .step-box {
+    display: flex;
+    justify-content: center;
 }
 .project-create .form-header .step-box .step {
     display: inline-block;

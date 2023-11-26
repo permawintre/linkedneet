@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react"
 import style from './ProjectCreate.module.css'
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { dbService, auth } from '../firebase.js';
-import { addDoc, collection } from "firebase/firestore"
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { dbService, auth, storage } from '../firebase.js';
+import { addDoc, collection, getDoc, doc } from "firebase/firestore"
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import moment from 'moment'
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
@@ -184,7 +184,6 @@ const BasicInfoForm = ({ nextStep, formData, setFormData, mainImage }) => {
     );
 };
 const DetailedInfoForm = ({ prevStep, nextStep, formData, setFormData, mainImage, setMainImage }) => {
-    const storage = getStorage();
     const uploadAndReturnUrl = async (storageRef, file) => {
       try {
         // Upload 'file' to Firebase Storage.
@@ -528,7 +527,16 @@ const CompletionForm = ({ prevStep, formData, setFormData, mainImage }) => {
       };
 
       // Save formData to Firebase Firestore
-      await addDoc(collection(dbService, 'projects'), updatedFormData);
+      const projectRef = await addDoc(collection(dbService, 'projects'), updatedFormData);
+      const leaderDoc = await getDoc(doc(dbService, 'users', uid));
+      const leaderData = leaderDoc.data();
+      await addDoc(collection(dbService, 'projectMember'), {
+        projectId: projectRef.id,
+        userId: uid,
+        userNickName: leaderData.nickname,
+        userEmail: leaderData.email,
+        createdAt: moment().toDate(),
+      });
 
       window.alert('소모임이 생성되었습니다!');
       navigate('/project');

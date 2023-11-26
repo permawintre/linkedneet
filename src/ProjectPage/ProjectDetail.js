@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from "react"
 import style from './ProjectDetail.module.css'
 import { FcAlarmClock, FcCalendar, FcCheckmark, FcGlobe } from "react-icons/fc";
-import { doc, getDoc, getFirestore } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import { auth } from '../firebase.js'
+import { auth, dbService } from '../firebase.js'
 
-const defaultImage = 'https://cdn.imweb.me/upload/S20191010288d21675b22f/e33c22faf15bc.jpg';
-const defaultImage2 = 'https://images.freeimages.com/images/large-previews/c22/cat-1395746.jpg'
-const defaultImage3 = 'https://www.posist.com/restaurant-times/wp-content/uploads/2023/07/How-To-Start-A-Coffee-Shop-Business-A-Complete-Guide.jpg'
-const defaultImage4 = 'https://upload.wikimedia.org/wikipedia/commons/6/6e/Chelonia_mydas_is_going_for_the_air_edit.jpg'
+const defaultLeaderImg = 'https://s3.amazonaws.com/37assets/svn/765-default-avatar.png';
 
 const getTagColor = (status) => {
     switch (status) {
@@ -174,22 +171,23 @@ export const ProjectDetail = () => {
       }
     }, []);
 
-    const db = getFirestore();
     useEffect(() => {
         const fetchProject = async () => {
             try {
-                const projectDoc = await getDoc(doc(db, 'projects', projectId));
+                const projectDoc = await getDoc(doc(dbService, 'projects', projectId));
     
                 if (projectDoc.exists()) {
                     const projectData = projectDoc.data();
-    
+                    const leaderDoc = await getDoc(doc(dbService, 'users', projectData.leaderId));
+                    const leaderData = leaderDoc.data();
+                    
                     // Update projectData with additional properties
                     const updatedProjectData = {
                         ...projectData,
                         id: projectDoc.id,
-                        leaderName: '딩스',
-                        leaderComment: '니트컴퍼니 2기. 100일 동안 끄적끄적 그림을 그렸습니다. 현재도 끄적끄적 그려나가고 있습니다. 인스타그램 @xoxodingxx',
-                        leaderImage: defaultImage3,
+                        leaderName: leaderData.nickname,
+                        leaderComment: `니트컴퍼니 ${leaderData.generation}기. ${leaderData.intro_title}`,
+                        leaderImage: leaderData.profile_img ? leaderData.profile_img : defaultLeaderImg,
                         reviews: [
                             {
                                 'nickname': '유저1',
@@ -216,7 +214,7 @@ export const ProjectDetail = () => {
         };
     
         fetchProject();
-    }, [db, projectId]);
+    }, [dbService, projectId]);
 
     const [activeSection, setActiveSection] = useState('projectBodySection');
     const scrollToElement = (elementId) => {

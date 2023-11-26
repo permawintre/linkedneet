@@ -1,14 +1,10 @@
-// 준비물, 소모임 위치 해야됨.
-// 소모임 후기: 방명록 형태 가져오기
-// 지원page 만들어야함.
-// 리더탭은 리더 프로필과 연결되도록.
-// subImages 순서
 import React, { useState, useEffect } from "react"
 import style from './ProjectDetail.module.css'
 import { FcAlarmClock, FcCalendar, FcCheckmark, FcGlobe } from "react-icons/fc";
 import { doc, getDoc, getFirestore } from 'firebase/firestore';
 import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import { auth } from '../firebase.js'
 
 const defaultImage = 'https://cdn.imweb.me/upload/S20191010288d21675b22f/e33c22faf15bc.jpg';
 const defaultImage2 = 'https://images.freeimages.com/images/large-previews/c22/cat-1395746.jpg'
@@ -60,7 +56,7 @@ function formatDate(date) {
     return new Date(date).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
 }
 
-const ProjectHeader = (project) => {
+const ProjectHeader = ({project, uid}) => {
     return (
         <div className={style.projectDetail}>
           <div className={style.projectBoxDetail}>
@@ -105,12 +101,18 @@ const ProjectHeader = (project) => {
             </div>
           </div>
           <div className={style.projectBoxButtons}>
-            {project.status === '모집중' ? (
-              <Link to={`/projectJoin/${project.id}`} style={{ textDecoration: 'none', color: 'black' }} className={style.recruitButton}>
-                  소모임 지원하기
+            {project.leaderId === uid ? (
+              <Link to={`/projectManage/${project.id}`} style={{ textDecoration: 'none', color: 'black' }} className={style.recruitButton}>
+                소모임 관리하기
               </Link>
             ) : (
-              <span className={style.recruitButton}>모집기간이 아닙니다</span>
+              project.status === '모집중' ? (
+                <Link to={`/projectJoin/${project.id}`} style={{ textDecoration: 'none', color: 'black' }} className={style.recruitButton}>
+                  소모임 지원하기
+                </Link>
+              ) : (
+                <span className={style.recruitButton}>모집기간이 아닙니다</span>
+              )
             )}
             <span className={style.shareButton}>공유하기</span>
           </div>
@@ -164,6 +166,13 @@ const ProjectReview = (project) => {
 export const ProjectDetail = () => {
     const { projectId } = useParams();
     const [project, setProject] = useState(null);
+    const [uid, setUid] = useState("");
+
+    useEffect(() => {
+      if (auth.currentUser) {
+        setUid(auth.currentUser.uid);
+      }
+    }, []);
 
     const db = getFirestore();
     useEffect(() => {
@@ -225,7 +234,7 @@ export const ProjectDetail = () => {
     }
     return (
     <div className={style.body} style={{ overflowY: 'auto' }}>
-        {ProjectHeader(project)}
+        {ProjectHeader({'project': project, 'uid': uid})}
         <div className={style.projectBoxButtons}>
             <span
             className={`${style.projectButton} ${style[activeSection === 'projectBodySection' ? 'active' : '']}`}

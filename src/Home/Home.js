@@ -1,7 +1,6 @@
 import React from "react"
 import { getDayMinuteCounter, PostContents, PostPics, LikeBtn, CommentBtn, PlusBtn, CommentsWindow, WriteCommentContainer, addNewComment } from './supportFunctions'
 import './Home.css'
-import { initializeApp } from 'firebase/app';
 import { dbService , auth } from '../firebase.js'
 import {
     collection,
@@ -19,7 +18,7 @@ import { useEffect, useState } from 'react'
 import close from '../images/close.png'
 import moment from 'moment'
 import styled from 'styled-components'
-import { getStorage, ref, uploadString, listAll, getDownloadURL } from 'firebase/storage';
+import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid'; // 랜덤 식별자를 생성해주는 라이브러리
 import { storage } from '../firebase.js';
 
@@ -43,6 +42,7 @@ function Post(props) {
     const [imgUrls, setImgUrls] = useState([])
     const contents = props.contents
     const [postUserInfo, setPostUserInfo] = useState({ profileImage: '', nickname: '' });
+    const postWhere = props.postWhere;
 
     const addNewComment = (newComment) => {
         setComments(prevComments => [...prevComments, newComment]);
@@ -111,7 +111,7 @@ function Post(props) {
                 <div className="postHeader">
                     <div className='profileImg'><img src={postUserInfo.profileImage || profile1Img} alt="profileImg"/></div>
                     <div className='postInfo'>
-                        <div className="userName">{postUserInfo.nickname || userName}</div>
+                        <div className="userName">{postUserInfo.nickname || userName}<div className="postWhere">▸{postWhere}</div></div>
                         <div className='inGroup'>{postUserInfo.generation+'기' || companyClass+'기'}{moims.map((moim, idx)=>(<span key={idx}>{', '}{moim}</span>))}</div>
                         <div className="postedWhen">{getDayMinuteCounter(postedAt)}</div>
                     </div>
@@ -236,7 +236,8 @@ const Posts=({ userInfo }) =>{
                     numOfComments = {post.numOfComments}
                     whoLikes = {post.whoLikes}
                     postId = {post.postId}
-                    userId={post.userId}
+                    userId= {post.userId}
+                    postWhere = {post.postWhere}
                     userInfo={userInfo}
                 />
                 <div className='postFooter'>
@@ -386,14 +387,16 @@ function Write({ userInfo }) {
         numOfComments: 0,
         numOfLikes: 0,
         postedAt: null,
-        whoLikes: []
+        whoLikes: [],
+        postWhere: 'profile',
     }
     let [isOpen, setIsOpen] = useState(false)
     let [values, setValues] = useState(defaultValues)
     let [async, setAsync] = useState(false)
     let [contentImages, setContentImages] = useState([])
     let [uid, setUid] = useState("")
-    
+    let [selectBar, setSelectBar] = useState(false)
+    let [postWhere, setPostWhere] = useState("profile")
 
 
 
@@ -433,7 +436,8 @@ function Write({ userInfo }) {
             ...values,
             'postedAt': moment().unix(),
             'userId': uid,
-            'imgUrls': imgUrls
+            'imgUrls': imgUrls,
+            'postWhere': postWhere,
         
         })
         
@@ -456,7 +460,7 @@ function Write({ userInfo }) {
     return(
         <div className='homePost write'>
             <div className='postHeader'>
-                <div className='profileImg'><img src={userInfo?.profile_image ||profile1Img} alt="profileImg"/></div>
+                <div className='profileImg'><img src={userInfo?.profile_image || profile1Img} alt="profileImg"/></div>
                 <div className='popModal' onClick={ () => setIsOpen(true) }>당신의 일상을 공유해주세요!</div>
             </div>
             {isOpen ?
@@ -464,12 +468,25 @@ function Write({ userInfo }) {
                 <div onClick={ (e) => e.stopPropagation() }> {/** event 버블링 방지 */}
                     <div className='modalWrite'>
                         <div className='modalHeader'>
-                            <div className='modalProfile'>
-                                <div className='profileImg'><img src={userInfo?.profile_image ||profile1Img} alt="profileImg"/></div>
-                                <div className="userName">{userName}</div>
+                            <div className='modalProfile' onClick={ () => setSelectBar(!selectBar) }>
+                                <div className='profileImg'><img src={userInfo?.profile_image || profile1Img} alt="profileImg"/></div>
+                                <div>
+                                    <div className="userName">{userName}</div>
+                                    <div className="postWhere">게시 위치 ▸{postWhere}</div>
+                                </div>
                             </div>
+                            {selectBar ? 
+                                <div className="selectBar">
+                                    <div onClick={ () => {setPostWhere("profile");setSelectBar(!selectBar)} }>profile</div>
+                                    <div onClick={ () => {setPostWhere("neetCompany");setSelectBar(!selectBar)} }>neetCompany</div>
+                                    <div onClick={ () => {setPostWhere("project");setSelectBar(!selectBar)} }>project</div>{/*가입한 그룹이랑 연동하는것 구현필요*/}
+                                </div>
+                                :
+                                null
+                            }
                             <img src={close} alt='x' className='close' onClick={ () => setIsOpen(false) }/>
                         </div>
+                        
                         <form onSubmit={handleSubmit} className='modalForm'>
                             <textarea type='text' name='contents' value={values.contents} onChange={handleChange} placeholder='나누고 싶은 생각이 있으세요?'/>
                             <DndBox contentImages={ contentImages } setContentImages={ setContentImages } />

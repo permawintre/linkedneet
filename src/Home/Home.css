@@ -34,6 +34,12 @@
     font-weight: bold;
     line-height: 25px;
 }
+.userName .postWhere {
+    display: inline;
+    font-size: 13px;
+    color: #808080;
+    font-weight: lighter;
+}
 .inGroup {
     color: #808080;
     font-size: 13px;
@@ -342,6 +348,17 @@ hr {
     padding: 10px;
     justify-content: space-between;
 }
+.modalHeader .selectBar {
+    display: flex;
+}
+.modalHeader .selectBar>div {
+    padding: 20px;
+    margin: auto;
+    border-radius: 20px;
+}.modalHeader .selectBar>div:hover {
+    cursor: pointer;
+    background-color: #eeeeee;
+}
 .modalProfile {
     display: flex;
     padding: 10px;
@@ -367,6 +384,11 @@ hr {
 .modalProfile .userName {
     font-size: 20px;
     padding-left: 10px;
+}
+.modalProfile .postWhere {
+    font-size: 16px;
+    padding: 5px 10px 0 10px;
+    color: #808080;
 }
 
 .modalForm textarea {

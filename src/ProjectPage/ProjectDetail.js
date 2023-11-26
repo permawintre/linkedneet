@@ -65,7 +65,7 @@ const ProjectHeader = (project) => {
         <div className={style.projectDetail}>
           <div className={style.projectBoxDetail}>
             <span className={`${style.tag} ${style[getTagColor(project.status)]}`}>{project.status}</span>
-            <img src={project.image} alt={project.name} />
+            <img src={project.image.imageUrl} alt={project.name} />
             <div className={`${style.name} ${style[getTagColor(project.status)]}`}>{project.name}</div>
             <div className={style.comment}>
               <div>{project.shortDescription}</div>
@@ -135,8 +135,8 @@ const ProjectBody = (project) => {
         <div className={`${style.projectDetail} ${style.projectBody}`}>
           <div className={style.bodyTitle}>소모임 소개</div>
           <div className={style.bodyImages}>
-              {project.subImages.slice().reverse().map((image, index) => (
-                  <img key={index} src={image} alt={`Subimage ${index + 1}`} />
+              {project.subImages.map((image, index) => (
+                  <img key={index} src={image.imageUrl} alt={`Subimage ${index + 1}`} />
               ))}
           </div>
           <div className={style.bodyContent}>{project.introduction}</div>

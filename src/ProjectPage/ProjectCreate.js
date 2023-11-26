@@ -1,8 +1,4 @@
-// npm install react-datepicker
-// naver map?
-// 임시저장 버튼
-// leader uid
-// subImage uploade 완료 후 formData reset되는 문제 해결 필요
+// image upload error
 
 import React, { useState, useEffect } from "react"
 import './ProjectCreate.css'
@@ -10,13 +6,13 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { dbService, auth } from '../firebase.js';
 import { addDoc, collection } from "firebase/firestore"
-import { getStorage, ref, uploadBytes, getDownloadURL, uploadString } from 'firebase/storage';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import moment from 'moment'
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 
 
-const BasicInfoForm = ({ nextStep, formData, setFormData }) => {
+const BasicInfoForm = ({ nextStep, formData, setFormData, mainImage }) => {
   
     const handleCategoryClick = (category) => {
       setFormData({ ...formData, category: category });
@@ -50,7 +46,6 @@ const BasicInfoForm = ({ nextStep, formData, setFormData }) => {
       }
       const currentDate = new Date();
       currentDate.setHours(0, 0, 0, 0);
-      console.log(currentDate);
       if (formData.recruitStartDate > formData.recruitEndDate
         || formData.runningStartDate > formData.runningEndDate) {
         alert('종료일은 시작일 이후여야 합니다!');
@@ -64,7 +59,7 @@ const BasicInfoForm = ({ nextStep, formData, setFormData }) => {
     };
   
     return (
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="project-form">
         <div className="form-header">
             <div className="form-title">소모임 만들기</div>
             <div className="step-box">
@@ -190,19 +185,16 @@ const BasicInfoForm = ({ nextStep, formData, setFormData }) => {
       </form>
     );
 };
-const DetailedInfoForm = ({ prevStep, nextStep, formData, setFormData }) => {
-    
-    const [selectedImage, setSelectedImage] = useState(null);
-
+const DetailedInfoForm = ({ prevStep, nextStep, formData, setFormData, mainImage, setMainImage }) => {
     const storage = getStorage();
     const uploadAndReturnUrl = async (storageRef, file) => {
       try {
         // Upload 'file' to Firebase Storage.
         await uploadBytes(storageRef, file);
-  
+        
         // Get download url of uploaded file.
         const imageUrl = await getDownloadURL(storageRef);
-        return imageUrl;
+        return {imageUrl, fileName: file.name};
       } catch (error) {
         console.error('Error uploading file: ', error);
         throw error;
@@ -215,28 +207,32 @@ const DetailedInfoForm = ({ prevStep, nextStep, formData, setFormData }) => {
         setFormData({ ...formData, image: imageUrl });
     }
     const handleImageChange = async (e) => {
-        const selectedImage = e.target.files[0];
-        setSelectedImage(selectedImage)
-        uploadImage(selectedImage)
+        const targetImage = e.target.files[0];
+        setMainImage(targetImage);
+        uploadImage(targetImage);
     };
 
     const handleSubImagesChange = async (e) => {
       const selectedSubImages = Array.from(e.target.files);
-
+    
       const subImagePromises = selectedSubImages.map(async (subImage) => {
         const subimgUrl = uuidv4();
         const subImageRef = ref(storage, `project_images/${subimgUrl}`);
         return await uploadAndReturnUrl(subImageRef, subImage);
       });
-
-      const subimageUrls = await Promise.all(subImagePromises)
-
+    
+      const newSubimageUrls = await Promise.all(subImagePromises);
+    
       setFormData((prevFormData) => {
-        return { ...prevFormData, subImages: subimageUrls };
+        return { ...prevFormData, subImages: [...prevFormData.subImages, ...newSubimageUrls] };
       });
     };
-    const getFileNames = () => {
-      return formData.subImages.map((file, index) => `추가 이미지 ${index + 1}: ${file.name}`).join('\n');
+    const removeSubImage = (index) => {
+      const newSubImages = [...formData.subImages];
+      newSubImages.splice(index, 1);
+      setFormData((prevFormData) => {
+        return { ...prevFormData, subImages: newSubImages };
+      });
     };
     const handleIntroductionChange = (e) => {
         setFormData({ ...formData, introduction: e.target.value });
@@ -272,7 +268,7 @@ const DetailedInfoForm = ({ prevStep, nextStep, formData, setFormData }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (!formData.introduction || !formData.desiredCrew) {
+        if (!formData.image || !formData.introduction || !formData.desiredCrew) {
           alert('필수항목을 입력해주세요!');
           return;
         }
@@ -280,7 +276,7 @@ const DetailedInfoForm = ({ prevStep, nextStep, formData, setFormData }) => {
     };
     
       return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="project-form">
           <div className="form-header">
               <div className="form-title">소모임 만들기</div>
               <div className="step-box">
@@ -300,12 +296,11 @@ const DetailedInfoForm = ({ prevStep, nextStep, formData, setFormData }) => {
                   type="file"
                   accept="image/*"
                   onChange={handleImageChange}
-                  required // 필수 항목
                 />
                 {formData.image ? (
                   <img
                     className="form-image"
-                    src={URL.createObjectURL(selectedImage)}
+                    src={URL.createObjectURL(mainImage)}
                     alt="대표 이미지 미리보기"
                   />
                 ) : (
@@ -320,7 +315,8 @@ const DetailedInfoForm = ({ prevStep, nextStep, formData, setFormData }) => {
           <div className="form-box">
             <label>
               <div className="form-title">추가 이미지</div>
-              <div className="form-content">추가 이미지는 크기 제한이 없습니다. 자유롭게 추가 업로드 해주세요</div>
+              <div className="form-content">추가 이미지는 크기 제한이 없습니다. 자유롭게 추가 업로드 해주세요.</div>
+              <div className="form-content">이미지 순서를 지정하고 싶다면, 한 장씩 순서대로 첨부해주세요.</div>
               <div className="form-image-box">
                 <input
                   type="file"
@@ -329,7 +325,16 @@ const DetailedInfoForm = ({ prevStep, nextStep, formData, setFormData }) => {
                   multiple  // 여러 파일 선택을 허용
                 />
                 {formData.subImages.length > 0 && (
-                  <div className="image-names">{getFileNames()}</div>
+                  <div className="image-names">
+                    {formData.subImages.map((subImage, index) => (
+                      <div key={index} className="subImage-container">
+                        <button type="button" onClick={() => removeSubImage(index)}>
+                          삭제
+                        </button>
+                        <span>{`추가 이미지 ${index + 1}: ${subImage.fileName}`}</span>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             </label>
@@ -422,7 +427,7 @@ const DetailedInfoForm = ({ prevStep, nextStep, formData, setFormData }) => {
         </form>
       );
 }
-const RecruitmentForm = ({ prevStep, nextStep, formData, setFormData }) => {
+const RecruitmentForm = ({ prevStep, nextStep, formData, setFormData, mainImage }) => {
   const [newInput, setNewInput] = useState('');
 
     const addInput = () => {
@@ -447,7 +452,7 @@ const RecruitmentForm = ({ prevStep, nextStep, formData, setFormData }) => {
     };
     
       return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}  className="project-form">
           <div className="form-header">
               <div className="form-title">소모임 만들기</div>
               <div className="step-box">
@@ -501,7 +506,7 @@ const RecruitmentForm = ({ prevStep, nextStep, formData, setFormData }) => {
         </form>
       );
 }
-const CompletionForm = ({ prevStep, formData, setFormData }) => {
+const CompletionForm = ({ prevStep, formData, setFormData, mainImage }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   let [uid, setUid] = useState("")
   useEffect(() => {
@@ -539,7 +544,7 @@ const CompletionForm = ({ prevStep, formData, setFormData }) => {
   };
     
       return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}  className="project-form">
           <div className="form-header">
               <div className="form-title">소모임 만들기</div>
               <div className="step-box">
@@ -595,6 +600,7 @@ export const ProjectCreate = () => {
         tags: [], // ~ (2)
         recruitForm: [],
       });
+    const [mainImage, setMainImage] = useState(null);
   
     const nextStep = () => {
       setStep(step + 1);
@@ -611,6 +617,7 @@ export const ProjectCreate = () => {
                         nextStep={nextStep}
                         formData={formData}
                         setFormData={setFormData}
+                        mainImage={mainImage}
                     />
                 </div>;
       case 2:
@@ -620,6 +627,8 @@ export const ProjectCreate = () => {
                         prevStep={prevStep}
                         formData={formData}
                         setFormData={setFormData}
+                        mainImage={mainImage}
+                        setMainImage={setMainImage}
                     />
                 </div>;
       case 3:
@@ -629,6 +638,7 @@ export const ProjectCreate = () => {
                         prevStep={prevStep}
                         formData={formData}
                         setFormData={setFormData}
+                        mainImage={mainImage}
                     />
                 </div>;
       case 4:
@@ -637,6 +647,7 @@ export const ProjectCreate = () => {
                         prevStep={prevStep}
                         formData={formData}
                         setFormData={setFormData}
+                        mainImage={mainImage}
                     />
                 </div>;
       default:

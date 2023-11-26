@@ -22,7 +22,7 @@ const ProjectHeader = (project) => {
         <div className={style.projectDetail}>
           <div className={style.projectBoxDetail}>
             <div className={style.projectBoxColumn}>
-              <img src={project.image} alt={project.name} />
+              <img src={project.image.imageUrl} alt={project.name} />
             </div>
             <div className={style.projectBoxColumn}>
               <div className={style.name}>{project.name}</div>

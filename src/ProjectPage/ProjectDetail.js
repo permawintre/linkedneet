@@ -1,19 +1,12 @@
-// 준비물, 소모임 위치 해야됨.
-// 소모임 후기: 방명록 형태 가져오기
-// 지원page 만들어야함.
-// 리더탭은 리더 프로필과 연결되도록.
-// subImages 순서
 import React, { useState, useEffect } from "react"
 import style from './ProjectDetail.module.css'
 import { FcAlarmClock, FcCalendar, FcCheckmark, FcGlobe } from "react-icons/fc";
-import { doc, getDoc, getFirestore } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import { auth, dbService } from '../firebase.js'
 
-const defaultImage = 'https://cdn.imweb.me/upload/S20191010288d21675b22f/e33c22faf15bc.jpg';
-const defaultImage2 = 'https://images.freeimages.com/images/large-previews/c22/cat-1395746.jpg'
-const defaultImage3 = 'https://www.posist.com/restaurant-times/wp-content/uploads/2023/07/How-To-Start-A-Coffee-Shop-Business-A-Complete-Guide.jpg'
-const defaultImage4 = 'https://upload.wikimedia.org/wikipedia/commons/6/6e/Chelonia_mydas_is_going_for_the_air_edit.jpg'
+const defaultLeaderImg = 'https://s3.amazonaws.com/37assets/svn/765-default-avatar.png';
 
 const getTagColor = (status) => {
     switch (status) {
@@ -60,12 +53,12 @@ function formatDate(date) {
     return new Date(date).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
 }
 
-const ProjectHeader = (project) => {
+const ProjectHeader = ({project, uid}) => {
     return (
         <div className={style.projectDetail}>
           <div className={style.projectBoxDetail}>
             <span className={`${style.tag} ${style[getTagColor(project.status)]}`}>{project.status}</span>
-            <img src={project.image} alt={project.name} />
+            <img src={project.image.imageUrl} alt={project.name} />
             <div className={`${style.name} ${style[getTagColor(project.status)]}`}>{project.name}</div>
             <div className={style.comment}>
               <div>{project.shortDescription}</div>
@@ -105,12 +98,18 @@ const ProjectHeader = (project) => {
             </div>
           </div>
           <div className={style.projectBoxButtons}>
-            {project.status === '모집중' ? (
-              <Link to={`/projectJoin/${project.id}`} style={{ textDecoration: 'none', color: 'black' }} className={style.recruitButton}>
-                  소모임 지원하기
+            {project.leaderId === uid ? (
+              <Link to={`/projectManage/${project.id}`} style={{ textDecoration: 'none', color: 'black' }} className={style.recruitButton}>
+                소모임 관리하기
               </Link>
             ) : (
-              <span className={style.recruitButton}>모집기간이 아닙니다</span>
+              project.status === '모집중' ? (
+                <Link to={`/projectJoin/${project.id}`} style={{ textDecoration: 'none', color: 'black' }} className={style.recruitButton}>
+                  소모임 지원하기
+                </Link>
+              ) : (
+                <span className={style.recruitButton}>모집기간이 아닙니다</span>
+              )
             )}
             <span className={style.shareButton}>공유하기</span>
           </div>
@@ -135,8 +134,8 @@ const ProjectBody = (project) => {
         <div className={`${style.projectDetail} ${style.projectBody}`}>
           <div className={style.bodyTitle}>소모임 소개</div>
           <div className={style.bodyImages}>
-              {project.subImages.slice().reverse().map((image, index) => (
-                  <img key={index} src={image} alt={`Subimage ${index + 1}`} />
+              {project.subImages.map((image, index) => (
+                  <img key={index} src={image.imageUrl} alt={`Subimage ${index + 1}`} />
               ))}
           </div>
           <div className={style.bodyContent}>{project.introduction}</div>
@@ -164,23 +163,31 @@ const ProjectReview = (project) => {
 export const ProjectDetail = () => {
     const { projectId } = useParams();
     const [project, setProject] = useState(null);
+    const [uid, setUid] = useState("");
 
-    const db = getFirestore();
+    useEffect(() => {
+      if (auth.currentUser) {
+        setUid(auth.currentUser.uid);
+      }
+    }, []);
+
     useEffect(() => {
         const fetchProject = async () => {
             try {
-                const projectDoc = await getDoc(doc(db, 'projects', projectId));
+                const projectDoc = await getDoc(doc(dbService, 'projects', projectId));
     
                 if (projectDoc.exists()) {
                     const projectData = projectDoc.data();
-    
+                    const leaderDoc = await getDoc(doc(dbService, 'users', projectData.leaderId));
+                    const leaderData = leaderDoc.data();
+                    
                     // Update projectData with additional properties
                     const updatedProjectData = {
                         ...projectData,
                         id: projectDoc.id,
-                        leaderName: '딩스',
-                        leaderComment: '니트컴퍼니 2기. 100일 동안 끄적끄적 그림을 그렸습니다. 현재도 끄적끄적 그려나가고 있습니다. 인스타그램 @xoxodingxx',
-                        leaderImage: defaultImage3,
+                        leaderName: leaderData.nickname,
+                        leaderComment: `니트컴퍼니 ${leaderData.generation}기. ${leaderData.intro_title}`,
+                        leaderImage: leaderData.profile_img ? leaderData.profile_img : defaultLeaderImg,
                         reviews: [
                             {
                                 'nickname': '유저1',
@@ -207,7 +214,7 @@ export const ProjectDetail = () => {
         };
     
         fetchProject();
-    }, [db, projectId]);
+    }, [dbService, projectId]);
 
     const [activeSection, setActiveSection] = useState('projectBodySection');
     const scrollToElement = (elementId) => {
@@ -225,7 +232,7 @@ export const ProjectDetail = () => {
     }
     return (
     <div className={style.body} style={{ overflowY: 'auto' }}>
-        {ProjectHeader(project)}
+        {ProjectHeader({'project': project, 'uid': uid})}
         <div className={style.projectBoxButtons}>
             <span
             className={`${style.projectButton} ${style[activeSection === 'projectBodySection' ? 'active' : '']}`}

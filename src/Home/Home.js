@@ -21,7 +21,7 @@ import { useEffect, useState } from 'react'
 import close from '../images/close.png'
 import moment from 'moment'
 import styled from 'styled-components'
-import { getStorage, ref, uploadString, listAll, getDownloadURL } from 'firebase/storage';
+import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid'; // 랜덤 식별자를 생성해주는 라이브러리
 import { storage } from '../firebase.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -47,6 +47,7 @@ function Post(props) {
     const [imgUrls, setImgUrls] = useState([])
     const contents = props.contents
     const [postUserInfo, setPostUserInfo] = useState({ profileImage: '', nickname: '' });
+    const postWhere = props.postWhere;
 
     const addNewComment = (newComment) => {
         setComments(prevComments => [...prevComments, newComment]);
@@ -288,7 +289,8 @@ const Posts=({ userInfo }) =>{
                     numOfComments = {post.numOfComments}
                     whoLikes = {post.whoLikes}
                     postId = {post.postId}
-                    userId={post.userId}
+                    userId= {post.userId}
+                    postWhere = {post.postWhere}
                     userInfo={userInfo}
                 />
                 <div className='postFooter'>
@@ -438,13 +440,14 @@ function Write({ userInfo,isOpen, setIsOpen,existingPost,showHeader }) {
         numOfComments: 0,
         numOfLikes: 0,
         postedAt: null,
-        postWhere: '',
-        whoLikes: []
+        whoLikes: [],
+        postWhere: 'profile',
     }
     let [values, setValues] = useState(defaultValues)
     let [async, setAsync] = useState(false)
     let [contentImages, setContentImages] = useState([])
     let [uid, setUid] = useState("")
+
 
     useEffect(() => {
         if (existingPost) {
@@ -456,6 +459,10 @@ function Write({ userInfo,isOpen, setIsOpen,existingPost,showHeader }) {
         }
     }, [existingPost]);
     
+
+    let [selectBar, setSelectBar] = useState(false)
+    let [postWhere, setPostWhere] = useState("profile")
+
 
 
 
@@ -494,9 +501,10 @@ function Write({ userInfo,isOpen, setIsOpen,existingPost,showHeader }) {
         const postData = {
             ...defaultValues,
             ...values,
-            postedAt: moment().unix(),
-            userId: uid,
-            imgUrls: imgUrls
+            'postedAt': moment().unix(),
+            'userId': uid,
+            'imgUrls': imgUrls,
+            'postWhere': postWhere,
         };
     
         const handleUploadImages = () => {
@@ -525,6 +533,7 @@ function Write({ userInfo,isOpen, setIsOpen,existingPost,showHeader }) {
                 .catch(error => {
                     console.error("Error adding document: ", error);
                 });
+
         }
     
         setIsOpen(false);
@@ -538,6 +547,7 @@ function Write({ userInfo,isOpen, setIsOpen,existingPost,showHeader }) {
         <div className='homePost write'>
             {showHeader && (
                 <div className='postHeader'>
+
                 <div className='profileImg'><img src={userInfo?.profile_image || profile1Img} alt="profileImg"/></div>
                 <div className='popModal' onClick={ () => setIsOpen(true) }>당신의 일상을 공유해주세요!</div>
                 </div>
@@ -547,12 +557,25 @@ function Write({ userInfo,isOpen, setIsOpen,existingPost,showHeader }) {
                 <div onClick={ (e) => e.stopPropagation() }> {/** event 버블링 방지 */}
                     <div className='modalWrite'>
                         <div className='modalHeader'>
-                            <div className='modalProfile'>
-                                <div className='profileImg'><img src={userInfo?.profile_image ||profile1Img} alt="profileImg"/></div>
-                                <div className="userName">{userName}</div>
+                            <div className='modalProfile' onClick={ () => setSelectBar(!selectBar) }>
+                                <div className='profileImg'><img src={userInfo?.profile_image || profile1Img} alt="profileImg"/></div>
+                                <div>
+                                    <div className="userName">{userName}</div>
+                                    <div className="postWhere">게시 위치 ▸{postWhere}</div>
+                                </div>
                             </div>
+                            {selectBar ? 
+                                <div className="selectBar">
+                                    <div onClick={ () => {setPostWhere("profile");setSelectBar(!selectBar)} }>profile</div>
+                                    <div onClick={ () => {setPostWhere("neetCompany");setSelectBar(!selectBar)} }>neetCompany</div>
+                                    <div onClick={ () => {setPostWhere("project");setSelectBar(!selectBar)} }>project</div>{/*가입한 그룹이랑 연동하는것 구현필요*/}
+                                </div>
+                                :
+                                null
+                            }
                             <img src={close} alt='x' className='close' onClick={ () => setIsOpen(false) }/>
                         </div>
+                        
                         <form onSubmit={handleSubmit} className='modalForm'>
                             <textarea type='text' name='contents' value={values.contents} onChange={handleChange} placeholder='나누고 싶은 생각이 있으세요?'/>
                             <DndBox contentImages={ contentImages } setContentImages={ setContentImages } />

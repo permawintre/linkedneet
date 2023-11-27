@@ -5,6 +5,5 @@ export const NeetCompany = () => {
             <h1>NeetCompany Page</h1>
             <p>notImplemented</p>
         </div>
-        
     )
 }

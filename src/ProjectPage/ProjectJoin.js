@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react"
 import style from './ProjectJoin.module.css'
 import { FcAlarmClock, FcCalendar, FcCheckmark, FcGlobe } from "react-icons/fc";
-import { doc, getDoc, getFirestore, addDoc, collection } from 'firebase/firestore';
+import { doc, getDoc, addDoc, collection, where, getDocs, query } from 'firebase/firestore';
 import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import { auth } from '../firebase.js'
+import { auth, dbService } from '../firebase.js'
 import moment from 'moment'
 import { useNavigate } from 'react-router-dom';
 
@@ -22,7 +22,7 @@ const ProjectHeader = (project) => {
         <div className={style.projectDetail}>
           <div className={style.projectBoxDetail}>
             <div className={style.projectBoxColumn}>
-              <img src={project.image} alt={project.name} />
+              <img src={project.image.imageUrl} alt={project.name} />
             </div>
             <div className={style.projectBoxColumn}>
               <div className={style.name}>{project.name}</div>
@@ -88,11 +88,10 @@ export const ProjectJoin = () => {
       }
     }, []);
 
-    const db = getFirestore();
     useEffect(() => {
         const fetchProject = async () => {
             try {
-                const projectDoc = await getDoc(doc(db, 'projects', projectId));
+                const projectDoc = await getDoc(doc(dbService, 'projects', projectId));
     
                 if (projectDoc.exists()) {
                     const projectData = projectDoc.data();
@@ -110,12 +109,12 @@ export const ProjectJoin = () => {
         };
     
         fetchProject();
-    }, [db, projectId]);
+    }, [dbService, projectId]);
     useEffect(() => {
       const fetchUserDetails = async () => {
         try {
           if (uid) {
-            const userDoc = await getDoc(doc(db, 'users', uid));
+            const userDoc = await getDoc(doc(dbService, 'users', uid));
   
             if (userDoc.exists()) {
               const userData = userDoc.data();
@@ -130,7 +129,7 @@ export const ProjectJoin = () => {
       };
   
       fetchUserDetails();
-    }, [db, uid]);
+    }, [dbService, uid]);
     const handleReasonChange = (e) => {
       setFormData({...formData, applyReason: e.target.value})
     }
@@ -148,7 +147,22 @@ export const ProjectJoin = () => {
       }
 
       try {
-        const applyRef = await addDoc(collection(db, 'projectApply'), {
+        // Check if the application already exists
+        const existingApplicationQuery = query(
+          collection(dbService, 'projectApply'),
+          where('projectId', '==', projectId),
+          where('userId', '==', uid)
+        );
+
+        const existingApplicationSnapshot = await getDocs(existingApplicationQuery);
+
+        if (!existingApplicationSnapshot.empty) {
+          window.alert('지원이력이 존재합니다!');
+          navigate(`/projectDetail/${projectId}`);
+          return;
+        }
+
+        const applyRef = await addDoc(collection(dbService, 'projectApply'), {
           projectId: projectId,
           userId: uid,
           userNickname: userDetails?.nickname || '',

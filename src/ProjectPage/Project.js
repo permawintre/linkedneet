@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from "react"
 import style from './Project.module.css'
 import { Link } from 'react-router-dom';
-import { getFirestore, collection, query, orderBy, getDocs } from 'firebase/firestore';
+import { collection, query, orderBy, getDocs, where, getDoc, doc } from 'firebase/firestore';
+import { dbService, auth } from '../firebase.js';
 
 const UserProject = ({ project }) => {
     return (
       <div className={style.projectBox}>
-        <img src={project.image} alt={project.name} />
+        {project.default ? (
+          <img src={project.image} alt={project.name} />
+        ) : (
+          <img src={project.image.imageUrl} alt={project.name} />
+        )}
         <div className={style.name}>{project.name}</div>
         <div className={style.comment}>{project.shortDescription}</div>
       </div>
@@ -25,7 +30,7 @@ const DetailedProject = ({ project }) => {
     return (
     <div className={style.projectBox}>
         <span className={`${style.tag} ${style[getTagColor(project.status)]}`}>{project.status}</span>
-        <img src={project.image} alt={project.name} />
+        <img src={project.image.imageUrl} alt={project.name} />
         <Link to={`/projectDetail/${project.id}`} style={{ textDecoration: 'none' }} className={style.name}>
             {project.name}
         </Link>
@@ -33,53 +38,6 @@ const DetailedProject = ({ project }) => {
     </div>
       );
 };
-
-const defaultImage = 'https://cdn.imweb.me/upload/S20191010288d21675b22f/e33c22faf15bc.jpg';
-const defaultImage2 = 'https://images.freeimages.com/images/large-previews/c22/cat-1395746.jpg'
-const defaultImage3 = 'https://www.posist.com/restaurant-times/wp-content/uploads/2023/07/How-To-Start-A-Coffee-Shop-Business-A-Complete-Guide.jpg'
-const defaultImage4 = 'https://upload.wikimedia.org/wikipedia/commons/6/6e/Chelonia_mydas_is_going_for_the_air_edit.jpg'
-
-const MyProject = () => {
-    const myProjects = [
-        { name: '느긋 느슨 그림그리기 크랍 11월', image: defaultImage, comment: '한 달 동안 우리 함께 그림 루틴 만들어 볼까요?' },
-        { name: '니트니까 평일에 롯데월드', image: defaultImage2, comment: '니트의 특권으로 평일에 놀아요 :)' },
-        { name: '요리보고 채식보고', image: defaultImage3, comment: '설명입니다.' },
-        { name: '달이 뜨면 오늘 하루를 마무리해요', image: defaultImage4, comment: '설명입니다.' },
-        { name: '사부작 모임', image: defaultImage, comment: '설명입니다.' },
-        { name: '바꿔바꿔 니트(knit) 교환 장터', image: defaultImage2, comment: '설명입니다.' },
-    ];
-
-    const itemsPerPage = 3;
-    const [page, setPage] = useState(0);
-
-    const totalPages = Math.ceil(myProjects.length / itemsPerPage);
-
-    const showPreviousPage = () => {
-        setPage((prev) => (prev > 0 ? prev - 1 : prev));
-    };
-    
-    const showNextPage = () => {
-        setPage((prev) => (prev < totalPages - 1 ? prev + 1 : prev));
-    };
-
-    const visibleProjects = myProjects.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
-
-    return (
-        <div className={style.projects}>
-            <div className={`${style.myProjectsTitle} ${style.navigation}`}>
-                <button onClick={showPreviousPage}>{'<'}</button>
-                <span className={style.projectsTitle}>나의 소모임</span>
-                <button onClick={showNextPage}>{'>'}</button>
-            </div>
-            <div className={style.projectsRow}>
-                {visibleProjects.map((project, index) => (
-                    <UserProject key={index} project={project} />
-                ))}
-            </div>
-        </div>
-    );
-};
-
 const setProjectStatus = (project) => {
   const currentDate = new Date();
   const timestampInSeconds = Math.floor(currentDate.getTime() / 1000);
@@ -104,16 +62,101 @@ const setProjectStatus = (project) => {
   }
 }
 
+const MyProject = () => {
+  const uid = auth.currentUser.uid;
+  const [myProjects, setMyProjects] = useState([]);
+
+  useEffect(() => {
+    const fetchProjects = async () => {
+      // Fetch projectMember documents where userId matches uid
+      const projectMemberCollection = collection(dbService, 'projectMember');
+      const memberQuery = query(projectMemberCollection, where('userId', '==', uid));
+
+      try {
+        const memberQuerySnapshot = await getDocs(memberQuery);
+
+        const projectIds = memberQuerySnapshot.docs.map((doc) => doc.data().projectId);
+
+        // Fetch projects where document ID is in the list of projectIds
+        const projectsCollection = collection(dbService, 'projects');
+
+        // Individual fetch for each project ID
+        const projectsData = await Promise.all(
+          projectIds.map(async (projectId) => {
+            const projectDoc = await getDoc(doc(projectsCollection, projectId));
+            return { id: projectId, ...projectDoc.data() };
+          })
+        );
+
+        setMyProjects(projectsData);
+      } catch (error) {
+        console.error('Error fetching projects: ', error);
+      }
+    };
+
+    fetchProjects();
+  }, [uid]);
+
+    // For Navigation Button
+    const itemsPerRow = 3; // 한 줄 당 아이템 수
+    const totalRows = 1; // 총 줄 수
+    const itemsPerPage = itemsPerRow * totalRows; // 페이지 당 아이템 수
+    const [page, setPage] = useState(0); // 페이지 상태
+    const totalPages = Math.ceil(myProjects.length / itemsPerPage); // 전체 페이지 수
+    // 이전 페이지 보기
+    const showPreviousPage = () => {
+        setPage((prev) => (prev > 0 ? prev - 1 : prev));
+    };
+    // 다음 페이지 보기
+    const showNextPage = () => {
+        setPage((prev) => (prev < totalPages - 1 ? prev + 1 : prev));
+    };
+    // 현재 페이지에 해당하는 프로젝트 가져오기
+    const visibleProjects = myProjects.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
+    const defaultProject = {
+      default: true,
+      name: '새로운 소모임에 가입하세요!',
+      shortDescription: '',
+      image: 'https://images.pexels.com/photos/1731427/pexels-photo-1731427.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260'
+    };
+    // myProjects 개수가 itemsPerRow 미만이면 default로 채운다
+    const paddedVisibleProjects = [
+      ...visibleProjects,
+      ...Array(Math.max(0, itemsPerRow - visibleProjects.length)).fill(defaultProject)
+    ];
+    console.log(paddedVisibleProjects);
+  
+    return (
+      <div className={style.projects}>
+        <div className={style.myProjects}>
+          <div className={`${style.projectsTitle} ${style.navigation}`}>
+            <span className={style.projectsTitle}>나의 소모임</span>
+          </div>
+          <div className={style.projectsRow}>
+            {paddedVisibleProjects.map((project, index) => (
+              project ? (
+                <UserProject key={index} project={project} />
+              ) : (
+                <div key={index} className={style.emptyProject}></div>
+              )
+            ))}
+          </div>
+          <div className={style.navigation}>
+            <button onClick={showPreviousPage} disabled={page === 0}>{'<'}</button>
+            <span>{page + 1} / {totalPages}</span>
+            <button onClick={showNextPage} disabled={page === totalPages - 1}>{'>'}</button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
 const ProjectList = () => {
-
-    const [myProjects, setMyProjects] = useState([]);
-
-    
-    // Firestore에서 데이터를 가져오는 useEffect
+    const [projects, setProjects] = useState([]);
+    // get data from Firebase db
     useEffect(() => {
       const fetchProjects = async () => {
-        const db = getFirestore(); // Firestore 인스턴스 얻기
-        const projectsCollection = collection(db, 'projects');
+        const projectsCollection = collection(dbService, 'projects');
         const q = query(projectsCollection, orderBy('createdAt', 'desc'));
         
         try {
@@ -126,17 +169,17 @@ const ProjectList = () => {
             };
             projectsData.push(newObj);
           });
-          setMyProjects(projectsData);
+          setProjects(projectsData);
         } catch (error) {
           console.error('Error fetching projects: ', error);
         }
       };
 
-      fetchProjects(); // 함수 호출
+      fetchProjects();
 
-    }, []); // 빈 배열은 컴포넌트가 마운트될 때 한 번만 실행
+    }, []);
 
-    myProjects.forEach((project) => {
+    projects.forEach((project) => {
       setProjectStatus(project);
     });
 
@@ -153,7 +196,7 @@ const ProjectList = () => {
     const [selectedStatus, setSelectedStatus] = useState('전체'); // 모집중, 진행중, 진행완료
     const [selectedType, setSelectedType] = useState('전체'); // 온라인, 오프라인, 온오프라인
     const [selectedCategory, setSelectedCategory] = useState('전체'); // 루틴, 관계, 경험
-    const filteredProjects = myProjects.filter(project => {
+    const filteredProjects = projects.filter(project => {
         return (
             (selectedStatus === '전체' || project.status === selectedStatus) &&
             (selectedType === '전체' || project.type === selectedType) &&

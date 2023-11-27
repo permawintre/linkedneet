@@ -1,22 +1,16 @@
-// npm install react-datepicker
-// naver map?
-// 임시저장 버튼
-// leader uid
-// subImage uploade 완료 후 formData reset되는 문제 해결 필요
-
 import React, { useState, useEffect } from "react"
-import './ProjectCreate.css'
+import style from './ProjectCreate.module.css'
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { dbService, auth } from '../firebase.js';
-import { addDoc, collection } from "firebase/firestore"
-import { getStorage, ref, uploadBytes, getDownloadURL, uploadString } from 'firebase/storage';
+import { dbService, auth, storage } from '../firebase.js';
+import { addDoc, collection, getDoc, doc } from "firebase/firestore"
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import moment from 'moment'
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 
 
-const BasicInfoForm = ({ nextStep, formData, setFormData }) => {
+const BasicInfoForm = ({ nextStep, formData, setFormData, mainImage }) => {
   
     const handleCategoryClick = (category) => {
       setFormData({ ...formData, category: category });
@@ -50,7 +44,6 @@ const BasicInfoForm = ({ nextStep, formData, setFormData }) => {
       }
       const currentDate = new Date();
       currentDate.setHours(0, 0, 0, 0);
-      console.log(currentDate);
       if (formData.recruitStartDate > formData.recruitEndDate
         || formData.runningStartDate > formData.runningEndDate) {
         alert('종료일은 시작일 이후여야 합니다!');
@@ -65,19 +58,19 @@ const BasicInfoForm = ({ nextStep, formData, setFormData }) => {
   
     return (
       <form onSubmit={handleSubmit}>
-        <div className="form-header">
-            <div className="form-title">소모임 만들기</div>
-            <div className="step-box">
-                <div className="step step-highlight">1. 기본 정보</div>
-                <div className="step">2. 상세 정보</div>
-                <div className="step">3. 모집 양식</div>
-                <div className="step">4. 완료</div>
+        <div className={style.formHeader}>
+            <div className={style.formTitle}>소모임 만들기</div>
+            <div className={style.stepBox}>
+                <div className={`${style.step} ${style.stepHighlight}`}>1. 기본 정보</div>
+                <div className={style.step}>2. 상세 정보</div>
+                <div className={style.step}>3. 모집 양식</div>
+                <div className={style.step}>4. 완료</div>
             </div>
         </div>
-        <div className="form-box">
+        <div className={style.formBox}>
           <label>
-            <div className="form-title">모임명 *</div>
-            <div className="form-content">모임명은 한글과 영문, 숫자만 입력 가능합니다.</div>
+            <div className={style.formTitle}>모임명 *</div>
+            <div className={style.formContent}>모임명은 한글과 영문, 숫자만 입력 가능합니다.</div>
             <input
               type="text" name="name" value={formData.name}
               placeholder="모임명을 입력하세요"
@@ -85,10 +78,10 @@ const BasicInfoForm = ({ nextStep, formData, setFormData }) => {
             />
           </label>
         </div>
-        <div className="form-box">
+        <div className={style.formBox}>
           <label>
-            <div className="form-title">한 줄 소개 *</div>
-            <div className="form-content">모임을 한 줄로 소개해주세요. (자세한 소개는 다음 단계에)</div>
+            <div className={style.formTitle}>한 줄 소개 *</div>
+            <div className={style.formContent}>모임을 한 줄로 소개해주세요. (자세한 소개는 다음 단계에)</div>
             <input
               type="text" name="shortDescription" value={formData.shortDescription}
               placeholder="한 줄 소개를 입력하세요"
@@ -96,53 +89,53 @@ const BasicInfoForm = ({ nextStep, formData, setFormData }) => {
             />
           </label>
         </div>
-        <div className="form-box div-style">
-            <div className="form-title">소모임 분류 *</div>
-            <div className="form-button-3"
+        <div className={`${style.formBox} ${style.divStyle}`}>
+            <div className={style.formTitle}>소모임 분류 *</div>
+            <div className={style.formButton3}
                 onClick={() => handleCategoryClick('루틴')}
                 style={{ backgroundColor: formData.category === '루틴' ? 'yellowgreen' : 'silver' }}
             >
                 루틴
             </div>
-            <div className="form-button-3"
+            <div className={style.formButton3}
                 onClick={() => handleCategoryClick('관계')}
                 style={{ backgroundColor: formData.category === '관계' ? 'yellowgreen' : 'silver' }}
             >
                 관계
             </div>
-            <div className="form-button-3"
+            <div className={style.formButton3}
                 onClick={() => handleCategoryClick('경험')}
                 style={{ backgroundColor: formData.category === '경험' ? 'yellowgreen' : 'silver' }}
             >
                 경험
             </div>
         </div>
-        <div className="form-box div-style">
-            <div className="form-title">모임형태 *</div>
-            <div className="form-button-3"
+        <div className={`${style.formBox} ${style.divStyle}`}>
+            <div className={style.formTitle}>모임형태 *</div>
+            <div className={style.formButton3}
                 onClick={() => handleTypeClick('온라인')}
                 style={{ backgroundColor: formData.type === '온라인' ? 'yellowgreen' : 'silver' }}
             >
                 온라인
             </div>
-            <div className="form-button-3"
+            <div className={style.formButton3}
                 onClick={() => handleTypeClick('오프라인')}
                 style={{ backgroundColor: formData.type === '오프라인' ? 'yellowgreen' : 'silver' }}
             >
                 오프라인
             </div>
-            <div className="form-button-3"
+            <div className={style.formButton3}
                 onClick={() => handleTypeClick('온오프라인')}
                 style={{ backgroundColor: formData.type === '온오프라인' ? 'yellowgreen' : 'silver' }}
             >
                 온오프라인
             </div>
         </div>
-        <div className="form-box div-style">
-            <div className="form-title">모집 기간</div>
-            <div className="date-picker">
+        <div className={`${style.formBox} ${style.divStyle}`}>
+            <div className={style.formTitle}>모집 기간</div>
+            <div className={style.datePicker}>
                 <label>
-                    <div className="form-content">시작일 *</div>
+                    <div className={style.formContent}>시작일 *</div>
                     <DatePicker
                     selected={formData.recruitStartDate}
                     onChange={handleRecruitStartDateChange}
@@ -151,7 +144,7 @@ const BasicInfoForm = ({ nextStep, formData, setFormData }) => {
                     />
                 </label>
                 <label>
-                    <div className="form-content">마감일 *</div>
+                    <div className={style.formContent}>마감일 *</div>
                     <DatePicker
                     selected={formData.recruitEndDate}
                     onChange={handleRecruitEndDateChange}
@@ -161,11 +154,11 @@ const BasicInfoForm = ({ nextStep, formData, setFormData }) => {
                 </label>
             </div>
         </div>
-        <div className="form-box div-style">
-            <div className="form-title">운영 기간</div>
-            <div className="date-picker">
+        <div className={`${style.formBox} ${style.divStyle}`}>
+            <div className={style.formTitle}>운영 기간</div>
+            <div className={style.datePicker}>
                 <label>
-                    <div className="form-content">시작일 *</div>
+                    <div className={style.formContent}>시작일 *</div>
                     <DatePicker
                       selected={formData.runningStartDate}
                       onChange={handleRunningStartDateChange}
@@ -174,7 +167,7 @@ const BasicInfoForm = ({ nextStep, formData, setFormData }) => {
                     />
                 </label>
                 <label>
-                    <div className="form-content">종료일 *</div>
+                    <div className={style.formContent}>종료일 *</div>
                     <DatePicker
                     selected={formData.runningEndDate}
                     onChange={handleRunningEndDateChange}
@@ -184,25 +177,21 @@ const BasicInfoForm = ({ nextStep, formData, setFormData }) => {
                 </label>
             </div>
         </div>
-        <div className="form-footer">
-            <button className="next-button" type="submit">다음으로</button>
+        <div className={style.formFooter}>
+            <button className={style.nextButton} type="submit">다음으로</button>
         </div>
       </form>
     );
 };
-const DetailedInfoForm = ({ prevStep, nextStep, formData, setFormData }) => {
-    
-    const [selectedImage, setSelectedImage] = useState(null);
-
-    const storage = getStorage();
+const DetailedInfoForm = ({ prevStep, nextStep, formData, setFormData, mainImage, setMainImage }) => {
     const uploadAndReturnUrl = async (storageRef, file) => {
       try {
         // Upload 'file' to Firebase Storage.
         await uploadBytes(storageRef, file);
-  
+        
         // Get download url of uploaded file.
         const imageUrl = await getDownloadURL(storageRef);
-        return imageUrl;
+        return {imageUrl, fileName: file.name};
       } catch (error) {
         console.error('Error uploading file: ', error);
         throw error;
@@ -215,28 +204,32 @@ const DetailedInfoForm = ({ prevStep, nextStep, formData, setFormData }) => {
         setFormData({ ...formData, image: imageUrl });
     }
     const handleImageChange = async (e) => {
-        const selectedImage = e.target.files[0];
-        setSelectedImage(selectedImage)
-        uploadImage(selectedImage)
+        const targetImage = e.target.files[0];
+        setMainImage(targetImage);
+        uploadImage(targetImage);
     };
 
     const handleSubImagesChange = async (e) => {
       const selectedSubImages = Array.from(e.target.files);
-
+    
       const subImagePromises = selectedSubImages.map(async (subImage) => {
         const subimgUrl = uuidv4();
         const subImageRef = ref(storage, `project_images/${subimgUrl}`);
         return await uploadAndReturnUrl(subImageRef, subImage);
       });
-
-      const subimageUrls = await Promise.all(subImagePromises)
-
+    
+      const newSubimageUrls = await Promise.all(subImagePromises);
+    
       setFormData((prevFormData) => {
-        return { ...prevFormData, subImages: subimageUrls };
+        return { ...prevFormData, subImages: [...prevFormData.subImages, ...newSubimageUrls] };
       });
     };
-    const getFileNames = () => {
-      return formData.subImages.map((file, index) => `추가 이미지 ${index + 1}: ${file.name}`).join('\n');
+    const removeSubImage = (index) => {
+      const newSubImages = [...formData.subImages];
+      newSubImages.splice(index, 1);
+      setFormData((prevFormData) => {
+        return { ...prevFormData, subImages: newSubImages };
+      });
     };
     const handleIntroductionChange = (e) => {
         setFormData({ ...formData, introduction: e.target.value });
@@ -272,7 +265,7 @@ const DetailedInfoForm = ({ prevStep, nextStep, formData, setFormData }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (!formData.introduction || !formData.desiredCrew) {
+        if (!formData.image || !formData.introduction || !formData.desiredCrew) {
           alert('필수항목을 입력해주세요!');
           return;
         }
@@ -281,47 +274,47 @@ const DetailedInfoForm = ({ prevStep, nextStep, formData, setFormData }) => {
     
       return (
         <form onSubmit={handleSubmit}>
-          <div className="form-header">
-              <div className="form-title">소모임 만들기</div>
-              <div className="step-box">
-                  <div className="step">1. 기본 정보</div>
-                  <div className="step step-highlight">2. 상세 정보</div>
-                  <div className="step">3. 모집 양식</div>
-                  <div className="step">4. 완료</div>
+          <div className={style.formHeader}>
+              <div className={style.formTitle}>소모임 만들기</div>
+              <div className={style.stepBox}>
+                  <div className={style.step}>1. 기본 정보</div>
+                  <div className={`${style.step} ${style.stepHighlight}`}>2. 상세 정보</div>
+                  <div className={style.step}>3. 모집 양식</div>
+                  <div className={style.step}>4. 완료</div>
               </div>
           </div>
-          <div className="form-box">
+          <div className={style.formBox}>
             <label>
-              <div className="form-title">대표 이미지 *</div>
-              <div className="form-content">소모임을 설명할 수 있는 이미지를 첨부해주세요!</div>
-              <div className="form-content">700 x 250 의 크기로 업로드하시면 가장 좋습니다. </div>
-              <div className="form-image-box">
+              <div className={style.formTitle}>대표 이미지 *</div>
+              <div className={style.formContent}>소모임을 설명할 수 있는 이미지를 첨부해주세요!</div>
+              <div className={style.formContent}>700 x 250 의 크기로 업로드하시면 가장 좋습니다. </div>
+              <div className={style.formImageBox}>
                 <input
                   type="file"
                   accept="image/*"
                   onChange={handleImageChange}
-                  required // 필수 항목
                 />
                 {formData.image ? (
                   <img
-                    className="form-image"
-                    src={URL.createObjectURL(selectedImage)}
+                    className={style.formImage}
+                    src={URL.createObjectURL(mainImage)}
                     alt="대표 이미지 미리보기"
                   />
                 ) : (
-                  <div className="form-image">
+                  <div className={style.formImage}>
                     <div>이미지 미리보기</div>
-                    <div className="form-image-description">(이미지 로딩에는 시간이 소요될 수 있습니다)</div>
+                    <div className={style.formImageDescription}>(이미지 로딩에는 시간이 소요될 수 있습니다)</div>
                   </div>
                 )}
               </div>
             </label>
           </div>
-          <div className="form-box">
+          <div className={style.formBox}>
             <label>
-              <div className="form-title">추가 이미지</div>
-              <div className="form-content">추가 이미지는 크기 제한이 없습니다. 자유롭게 추가 업로드 해주세요</div>
-              <div className="form-image-box">
+              <div className={style.formTitle}>추가 이미지</div>
+              <div className={style.formContent}>추가 이미지는 크기 제한이 없습니다. 자유롭게 추가 업로드 해주세요.</div>
+              <div className={style.formContent}>이미지 순서를 지정하고 싶다면, 한 장씩 순서대로 첨부해주세요.</div>
+              <div className={style.formImageBox}>
                 <input
                   type="file"
                   accept="image/*"
@@ -329,15 +322,24 @@ const DetailedInfoForm = ({ prevStep, nextStep, formData, setFormData }) => {
                   multiple  // 여러 파일 선택을 허용
                 />
                 {formData.subImages.length > 0 && (
-                  <div className="image-names">{getFileNames()}</div>
+                  <div className={style.imageNames}>
+                    {formData.subImages.map((subImage, index) => (
+                      <div key={index} className={style.subImageContainer}>
+                        <button type="button" onClick={() => removeSubImage(index)}>
+                          삭제
+                        </button>
+                        <span>{`추가 이미지 ${index + 1}: ${subImage.fileName}`}</span>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
             </label>
           </div>
-          <div className="form-box">
+          <div className={style.formBox}>
             <label>
-                <div className="form-title">소모임 소개 *</div>
-                <div className="form-body">
+                <div className={style.formTitle}>소모임 소개 *</div>
+                <div className={style.formBody}>
                     <textarea
                         value={formData.introduction}
                         onChange={handleIntroductionChange}
@@ -346,10 +348,10 @@ const DetailedInfoForm = ({ prevStep, nextStep, formData, setFormData }) => {
                 </div>
             </label>
           </div>
-          <div className="form-box">
+          <div className={style.formBox}>
             <label>
-                <div className="form-title">이런 크루를 원해요 *</div>
-                <div className="form-body">
+                <div className={style.formTitle}>이런 크루를 원해요 *</div>
+                <div className={style.formBody}>
                     <textarea
                         value={formData.desiredCrew}
                         onChange={handleDesiredCrewChange}
@@ -358,10 +360,10 @@ const DetailedInfoForm = ({ prevStep, nextStep, formData, setFormData }) => {
                 </div>
             </label>
           </div>
-          <div className="form-box">
+          <div className={style.formBox}>
             <label>
-                <div className="form-title">준비물</div>
-                <div className="form-body">
+                <div className={style.formTitle}>준비물</div>
+                <div className={style.formBody}>
                     <textarea
                         value={formData.preparation}
                         onChange={handlePreparationChange}
@@ -370,13 +372,13 @@ const DetailedInfoForm = ({ prevStep, nextStep, formData, setFormData }) => {
                 </div>
             </label>
           </div>
-          <div className="form-box">
+          <div className={style.formBox}>
             <label>
-                <div className="form-title">오시는 길</div>
-                <div className="form-content">
+                <div className={style.formTitle}>오시는 길</div>
+                <div className={style.formContent}>
                   소모임 운영을 오프라인에서 진행할 경우 운영 장소의 주소를 입력해주세요.
                 </div>
-                <div className="form-body">
+                <div className={style.formBody}>
                     <textarea
                         value={formData.location}
                         onChange={handleLocationChange}
@@ -385,16 +387,16 @@ const DetailedInfoForm = ({ prevStep, nextStep, formData, setFormData }) => {
                 </div>
             </label>
           </div>
-          <div className="form-box">
+          <div className={style.formBox}>
             <label>
-              <div className="form-title">태그</div>
-              <div className="form-content">
+              <div className={style.formTitle}>태그</div>
+              <div className={style.formContent}>
                 운영할 소모임을 설명할 수 있는 몇 개의 단어를 입력해주세요.
               </div>
-              <div className="form-content">
+              <div className={style.formContent}>
                 태그를 추가하고 싶다면 입력 후 스페이스바를 눌러주세요!
               </div>
-              <div className="tag-input-container">
+              <div className={style.tagInputContainer}>
                 <input
                   type="text"
                   value={formData.enteredTags}
@@ -402,9 +404,9 @@ const DetailedInfoForm = ({ prevStep, nextStep, formData, setFormData }) => {
                   onKeyDown={handleTagsKeyDown}
                   placeholder="태그를 입력하세요"
                 />
-                <div className="tag-list">
+                <div className={style.tagList}>
                   {formData.tags.map((tag, index) => (
-                    <div key={index} className="tag">
+                    <div key={index} className={style.tag}>
                       <span>{tag}</span>
                       <button type="button" onClick={() => removeTag(index)}>
                         X
@@ -415,14 +417,14 @@ const DetailedInfoForm = ({ prevStep, nextStep, formData, setFormData }) => {
               </div>
             </label>
           </div>
-          <div className="form-footer">
-            <button className="prev-button" type="button" onClick={prevStep}>이전으로</button>
-            <button className="next-button" type="submit">다음으로</button>
+          <div className={style.formFooter}>
+            <button className={style.prevButton} type="button" onClick={prevStep}>이전으로</button>
+            <button className={style.nextButton} type="submit">다음으로</button>
           </div>
         </form>
       );
 }
-const RecruitmentForm = ({ prevStep, nextStep, formData, setFormData }) => {
+const RecruitmentForm = ({ prevStep, nextStep, formData, setFormData, mainImage }) => {
   const [newInput, setNewInput] = useState('');
 
     const addInput = () => {
@@ -448,40 +450,40 @@ const RecruitmentForm = ({ prevStep, nextStep, formData, setFormData }) => {
     
       return (
         <form onSubmit={handleSubmit}>
-          <div className="form-header">
-              <div className="form-title">소모임 만들기</div>
-              <div className="step-box">
-                  <div className="step">1. 기본 정보</div>
-                  <div className="step">2. 상세 정보</div>
-                  <div className="step step-highlight">3. 모집 양식</div>
-                  <div className="step">4. 완료</div>
+          <div className={style.formHeader}>
+              <div className={style.formTitle}>소모임 만들기</div>
+              <div className={style.stepBox}>
+                  <div className={style.step}>1. 기본 정보</div>
+                  <div className={style.step}>2. 상세 정보</div>
+                  <div className={`${style.step} ${style.stepHighlight}`}>3. 모집 양식</div>
+                  <div className={style.step}>4. 완료</div>
               </div>
           </div>
-          <div className="form-box">
-            <div className="form-content">모임의 모집 방법과 모집 양식을 설정할 수 있습니다.</div>
-            <div className="form-content">* 모집 양식은 등록 이후 수정이 불가능합니다.</div>
+          <div className={style.formBox}>
+            <div className={style.formContent}>모임의 모집 방법과 모집 양식을 설정할 수 있습니다.</div>
+            <div className={style.formContent}>* 모집 양식은 등록 이후 수정이 불가능합니다.</div>
           </div>
-          <div className="form-box">
-            <div className="form-title">기본 입력 양식</div>
-            <div className="form-content">아래 기본 양식들은 모든 신청자들로부터 기본 입력받게 됩니다.</div>
-            <div className="recruit-box">이름</div>
-            <div className="recruit-box">이메일</div>
-            <div className="recruit-box">신청동기</div>
+          <div className={style.formBox}>
+            <div className={style.formTitle}>기본 입력 양식</div>
+            <div className={style.formContent}>아래 기본 양식들은 모든 신청자들로부터 기본 입력받게 됩니다.</div>
+            <div className={style.recruitBox}>이름</div>
+            <div className={style.recruitBox}>이메일</div>
+            <div className={style.recruitBox}>신청동기</div>
           </div>
-          <div className="form-box">
-            <div className="form-title">추가 입력 양식</div>
-            <div className="form-content">기본 양식 외로 추가로 입력받고 싶은 양식을 추가하실 수 있습니다.</div>
-            <div className="form-content">(예시) 모임 안내를 위해 연락처 or 카톡 아이디를 공유해주세요.</div>
-            <div className="recruit-form-container">
+          <div className={style.formBox}>
+            <div className={style.formTitle}>추가 입력 양식</div>
+            <div className={style.formContent}>기본 양식 외로 추가로 입력받고 싶은 양식을 추가하실 수 있습니다.</div>
+            <div className={style.formContent}>(예시) 모임 안내를 위해 연락처 or 카톡 아이디를 공유해주세요.</div>
+            <div className={style.recruitFormContainer}>
               {formData.recruitForm.map((input, index) => (
-                <div key={index} className="recruit-form-box">
-                  <div className="recruit-box">{input}</div>
-                  <div className="recruit-button" onClick={() => removeInput(index)}>
+                <div key={index} className={style.recruitFormBox}>
+                  <div className={style.recruitBox}>{input}</div>
+                  <div className={style.recruitButton} onClick={() => removeInput(index)}>
                     X
                   </div>
                 </div>
               ))}
-              <div className="recruit-input-box">
+              <div className={style.recruitInputBox}>
                 <input
                   type="text"
                   value={newInput}
@@ -494,14 +496,14 @@ const RecruitmentForm = ({ prevStep, nextStep, formData, setFormData }) => {
               </div>
             </div>
           </div>
-          <div className="form-footer">
-            <button className="prev-button" type="button" onClick={prevStep}>이전으로</button>
-            <button className="next-button" type="submit">다음으로</button>
+          <div className={style.formFooter}>
+            <button className={style.prevButton} type="button" onClick={prevStep}>이전으로</button>
+            <button className={style.nextButton} type="submit">다음으로</button>
           </div>
         </form>
       );
 }
-const CompletionForm = ({ prevStep, formData, setFormData }) => {
+const CompletionForm = ({ prevStep, formData, setFormData, mainImage }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   let [uid, setUid] = useState("")
   useEffect(() => {
@@ -525,7 +527,16 @@ const CompletionForm = ({ prevStep, formData, setFormData }) => {
       };
 
       // Save formData to Firebase Firestore
-      await addDoc(collection(dbService, 'projects'), updatedFormData);
+      const projectRef = await addDoc(collection(dbService, 'projects'), updatedFormData);
+      const leaderDoc = await getDoc(doc(dbService, 'users', uid));
+      const leaderData = leaderDoc.data();
+      await addDoc(collection(dbService, 'projectMember'), {
+        projectId: projectRef.id,
+        userId: uid,
+        userNickName: leaderData.nickname,
+        userEmail: leaderData.email,
+        createdAt: moment().toDate(),
+      });
 
       window.alert('소모임이 생성되었습니다!');
       navigate('/project');
@@ -540,20 +551,20 @@ const CompletionForm = ({ prevStep, formData, setFormData }) => {
     
       return (
         <form onSubmit={handleSubmit}>
-          <div className="form-header">
-              <div className="form-title">소모임 만들기</div>
-              <div className="step-box">
-                  <div className="step">1. 기본 정보</div>
-                  <div className="step">2. 상세 정보</div>
-                  <div className="step">3. 모집 양식</div>
-                  <div className="step step-highlight">4. 완료</div>
+          <div className={style.formHeader}>
+              <div className={style.formTitle}>소모임 만들기</div>
+              <div className={style.stepBox}>
+                  <div className={style.step}>1. 기본 정보</div>
+                  <div className={style.step}>2. 상세 정보</div>
+                  <div className={style.step}>3. 모집 양식</div>
+                  <div className={`${style.step} ${style.stepHighlight}`}>4. 완료</div>
               </div>
           </div>
-          <div className="form-box">
-            <div className="form-title">모임 등록을 완료했습니다!</div>
-            <div className="form-content">빠진 내용이 없는지 미리보기를 통해 확인해보세요</div>
+          <div className={style.formBox}>
+            <div className={style.formTitle}>모임 등록을 완료했습니다!</div>
+            <div className={style.formContent}>빠진 내용이 없는지 미리보기를 통해 확인해보세요</div>
           </div>
-          <div className="form-footer">
+          <div className={style.formFooter}>
             {isSubmitting ? (
               <div>
                 <div>생성 중입니다...</div>
@@ -561,10 +572,10 @@ const CompletionForm = ({ prevStep, formData, setFormData }) => {
               </div>
             ) : (
               <>
-                <button className="prev-button" type="button" onClick={prevStep}>
+                <button className={style.prevButton} type="button" onClick={prevStep}>
                   이전으로
                 </button>
-                <button className="next-button" type="submit">
+                <button className={style.nextButton} type="submit">
                   제출하기
                 </button>
               </>
@@ -595,6 +606,7 @@ export const ProjectCreate = () => {
         tags: [], // ~ (2)
         recruitForm: [],
       });
+    const [mainImage, setMainImage] = useState(null);
   
     const nextStep = () => {
       setStep(step + 1);
@@ -606,37 +618,42 @@ export const ProjectCreate = () => {
   
     switch (step) {
       case 1:
-        return <div className="body project-create">
+        return <div>
                     <BasicInfoForm
                         nextStep={nextStep}
                         formData={formData}
                         setFormData={setFormData}
+                        mainImage={mainImage}
                     />
                 </div>;
       case 2:
-        return <div className="body project-create">
+        return <div>
                     <DetailedInfoForm
                         nextStep={nextStep}
                         prevStep={prevStep}
                         formData={formData}
                         setFormData={setFormData}
+                        mainImage={mainImage}
+                        setMainImage={setMainImage}
                     />
                 </div>;
       case 3:
-        return <div className="body project-create">
+        return <div>
                     <RecruitmentForm
                         nextStep={nextStep}
                         prevStep={prevStep}
                         formData={formData}
                         setFormData={setFormData}
+                        mainImage={mainImage}
                     />
                 </div>;
       case 4:
-        return <div className="body project-create">
+        return <div>
                     <CompletionForm
                         prevStep={prevStep}
                         formData={formData}
                         setFormData={setFormData}
+                        mainImage={mainImage}
                     />
                 </div>;
       default:

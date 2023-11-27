@@ -143,3 +143,8 @@
     white-space: nowrap;
     z-index: 1;
 }
+
+.no-posts-message {
+    font-weight: bolder;
+    font-size: x-large;
+}

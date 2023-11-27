@@ -99,19 +99,25 @@ const ProfilePost = ({userData, myProfile, profileUid}) => {
             <main className='profile-post-main'>
                 <h2>게시글</h2>
                 <div className="profile-post-list">
-                    {postList.map(post => (
-                        <div className="profile-post" key={post.id}>
-                            <div className='post-header'>
-                                <img src={post.userProfile} alt="User Profile" className="user-profile-img" />
-                                <div className='post-info'>
-                                    <div className='profile-post-nickname'>{post.nickname}</div>
-                                    <div className='profile-post-posted-time' data-tooltip={(new Date(post.postedAt*1000)).toLocaleString()}>{formatDistanceToNow(new Date(post.postedAt*1000), { addSuffix: true, locale: ko })}</div>
-                                </div>
+                    {postList.length === 0 ? (
+                            <div className="no-posts-message">
+                                게시글이 아직 없어요 T^T
                             </div>
-                            <div className='text'>{post.contents}</div>
-                            {post.images && post.images.length > 0 && <PostPics imgs={post.images} />}
-                        </div>
-                    ))}
+                    ) : (
+                        postList.map(post => (
+                            <div className="profile-post" key={post.id}>
+                                <div className='post-header'>
+                                    <img src={post.userProfile} alt="User Profile" className="user-profile-img" />
+                                    <div className='post-info'>
+                                        <div className='profile-post-nickname'>{post.nickname}</div>
+                                        <div className='profile-post-posted-time' data-tooltip={(new Date(post.postedAt*1000)).toLocaleString()}>{formatDistanceToNow(new Date(post.postedAt*1000), { addSuffix: true, locale: ko })}</div>
+                                    </div>
+                                </div>
+                                <div className='text'>{post.contents}</div>
+                                {post.images && post.images.length > 0 && <PostPics imgs={post.images} />}
+                            </div>
+                        ))
+                    )}
                 </div>
             </main>
         </div>

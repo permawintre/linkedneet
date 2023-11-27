@@ -6,7 +6,6 @@
     background-color: white;
     border-radius: 20px;
     font-family: 'Noto Sans KR', sans-serif;
-    margin: auto;
     margin-top: 10px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     position: relative;
@@ -180,7 +179,6 @@ hr {
 .postComment {
     display: flex;
     align-items: flex-start;
-    margin-bottom: 15px;
     margin-left: 10px;
 }
 
@@ -235,7 +233,7 @@ hr {
 
 .writecommentcontainer {
     width: 100%;
-    margin-bottom: -15px;
+    margin-bottom: -25px;
     padding: 5px;
 }
   
@@ -372,9 +370,6 @@ hr {
     width: 700px;
     background-color: #FFFFFF;
     margin: 140px auto 0 auto;
-    max-height: 500px;
-    overflow-y: auto;
-    overflow-x: hidden;
 }
 .modalHeader {
     display: flex;
@@ -631,12 +626,13 @@ hr {
     flex-direction: column;
     background-color: white;
     border: solid 1px #ccc;
-    border-radius: 10px;
+    border-radius: 20px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     padding: 20px;
     padding-top: 0;
     box-sizing: border-box;
     align-items: center;
+    margin-top: 10px;
   }
   .background-img-container {
     width: calc(100% + 40px);
@@ -648,7 +644,7 @@ hr {
     width: 100%;
     height: 100%; 
     object-fit: cover;
-    border-radius: 10px 10px 0 0;
+    border-radius: 20px 20px 0 0;
   }
   .profile-img1 {
     top: 110px;
@@ -680,7 +676,7 @@ hr {
     z-index: 0;
     background-color: white;
     border: solid 1px #ccc;
-    border-radius: 10px;
+    border-radius: 20px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     padding: 20px;
     box-sizing: border-box;

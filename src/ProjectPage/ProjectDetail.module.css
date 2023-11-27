@@ -53,8 +53,9 @@
     overflow-wrap: break-word;
     padding: 5px;
     font-size: 28px;
-    border-top: solid 1px;
-    border-bottom: solid 1px;
+    border-top: solid 1px black;
+    border-bottom: solid 1px black;
+    color: black;
 }
 .projectBoxDetail .comment {
     display: flex;
@@ -152,6 +153,7 @@
     display: flex;
     align-items: center;
     font-weight: bold;
+    color: black;
 }
 .projectBoxLeader .leaderBody .leaderName .leaderCaption {
     background-color: lightcoral;

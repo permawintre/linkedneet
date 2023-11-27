@@ -67,7 +67,7 @@ const ProjectHeader = (project) => {
                 </div>
               </div>
               <div className={style.info}>
-                <Link to={`/projectDetail/${projectId}`} style={{ color: 'gray' }}>
+                <Link to={`/projectDetail/${projectId}`} style={{ color: 'gray', textDecoration: 'underline' }}>
                     상세보기
                 </Link>
               </div>

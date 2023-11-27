@@ -401,9 +401,9 @@ function Write({ userInfo }) {
 
 
     useEffect(() => {
-          if(auth.currentUser) {
-            setUid(auth.currentUser.uid)
-          }
+        if(auth.currentUser) {
+        setUid(auth.currentUser.uid)
+        }
     }, [])
     
 
@@ -428,7 +428,7 @@ function Write({ userInfo }) {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
 
         const imgUrls = [...new Array(contentImages.length)].map(() => uuidv4())
         e.preventDefault();
@@ -449,7 +449,7 @@ function Write({ userInfo }) {
 
         for(let i=0;i<contentImages.length;i++) {
             const fileRef = ref(storage, imgUrls[i]);
-            uploadString(fileRef, contentImages[i], 'data_url');
+            await uploadString(fileRef, contentImages[i], 'data_url');
         }
 
         setAsync(true)

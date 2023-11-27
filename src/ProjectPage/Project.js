@@ -4,9 +4,12 @@ import { Link } from 'react-router-dom';
 import { collection, query, orderBy, getDocs, where, getDoc, doc } from 'firebase/firestore';
 import { dbService, auth } from '../firebase.js';
 
-const UserProject = ({ project }) => {
+const UserProject = ({ uid, project }) => {
     return (
       <div className={style.projectBox}>
+        {project.leaderId === uid ? (
+          <span className={`${style.tag} ${style.tagBeforeRunning}`}>관리자</span>
+        ) : (<span></span>)}
         {project.default ? (
           <img src={project.image} alt={project.name} />
         ) : (
@@ -62,41 +65,7 @@ const setProjectStatus = (project) => {
   }
 }
 
-const MyProject = () => {
-  const uid = auth.currentUser.uid;
-  const [myProjects, setMyProjects] = useState([]);
-
-  useEffect(() => {
-    const fetchProjects = async () => {
-      // Fetch projectMember documents where userId matches uid
-      const projectMemberCollection = collection(dbService, 'projectMember');
-      const memberQuery = query(projectMemberCollection, where('userId', '==', uid));
-
-      try {
-        const memberQuerySnapshot = await getDocs(memberQuery);
-
-        const projectIds = memberQuerySnapshot.docs.map((doc) => doc.data().projectId);
-
-        // Fetch projects where document ID is in the list of projectIds
-        const projectsCollection = collection(dbService, 'projects');
-
-        // Individual fetch for each project ID
-        const projectsData = await Promise.all(
-          projectIds.map(async (projectId) => {
-            const projectDoc = await getDoc(doc(projectsCollection, projectId));
-            return { id: projectId, ...projectDoc.data() };
-          })
-        );
-
-        setMyProjects(projectsData);
-      } catch (error) {
-        console.error('Error fetching projects: ', error);
-      }
-    };
-
-    fetchProjects();
-  }, [uid]);
-
+const MyProject = ({ uid, myProjects }) => {
     // For Navigation Button
     const itemsPerRow = 3; // 한 줄 당 아이템 수
     const totalRows = 1; // 총 줄 수
@@ -124,7 +93,6 @@ const MyProject = () => {
       ...visibleProjects,
       ...Array(Math.max(0, itemsPerRow - visibleProjects.length)).fill(defaultProject)
     ];
-    console.log(paddedVisibleProjects);
   
     return (
       <div className={style.projects}>
@@ -135,7 +103,7 @@ const MyProject = () => {
           <div className={style.projectsRow}>
             {paddedVisibleProjects.map((project, index) => (
               project ? (
-                <UserProject key={index} project={project} />
+                <UserProject key={index} uid={uid} project={project} />
               ) : (
                 <div key={index} className={style.emptyProject}></div>
               )
@@ -151,34 +119,8 @@ const MyProject = () => {
     );
   };
 
-const ProjectList = () => {
-    const [projects, setProjects] = useState([]);
-    // get data from Firebase db
-    useEffect(() => {
-      const fetchProjects = async () => {
-        const projectsCollection = collection(dbService, 'projects');
-        const q = query(projectsCollection, orderBy('createdAt', 'desc'));
-        
-        try {
-          const querySnapshot = await getDocs(q);
-          const projectsData = [];
-          querySnapshot.forEach((doc) => {
-            const newObj = {
-                ...doc.data(),
-                id: doc.id,
-            };
-            projectsData.push(newObj);
-          });
-          setProjects(projectsData);
-        } catch (error) {
-          console.error('Error fetching projects: ', error);
-        }
-      };
-
-      fetchProjects();
-
-    }, []);
-
+const ProjectList = ({ projects }) => {
+  
     projects.forEach((project) => {
       setProjectStatus(project);
     });
@@ -305,10 +247,61 @@ const ProjectList = () => {
 };
 
 export const Project = () => {
+  const uid = auth.currentUser.uid;
+  const [myProjects, setMyProjects] = useState([]);
+  const [recommendProjects, setRecommendProjects] = useState([]);
+  
+  useEffect(() => {
+    const fetchProjects = async () => {
+      // Fetch projectMember documents where userId matches uid
+      const projectMemberCollection = collection(dbService, 'projectMember');
+      const memberQuery = query(projectMemberCollection, where('userId', '==', uid));
+  
+      try {
+        const memberQuerySnapshot = await getDocs(memberQuery);
+  
+        const projectIds = memberQuerySnapshot.docs.map((doc) => doc.data().projectId);
+  
+        // Fetch all projects from the 'projects' collection
+        const projectsCollection = collection(dbService, 'projects');
+        const allProjectsSnapshot = await getDocs(projectsCollection);
+  
+        // Map all project data into an object for quick access
+        const allProjectsData = {};
+        allProjectsSnapshot.forEach((doc) => {
+          allProjectsData[doc.id] = { id: doc.id, ...doc.data() };
+        });
+  
+        // Separate projects into myProjects and recommendProjects
+        const myProjectsData = [];
+        const recommendProjectsData = [];
+
+        Object.keys(allProjectsData).forEach((projectId) => {
+          const projectData = allProjectsData[projectId];
+          if (projectIds.includes(projectId)) {
+            myProjectsData.push(projectData);
+          } else {
+            recommendProjectsData.push(projectData);
+          }
+        });
+  
+        setMyProjects(myProjectsData);
+        setRecommendProjects(recommendProjectsData);
+      } catch (error) {
+        console.error('Error fetching projects: ', error);
+      }
+    };
+  
+    fetchProjects();
+  }, [uid]);
+
+    console.log(myProjects);
+    console.log(recommendProjects);
+
     return (
         <div className={style.body}>
-            <MyProject/>
-            <ProjectList/>
+            <MyProject uid={uid} myProjects={myProjects}/>
+            <ProjectList projects={recommendProjects}/>
         </div>
     );
 }

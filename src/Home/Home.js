@@ -148,10 +148,7 @@ function Post(props) {
                     </Link>
                     <div className='postInfo'>
                         <Link to={`/profiledetail?uid=${props.userId}`}>
-                            <div className="userName">
-                                    {postUserInfo.nickname || userName}
-                                
-                            </div>
+                            <div className="userName">{postUserInfo.nickname || userName}<div className="postWhere">▸{postWhere}</div></div>
                             <div className='inGroup'>
                                     {postUserInfo.generation+'기' || companyClass+'기'}{moims.map((moim, idx)=>(<span key={idx}>{', '}{moim}</span>))}
                             </div>

@@ -178,10 +178,10 @@ export const PostPics = ({imgs}) => {
   }, [])
 
   useEffect(() => {
-    if(uid && whoLikes.includes(uid)){
+    if(uid && whoLikes && whoLikes.includes(uid)){
       setOn(true)
     }
-  }, [uid])
+  }, [uid,whoLikes])
 
   useEffect(() => {
     if(uid && clicked){

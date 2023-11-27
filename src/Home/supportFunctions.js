@@ -8,6 +8,7 @@ import emptyStar from '../images/emptyStar.png'
 import comments from '../images/comments.png'
 import React from 'react'
 import { dbService , auth } from '../firebase.js'
+import { Link } from "react-router-dom"
 
 
 
@@ -177,10 +178,10 @@ export const PostPics = ({imgs}) => {
   }, [])
 
   useEffect(() => {
-    if(uid && whoLikes.includes(uid)){
+    if(uid && whoLikes && whoLikes.includes(uid)){
       setOn(true)
     }
-  }, [uid])
+  }, [uid,whoLikes])
 
   useEffect(() => {
     if(uid && clicked){
@@ -242,14 +243,18 @@ export const CommentBtn = () => {
   )
 }
 
-export const Comments= ({ userPic, userName, postedAt, contents})=> {
+export const Comments= ({ userId, userPic, userName, postedAt, contents})=> {
   console.log(postedAt);
   return (
     <div className="postComment">
-        <img src={userPic} alt="Profile" className="commentUserPic" />
+        <Link to={`/profiledetail?uid=${userId}`}>
+          <img src={userPic} alt="Profile" className="commentUserPic" />
+        </Link>
         <div className="commentDetails">
           <div className="commentHeader">
-            <span className="commentUsername">{userName}</span>
+            <Link to={`/profiledetail?uid=${userId}`}>
+              <span className="commentUsername">{userName}</span>
+            </Link>
             <span className="commentPosetedAt">{getDayMinuteCounter(postedAt)}</span>
           </div>
           <p className="commentContents">{contents}</p>
@@ -280,6 +285,7 @@ export const CommentsWindow = ({comments, numOfComments, updateComments}) => {
           });
         }
       }
+      updatedComments.sort((a, b) => a.postedAt - b.postedAt);
       setCommentsWithUserInfo(updatedComments);
       console.log("Updated comments with user info: ", updatedComments);
     };
@@ -303,6 +309,7 @@ export const CommentsWindow = ({comments, numOfComments, updateComments}) => {
           userName={comment.userName}
           postedAt={comment.postedAt}
           contents={comment.contents}
+          userId={comment.userId}
         />
       );
     }) 

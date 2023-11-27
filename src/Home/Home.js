@@ -1,6 +1,8 @@
 import React from "react"
 import { getDayMinuteCounter, PostContents, PostPics, LikeBtn, CommentBtn, PlusBtn, CommentsWindow, WriteCommentContainer, addNewComment } from './supportFunctions'
 import './Home.css'
+import { initializeApp } from 'firebase/app';
+import { Link } from "react-router-dom"
 import { dbService , auth } from '../firebase.js'
 import {
     collection,
@@ -12,7 +14,8 @@ import {
     startAfter,
     doc,
     getDoc,
-    where
+    where,
+    updateDoc
 } from "firebase/firestore"
 import { useEffect, useState } from 'react'
 import close from '../images/close.png'
@@ -21,6 +24,8 @@ import styled from 'styled-components'
 import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid'; // 랜덤 식별자를 생성해주는 라이브러리
 import { storage } from '../firebase.js';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 
 
 
@@ -47,6 +52,8 @@ function Post(props) {
     const addNewComment = (newComment) => {
         setComments(prevComments => [...prevComments, newComment]);
     };
+    const [showDropdown, setShowDropdown] = useState(false);
+    const [isWriteOpen, setIsWriteOpen] = useState(false);
 
     useEffect(() => {
         const fetchPostUserInfo = async () => {
@@ -105,16 +112,52 @@ function Post(props) {
         fetchComments();
     }, [postId]);
 
+    const postWriteEditBtnClick = ()=> {
+        setShowDropdown(!showDropdown);
+        console.log('아이콘 클릭!');
+        // 추가적인 핸들러 로직
+    }
+    const handleDelete = () => {
+        console.log('삭제 클릭');
+        // 삭제 관련 로직
+      };
+      
+      const handleEdit = () => {
+        console.log('수정 클릭');
+        setIsWriteOpen(true);
+        // 수정 관련 로직
+      };
+
     return (
         <div className="homePost">
             <div className='paddingDiv'>
                 <div className="postHeader">
-                    <div className='profileImg'><img src={postUserInfo.profileImage || profile1Img} alt="profileImg"/></div>
+                    <Link to={`/profiledetail?uid=${props.userId}`}>
+                        <div className='profileImg'><img src={postUserInfo.profileImage || profile1Img} alt="profileImg"/></div>
+                    </Link>
                     <div className='postInfo'>
-                        <div className="userName">{postUserInfo.nickname || userName}<div className="postWhere">▸{postWhere}</div></div>
-                        <div className='inGroup'>{postUserInfo.generation+'기' || companyClass+'기'}{moims.map((moim, idx)=>(<span key={idx}>{', '}{moim}</span>))}</div>
-                        <div className="postedWhen">{getDayMinuteCounter(postedAt)}</div>
+                        <Link to={`/profiledetail?uid=${props.userId}`}>
+                            <div className="userName">
+                                    {postUserInfo.nickname || userName}
+                                
+                            </div>
+                            <div className='inGroup'>
+                                    {postUserInfo.generation+'기' || companyClass+'기'}{moims.map((moim, idx)=>(<span key={idx}>{', '}{moim}</span>))}
+                            </div>
+                            <div className="postedWhen">{getDayMinuteCounter(postedAt)}</div>
+                        </Link>
                     </div>
+                    {auth.currentUser.uid === userId && (
+                        <div className="menuIcon" onClick={postWriteEditBtnClick}>
+                            <FontAwesomeIcon icon={faEllipsisV} />
+                            {showDropdown && (
+                                <div className="dropdownMenu">
+                                <div className="menuItem" onClick={handleDelete}>삭제</div>
+                                <div className="menuItem" onClick={handleEdit}>수정</div>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
                 <PostContents contents={contents} />
             </div>
@@ -135,6 +178,16 @@ function Post(props) {
             </div>
             <CommentsWindow comments={comments} numOfComments={comments.length}/>
             <WriteCommentContainer userProfileImage = {props.userInfo?.profile_image} postId = {postId} userId ={auth.currentUser.uid} addNewComment={addNewComment}/>
+            <Write
+                isOpen={isWriteOpen}
+                setIsOpen={setIsWriteOpen}
+                existingPost={{
+                contents: contents, 
+                imgUrls: imgUrls,  
+                postId: postId
+                }}
+                showHeader={false}
+            />
         </div>
     )
 }
@@ -380,7 +433,7 @@ function DndBox(props) {
     )
 }
 
-function Write({ userInfo }) {
+function Write({ userInfo,isOpen, setIsOpen,existingPost,showHeader }) {
 
     const defaultValues = {
         contents: '',
@@ -390,13 +443,26 @@ function Write({ userInfo }) {
         whoLikes: [],
         postWhere: 'profile',
     }
-    let [isOpen, setIsOpen] = useState(false)
     let [values, setValues] = useState(defaultValues)
     let [async, setAsync] = useState(false)
     let [contentImages, setContentImages] = useState([])
     let [uid, setUid] = useState("")
+
+
+    useEffect(() => {
+        if (existingPost) {
+            setValues({
+                contents: existingPost.contents,
+            });
+            // 만약 게시글에 이미지가 있다면 setContentImages를 사용하세요
+            setContentImages(existingPost.imgUrls || []);
+        }
+    }, [existingPost]);
+    
+
     let [selectBar, setSelectBar] = useState(false)
     let [postWhere, setPostWhere] = useState("profile")
+
 
 
 
@@ -428,42 +494,65 @@ function Write({ userInfo }) {
         });
     };
 
-    const handleSubmit = async (e) => {
-
-        const imgUrls = [...new Array(contentImages.length)].map(() => uuidv4())
+    const handleSubmit = (e) => {
         e.preventDefault();
-        setValues({
+    
+        const imgUrls = contentImages.map(() => uuidv4());
+        const postData = {
+            ...defaultValues,
             ...values,
             'postedAt': moment().unix(),
             'userId': uid,
             'imgUrls': imgUrls,
             'postWhere': postWhere,
-        
-        })
-        
-        
+        };
+    
+        const handleUploadImages = () => {
+            for (let i = 0; i < contentImages.length; i++) {
+                const fileRef = ref(storage, imgUrls[i]);
+                uploadString(fileRef, contentImages[i], 'data_url');
+            }
+        };
+    
+        if (existingPost.postId) {
+            const postRef = doc(dbService, "posts", existingPost.postId);
+            updateDoc(postRef, postData)
+                .then(() => {
+                    handleUploadImages();
+                    // 업데이트 성공 시 처리
+                })
+                .catch(error => {
+                    console.error("Error updating document: ", error);
+                });
+        } else {
+            addDoc(collection(dbService, "posts"), postData)
+                .then(() => {
+                    handleUploadImages();
+                    // 생성 성공 시 처리
+                })
+                .catch(error => {
+                    console.error("Error adding document: ", error);
+                });
 
-        setIsOpen(false)
-
-        //const storage = getStorage();
-
-        for(let i=0;i<contentImages.length;i++) {
-            const fileRef = ref(storage, imgUrls[i]);
-            await uploadString(fileRef, contentImages[i], 'data_url');
         }
-
-        setAsync(true)
-        
+    
+        setIsOpen(false);
+        setValues(defaultValues);
+        setContentImages([]);
     };
+    
 
 
     return(
         <div className='homePost write'>
-            <div className='postHeader'>
+            {showHeader && (
+                <div className='postHeader'>
+
                 <div className='profileImg'><img src={userInfo?.profile_image || profile1Img} alt="profileImg"/></div>
                 <div className='popModal' onClick={ () => setIsOpen(true) }>당신의 일상을 공유해주세요!</div>
-            </div>
-            {isOpen ?
+                </div>
+            )}
+            {isOpen && (
                 <div className='modalBG' onClick={ () => setIsOpen(false) }>
                 <div onClick={ (e) => e.stopPropagation() }> {/** event 버블링 방지 */}
                     <div className='modalWrite'>
@@ -495,8 +584,9 @@ function Write({ userInfo }) {
                     </div>
                 </div>
                 </div>
-            :
-                null
+            )
+
+            
             }
             
         </div>
@@ -509,6 +599,7 @@ export const Home = () => {
 
     const [users, setUsers] = useState([]);
     const [userInfo, setUserInfo] = useState(null);
+    const [isWriteOpen, setIsWriteOpen] = useState(false);
 
     useEffect(() => { //오른쪽 사이드 바 코드
         const fetchUsers = async () => {
@@ -547,21 +638,23 @@ export const Home = () => {
     }, []);
 
     return(
+        
         <div className='home'>
-            <aside className="left-sidebar">
-                <div className="background-img-container">
-                    <img src={userInfo?.imgUrls || profile1Img} alt="background" className="homeProfile-background-img"/> 
-                    {/*임시*/}
-                </div>
-                <img src={userInfo?.profile_image} alt="profile" className="profile-img1" />
-                <div className="profile-info">
-                    <h3>{userInfo?.nickname || 'undefined'}</h3>
-                </div>
-                <button>내 그룹</button>
-            </aside>
+            <Link to={`/profiledetail?uid=${auth.currentUser.uid}`}>
+                <aside className="left-sidebar">
+                    <div className="background-img-container">
+                        <img src={userInfo?.imgUrls || profile1Img} alt="background" className="homeProfile-background-img"/> 
+                    </div>
+                    <img src={userInfo?.profile_image} alt="profile" className="profile-img1" />
+                    <div className="profile-info">
+                        <h3>{userInfo?.nickname || 'undefined'}</h3>
+                    </div>
+                    <button>내 프로필</button>
+                </aside>
+            </Link>
             
             <div className='postsContainer'>
-                <Write userInfo={userInfo}/>
+                <Write isOpen={isWriteOpen} setIsOpen={setIsWriteOpen} existingPost={{}} showHeader={true}/>
                 <Posts userInfo={userInfo}/>
             </div>
 
@@ -569,7 +662,9 @@ export const Home = () => {
                 <ul className="interestList">
                     {users.map(user => (
                         <li key={user.id} className="interestItem">
-                            <img src={user.imgUrls || profile1Img} alt={user.nickname || 'User'}/>
+                            <Link to={`/profiledetail?uid=${user.id}`}>
+                                <img src={user.imgUrls || profile1Img} alt={user.nickname || 'User'}/>
+                            </Link>
                             <span className="interestTitle">{user.nickname || 'Unknown User'}</span>
                             <PlusBtn/>
                         </li>

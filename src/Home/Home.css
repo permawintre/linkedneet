@@ -9,6 +9,7 @@
     margin: auto;
     margin-top: 10px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    position: relative;
 }
 .paddingDiv {
     padding: 10px;
@@ -33,6 +34,7 @@
 .userName {
     font-weight: bold;
     line-height: 25px;
+    color: black;  
 }
 .userName .postWhere {
     display: inline;
@@ -52,6 +54,33 @@
     font-weight: 300;
     line-height: 10px;
 }
+.menuIcon {
+    position: absolute;
+    top: 10px; /* 상단에서 0px의 위치 */
+    right: 10px; /* 오른쪽에서 0px의 위치 */
+    padding: 5px; /* 아이콘 주변의 여백 */
+    cursor: pointer; /* 마우스 오버시 포인터 모양 변경 */
+  }
+  .dropdownMenu {
+    position: absolute;
+    top: 100%; /* 아이콘의 바로 아래 */
+    right: 0;
+    background-color: #ffffff; /* 배경색 */
+    border: 1px solid #dddddd; /* 테두리 */
+    border-radius: 4px; /* 둥근 모서리 */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* 그림자 */
+    width: 80px; /* 메뉴의 너비 */
+    z-index: 1000; /* 다른 요소들 위에 표시 */
+  }
+  
+  .menuItem {
+    padding: 7px;
+    cursor: pointer; /* 마우스 오버시 포인터 모양 변경 */
+  }
+  
+  .menuItem:hover {
+    background-color: #f6f6f6; /* 호버시 배경색 변경 */
+  }
 
 
 .postContents {
@@ -179,6 +208,7 @@ hr {
 .commentUsername {
     font-weight: bold;
     display: block; /* 블록 레벨 요소로 설정 */
+    color: black; 
 }
 
 .commentContents {
@@ -342,6 +372,9 @@ hr {
     width: 700px;
     background-color: #FFFFFF;
     margin: 140px auto 0 auto;
+    max-height: 500px;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 .modalHeader {
     display: flex;
@@ -384,6 +417,7 @@ hr {
 .modalProfile .userName {
     font-size: 20px;
     padding-left: 10px;
+    color: black;  
 }
 .modalProfile .postWhere {
     font-size: 16px;
@@ -682,6 +716,7 @@ hr {
 
 .interestTitle {
     flex-grow: 1;
+    color: black;
 }
 
 .plusSign {
@@ -693,3 +728,8 @@ hr {
 .plusSign.active {
     color: #ccc; 
 }
+
+a {
+    text-decoration: none; /* 링크의 밑줄을 제거 */
+  }
+  

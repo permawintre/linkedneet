@@ -5,9 +5,8 @@ import { doc, getDoc, updateDoc, arrayUnion, collection, addDoc, query, where, g
 import { FaFacebookSquare, FaInstagramSquare} from 'react-icons/fa';
 import { IoGlobeOutline } from "react-icons/io5";
 import { MdPhoneIphone, MdEmail, MdCalendarMonth } from 'react-icons/md'
-import { formatDistanceToNow } from 'date-fns';
-import { ko } from 'date-fns/locale';
 import { ProfileEditModal, ProfileIntroEditModal } from './ProfileEditModal';
+import { ProfileComment } from './ProfileComment';
 import { defaultData } from './defaultData'
 import './ProfileDetail.css';
 import { Bars } from "react-loader-spinner";
@@ -256,137 +255,6 @@ const ProfilePost = ({userData, myProfile}) => {
             <span key={post.id}>{post.content}</span>
         ))}
         </div>
-      </main>
-    </div>
-  );
-};
-
-const ProfileComment = ({currentUserData, myProfile, profileUid}) => {
-  const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState('');
-  const [displayedCommentCount, setDisplayedCommentCount] = useState(5);
-  const [showAllComments, setShowAllComments] = useState(false);
-
-  const handleInputChange = (event) => {
-    setNewMessage(event.target.value);
-  };
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    if (newMessage.trim() !== '') {
-      const currentTime = new Date();
-      const commentData = {
-        contents: newMessage,
-        postedAt: currentTime,
-        profileId: profileUid,
-        userId: auth.currentUser.uid
-      };
-  
-      try {
-        const profileCommentsRef = collection(dbService, "profileComments");
-        await addDoc(profileCommentsRef, commentData);
-        const newCommentWithUserInfo = {
-          ...commentData,
-          userProfile: currentUserData.profile_image,
-          nickname: currentUserData.nickname,
-          postedAt: currentTime
-        };
-        // 새 댓글을 기존 댓글 목록에 추가
-        setMessages(oldMessages => [...oldMessages, newCommentWithUserInfo]);
-        setNewMessage('');
-      } catch (error) {
-        console.error("Error adding comment:", error);
-      }
-    }
-  };
-
-  useEffect(() => {
-    const fetchComments = async () => {
-      try {
-        const q = query(collection(dbService, "profileComments"), where("profileId", "==", profileUid));
-        const querySnapshot = await getDocs(q);
-        const commentPromises = querySnapshot.docs.map(async (_doc) => {
-          const commentData = _doc.data();
-          const userDocRef = doc(dbService, "users", commentData.userId);
-          const userDoc = await getDoc(userDocRef);
-          if (userDoc.exists()) {
-            commentData.userProfile = userDoc.data().profile_image;
-            commentData.nickname = userDoc.data().nickname;
-          }
-          // postedAt 필드가 Timestamp 객체인 경우 toDate()를 사용하여 Date 객체로 변환
-          if (commentData.postedAt && typeof commentData.postedAt.toDate === 'function') {
-            commentData.postedAt = commentData.postedAt.toDate();
-          }
-          return { id: _doc.id, ...commentData };
-        });
-        const comments = await Promise.all(commentPromises);
-        // 클라이언트 측에서 시간 순으로 정렬
-        comments.sort((a, b) => a.postedAt - b.postedAt);
-        setMessages(comments);
-      } catch (error) {
-        console.error("Error fetching comments:", error);
-      }
-    };
-  
-    fetchComments();
-  }, [profileUid]);
-
-  const handleShowMoreComments = () => {
-    if (showAllComments) {
-      setDisplayedCommentCount(5);
-      setShowAllComments(false);
-    } else if (displayedCommentCount + 5 < messages.length) {
-      setDisplayedCommentCount(displayedCommentCount + 5);
-    } else {
-      // setDisplayedCommentCount(messages.length);
-      setDisplayedCommentCount(messages.length);
-      setShowAllComments(true);
-    }
-  };
-  const displayedMessages = showAllComments ? messages : messages.slice(-displayedCommentCount);
-
-  return (
-    <div className="container">
-      <main>
-      <h2>방명록</h2>
-      <div className='profile-comment'>
-        <img src={currentUserData.profile_image} alt="프로필"/>
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            value={newMessage}
-            onChange={handleInputChange}
-            placeholder="방명록을 남겨주세요!"
-          />
-          <button type="submit">전송</button>
-        </form>
-      </div>
-      <div className='profile-comment-toggle'>
-        {messages.length > 5 && (
-          <button onClick={handleShowMoreComments}>
-            {/* {showAllComments ? "접기" : "더보기"} */}
-            {displayedCommentCount >= messages.length ? '접기' : '5개 더 보기'}
-          </button>
-        )}
-      </div>
-      <div>
-        {displayedMessages.map((message, index) => (
-          <div key={index} className='message'>
-            <a href={`/profiledetail?uid=${message.userId}`}>
-              <img src={message.userProfile} alt="프로필"/>
-            </a>
-            <div className='message-box'>
-              <div className='message-header'>
-                <a href={`/profiledetail?uid=${message.userId}`}>
-                  <h3>{message.nickname}</h3>
-                </a>
-                <p className='time' data-tooltip={message.postedAt.toLocaleString()}>{formatDistanceToNow(message.postedAt, { addSuffix: true, locale: ko })}</p>
-              </div>
-              <p className='text'>{message.contents}</p>
-            </div>
-          </div>
-        ))}
-      </div>
       </main>
     </div>
   );

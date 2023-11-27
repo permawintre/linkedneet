@@ -15,7 +15,8 @@ import {
     doc,
     getDoc,
     where,
-    updateDoc
+    updateDoc,
+    deleteDoc
 } from "firebase/firestore"
 import { useEffect, useState } from 'react'
 import close from '../images/close.png'
@@ -117,8 +118,18 @@ function Post(props) {
         console.log('아이콘 클릭!');
         // 추가적인 핸들러 로직
     }
-    const handleDelete = () => {
+    const handleDelete =async () => {
         console.log('삭제 클릭');
+        const confirmDelete = window.confirm("정말로 삭제하시겠습니까?");
+        if (confirmDelete) {
+            // Firebase에서 게시물 삭제
+            try {
+                await deleteDoc(doc(dbService, "posts", postId));
+                // UI 업데이트 로직 (예: 상태 업데이트 또는 부모 컴포넌트에 알림)
+            } catch (error) {
+                console.error("Error removing document: ", error);
+            }
+        }
         // 삭제 관련 로직
       };
       

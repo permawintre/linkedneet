@@ -372,10 +372,14 @@ const ProfileComment = ({currentUserData, myProfile, profileUid}) => {
       <div>
         {displayedMessages.map((message, index) => (
           <div key={index} className='message'>
-            <img src={message.userProfile} alt="프로필"/>
+            <a href={`/profiledetail?uid=${message.userId}`}>
+              <img src={message.userProfile} alt="프로필"/>
+            </a>
             <div className='message-box'>
               <div className='message-header'>
-                <h3>{message.nickname}</h3>
+                <a href={`/profiledetail?uid=${message.userId}`}>
+                  <h3>{message.nickname}</h3>
+                </a>
                 <p className='time' data-tooltip={message.postedAt.toLocaleString()}>{formatDistanceToNow(message.postedAt, { addSuffix: true, locale: ko })}</p>
               </div>
               <p className='text'>{message.contents}</p>

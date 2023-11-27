@@ -190,9 +190,12 @@ function Post(props) {
                 isOpen={isWriteOpen}
                 setIsOpen={setIsWriteOpen}
                 existingPost={{
-                contents: contents, 
-                imgUrls: imgUrls,  
-                postId: postId
+                    contents: contents, 
+                    imgUrls: imgUrls,  
+                    postId: postId,
+                    postWhere: postWhere,
+                    whoLikes: whoLikes,
+                    numOfLikes: numOfLikes,
                 }}
                 showHeader={false}
             />
@@ -331,11 +334,9 @@ const Posts=({ userInfo }) =>{
       return (
         <div>
             <div>{allPosts}</div>
-            <div style={{ textAlign: "center" }}>
+            <div className="addmargin" style={{ textAlign: "center" }}>
                 {nextPosts_loading ? (
                     <p>Loading..</p>
-                ) : lastKey > 0 ? (
-                    null
                 ) : (
                     <span>You are up to date!</span>
                 )}
@@ -441,7 +442,7 @@ function DndBox(props) {
     )
 }
 
-function Write({ userInfo,isOpen, setIsOpen,existingPost,showHeader }) {
+function Write({ userInfo, isOpen, setIsOpen, existingPost,showHeader }) {
 
     const defaultValues = {
         contents: '',
@@ -455,21 +456,25 @@ function Write({ userInfo,isOpen, setIsOpen,existingPost,showHeader }) {
     let [async, setAsync] = useState(false)
     let [contentImages, setContentImages] = useState([])
     let [uid, setUid] = useState("")
-
+    
 
     useEffect(() => {
         if (existingPost) {
             setValues({
-                contents: existingPost.contents,
+                contents: existingPost.contents, 
+                imgUrls: existingPost.imgUrls,  
+                postId: existingPost.postId,
+                postWhere: existingPost.postWhere,
+                whoLikes: existingPost.whoLikes,
+                numOfLikes: existingPost.numOfLikes,
             });
             // 만약 게시글에 이미지가 있다면 setContentImages를 사용하세요
             setContentImages(existingPost.imgUrls || []);
         }
-    }, [existingPost]);
+    }, []);
     
 
     let [selectBar, setSelectBar] = useState(false)
-    let [postWhere, setPostWhere] = useState("profile")
 
 
 
@@ -487,10 +492,12 @@ function Write({ userInfo,isOpen, setIsOpen,existingPost,showHeader }) {
             addDoc(collection(dbService , "posts"), values)
             setAsync(false)
         }
+        /*
         else {
             setValues(defaultValues)
             setContentImages([])
         }
+        */
         // 에러 임시로 없앰
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [async])
@@ -507,12 +514,10 @@ function Write({ userInfo,isOpen, setIsOpen,existingPost,showHeader }) {
     
         const imgUrls = contentImages.map(() => uuidv4());
         const postData = {
-            ...defaultValues,
             ...values,
             'postedAt': moment().unix(),
             'userId': uid,
             'imgUrls': imgUrls,
-            'postWhere': postWhere,
         };
     
         const handleUploadImages = () => {
@@ -569,14 +574,29 @@ function Write({ userInfo,isOpen, setIsOpen,existingPost,showHeader }) {
                                 <div className='profileImg'><img src={userInfo?.profile_image || profile1Img} alt="profileImg"/></div>
                                 <div>
                                     <div className="userName">{userName}</div>
-                                    <div className="postWhere">게시 위치 ▸{postWhere}</div>
+                                    <div className="postWhere">게시 위치 ▸{values.postWhere}</div>
                                 </div>
                             </div>
                             {selectBar ? 
                                 <div className="selectBar">
-                                    <div onClick={ () => {setPostWhere("profile");setSelectBar(!selectBar)} }>profile</div>
-                                    <div onClick={ () => {setPostWhere("neetCompany");setSelectBar(!selectBar)} }>neetCompany</div>
-                                    <div onClick={ () => {setPostWhere("project");setSelectBar(!selectBar)} }>project</div>{/*가입한 그룹이랑 연동하는것 구현필요*/}
+                                    <div onClick={ () => {setValues((prev) =>
+                                        ({...prev,
+                                        'postWhere': 'profile',})
+                                    );
+                                    setSelectBar(!selectBar)
+                                    }}>profile</div>
+                                    <div onClick={ () => {setValues((prev) =>
+                                        ({...prev,
+                                        'postWhere': 'neetCompany',})
+                                    );
+                                    setSelectBar(!selectBar)
+                                    }}>neetCompany</div>
+                                    <div onClick={ () => {setValues((prev) =>
+                                        ({...prev,
+                                        'postWhere': 'project',})
+                                    );
+                                    setSelectBar(!selectBar)
+                                    }}>project</div>{/*가입한 그룹이랑 연동하는것 구현필요*/}
                                 </div>
                                 :
                                 null
@@ -662,7 +682,7 @@ export const Home = () => {
             </Link>
             
             <div className='postsContainer'>
-                <Write isOpen={isWriteOpen} setIsOpen={setIsWriteOpen} existingPost={{}} showHeader={true}/>
+                <Write isOpen={isWriteOpen} setIsOpen={setIsWriteOpen} existingPost={false} showHeader={true}/>
                 <Posts userInfo={userInfo}/>
             </div>
 

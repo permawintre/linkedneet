@@ -244,7 +244,7 @@ export const CommentBtn = () => {
 }
 
 export const Comments= ({ userId, userPic, userName, postedAt, contents})=> {
-  console.log(postedAt);
+  //console.log(postedAt);
   return (
     <div className="postComment">
         <Link to={`/profiledetail?uid=${userId}`}>
@@ -301,7 +301,7 @@ export const CommentsWindow = ({comments, numOfComments, updateComments}) => {
   }
   const renderComments = () => {
     return commentsWithUserInfo.map((comment, index) => {
-      console.log("Rendering comment: ", comment);
+      //console.log("Rendering comment: ", comment);
       return(
         <Comments
           key={index}

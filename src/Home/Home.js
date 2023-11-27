@@ -1,7 +1,7 @@
 import React from "react"
 import { getDayMinuteCounter, PostContents, PostPics, LikeBtn, CommentBtn, PlusBtn, CommentsWindow, WriteCommentContainer } from './supportFunctions'
 import './Home.css'
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import { dbService , auth } from '../firebase.js'
 import {
     collection,
@@ -17,27 +17,26 @@ import {
     updateDoc,
     deleteDoc
 } from "firebase/firestore"
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import close from '../images/close.png'
 import moment from 'moment'
 import styled from 'styled-components'
-import { ref, uploadString, getDownloadURL } from 'firebase/storage';
+import { ref, uploadString, getDownloadURL, deleteObject } from 'firebase/storage';
 import { v4 as uuidv4 } from 'uuid'; // 랜덤 식별자를 생성해주는 라이브러리
 import { storage } from '../firebase.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 
 
-
 import profile1Img from '../images/profile1Img.jpg'
 
-const user = auth.currentUser;
 const userName = "홍길동"
 const companyClass = 14
 const moims = ['모임 a', '모임 b', '모임 c']
 
 
 function Post(props) {
+    //console.log('사진여러장로딩문제', props.imgUrls)
     const userId = props.userId;
     const postId = props.postId
     const postedAt = props.postedAt
@@ -54,7 +53,7 @@ function Post(props) {
     };
     const [showDropdown, setShowDropdown] = useState(false);
     const [isWriteOpen, setIsWriteOpen] = useState(false);
-
+    const navigate = useNavigate();
     useEffect(() => {
         const fetchPostUserInfo = async () => {
             try {
@@ -114,29 +113,63 @@ function Post(props) {
 
     const postWriteEditBtnClick = ()=> {
         setShowDropdown(!showDropdown);
-        console.log('아이콘 클릭!');
+        //console.log('아이콘 클릭!');
         // 추가적인 핸들러 로직
     }
-    const handleDelete =async () => {
-        console.log('삭제 클릭');
+
+    const deleteComments = async () => {
+
+        const q = query(collection(dbService, "comments"), where("postId", "==", postId));
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach( async (document) => {
+            // doc.data() is never undefined for query doc snapshots
+            await deleteDoc(doc(dbService, 'comments', document.id));
+            console.log('commentsid: ', document.id)
+        });
+    }
+
+    const handleDelete = async () => {
+        //console.log('삭제 클릭');
         const confirmDelete = window.confirm("정말로 삭제하시겠습니까?");
         if (confirmDelete) {
             // Firebase에서 게시물 삭제
             try {
                 await deleteDoc(doc(dbService, "posts", postId));
+                await deleteComments();
                 // UI 업데이트 로직 (예: 상태 업데이트 또는 부모 컴포넌트에 알림)
             } catch (error) {
                 console.error("Error removing document: ", error);
             }
+            // storage deletion
+
+            for(let i=0;i<=props.imgUrls.length;i++){
+                const Ref = ref(storage, `/${props.imgUrls[i]}`);
+                try {
+                    await deleteObject(Ref)
+                } catch (error) {
+                    console.log("error in file deletion", error)
+                }
+            }
+            navigate(0);
         }
-        // 삭제 관련 로직
       };
       
       const handleEdit = () => {
-        console.log('수정 클릭');
+        //console.log('수정 클릭');
         setIsWriteOpen(true);
         // 수정 관련 로직
       };
+    
+    const dropDownRef = useRef(null);
+    useEffect(() => {
+        const handleClick = (e) => {
+            if (dropDownRef.current && !dropDownRef.current.contains(e.target)) {
+                setShowDropdown(false);
+            }
+        };
+        window.addEventListener('mousedown', handleClick);
+        return () => window.removeEventListener('mousedown', handleClick);
+    }, [dropDownRef]);
 
     return (
         <div className="homePost">
@@ -155,12 +188,12 @@ function Post(props) {
                         </Link>
                     </div>
                     {auth.currentUser.uid === userId && (
-                        <div className="menuIcon" onClick={postWriteEditBtnClick}>
+                        <div className="menuIcon" onClick={postWriteEditBtnClick} ref={dropDownRef}>
                             <FontAwesomeIcon icon={faEllipsisV} />
                             {showDropdown && (
                                 <div className="dropdownMenu">
-                                <div className="menuItem" onClick={handleDelete}>삭제</div>
-                                <div className="menuItem" onClick={handleEdit}>수정</div>
+                                    <div className="menuItem" onClick={handleDelete}>삭제</div>
+                                    <div className="menuItem" onClick={handleEdit}>수정</div>
                                 </div>
                             )}
                         </div>
@@ -189,8 +222,8 @@ function Post(props) {
                 isOpen={isWriteOpen}
                 setIsOpen={setIsWriteOpen}
                 existingPost={{
-                    contents: contents, 
-                    imgUrls: imgUrls,  
+                    contents: contents,
+                    imgIds: props.imgUrls,
                     postId: postId,
                     postWhere: postWhere,
                     whoLikes: whoLikes,
@@ -198,6 +231,7 @@ function Post(props) {
                 }}
                 showHeader={false}
             />
+            
         </div>
     )
 }
@@ -347,7 +381,9 @@ const Posts=({ userInfo }) =>{
 }
 
 
-
+const StyledCpnt = styled.div`
+    border: ${(props) => props.$isDragging ? '3px dotted #808080' : '3px solid #bbbbbb'}
+`
 function DndBox(props) {
 
     const [isDragging, setIsDragging] = useState(false);
@@ -356,6 +392,10 @@ function DndBox(props) {
     // 부모 컴포넌트에서 내려준 contentImage state
     const contentImages = props.contentImages;
     const setContentImages = props.setContentImages;
+    const imgIds = props.imgIds;
+    const [imgUrls, setImgUrls] = useState(false)
+    const isOpen = props.isOpen;
+    const setImgDeleted = props.setImgDeleted;
 
     const readImage = (image) => {
         const reader = new FileReader();
@@ -367,26 +407,51 @@ function DndBox(props) {
         
     };
 
+
+
+
+    const loadImage = async () => {
+
+        try {
+            const urls = [];
+            for (let i = 0; i < imgIds.length; i++) {
+                const downloadUrl = await getDownloadURL(ref(storage, imgIds[i]));
+                urls.push(downloadUrl);
+            }
+            setImgUrls(urls);
+          } catch (error) {
+            console.error('이미지를 불러오는 도중 에러 발생:', error);
+          }
+
+    }
+
+
+    useEffect(() => {
+        loadImage()
+    }, [isOpen, imgIds])
     
+    
+
+
 
     const onDragEnter = (e) => {
         e.preventDefault();
         e.stopPropagation();
         setIsDragging(true);
-      };
-      const onDragLeave = (e) => {
+    };
+    const onDragLeave = (e) => {
         e.preventDefault();
         e.stopPropagation();
         setIsDragging(false);
-      };
-      const onDragOver = (e) => {
+    };
+    const onDragOver = (e) => {
         e.preventDefault();
         e.stopPropagation();
         if (e.dataTransfer.files) {
-          setIsDragging(true);
+            setIsDragging(true);
         }
-      };
-      const onDrop = (e) => {
+    };
+    const onDrop = (e) => {
         e.preventDefault();
         e.stopPropagation();
         const files = e.dataTransfer.files || e.target.files;
@@ -394,34 +459,54 @@ function DndBox(props) {
             readImage(files[i]);
         }
         setIsDragging(false);
-      };
+    };
       
-      const StyledCpnt = styled.div`
-        border: ${(props) => props.$isDragging ? '3px dotted #808080' : '3px solid #bbbbbb'}
-      `
       
-      const handleClick = (e) => {
+      
+    const handleClick = (e) => {
         setDeleted(e)
-      }
+    }
 
-      useEffect(() => {
+    useEffect(() => {
+        setContentImages([])
+        setImgDeleted([])
+    }, [isOpen])
+
+    useEffect(() => {
         const deleteImg = (e) => {
-            let tmpImgs = contentImages;
-            tmpImgs.splice(e.target.dataset.key, 1);
-            setContentImages(tmpImgs);
-            setDeleted(false)
+            if(e.target.dataset.value === 'added'){
+                let tmpImgs = contentImages;
+                tmpImgs.splice(e.target.dataset.key, 1);
+                setContentImages(tmpImgs);
+                setDeleted(false)
+                //console.log('추가데이터', e.target.dataset.key)
+            }
+            else{
+                let tmpImgs = imgUrls;
+                tmpImgs.splice(e.target.dataset.key, 1);
+                setImgUrls(tmpImgs);
+                setDeleted(false);
+                setImgDeleted(prev => ([
+                    ...prev,
+                    e.target.dataset.value
+                ]))
+                //console.log('기존데이터', e.target.dataset.key)
+            }
         }
         if(deleted) deleteImg(deleted)
-      }, [deleted])
+    }, [deleted])
+
     return(
         <div>
-        {contentImages.length > 0 &&
         <div className="imgsAboveDnd">
+            {imgUrls && imgUrls.map((img, idx) =>
+                <img src={img} alt='preview' className='previewImg' key={idx} data-key={idx} data-value={imgIds[idx]} onClick={handleClick}/>
+            )}
             {contentImages.map((img, idx) => 
-                <img src={img} alt='preview' className='previewImg' data-key={idx} onClick={handleClick}/>
+                <img src={img} alt='preview' className='previewImg' key={idx} data-key={idx} data-value={'added'} onClick={handleClick}/>
             )}
         </div>
-        }
+        
         <StyledCpnt className='dndBox'
             onDragEnter={onDragEnter}
             onDragLeave={onDragLeave}
@@ -455,7 +540,8 @@ function Write({ userInfo, isOpen, setIsOpen, existingPost,showHeader }) {
     let [async, setAsync] = useState(false)
     let [contentImages, setContentImages] = useState([])
     let [uid, setUid] = useState("")
-    
+    let [imgIds, setImgIds] = useState(false)
+    let [imgDeleted, setImgDeleted] = useState([])
 
     useEffect(() => {
         if (existingPost) {
@@ -467,11 +553,10 @@ function Write({ userInfo, isOpen, setIsOpen, existingPost,showHeader }) {
                 whoLikes: existingPost.whoLikes,
                 numOfLikes: existingPost.numOfLikes,
             });
-            // 만약 게시글에 이미지가 있다면 setContentImages를 사용하세요
-            setContentImages(existingPost.imgUrls || []);
+            setImgIds(existingPost.imgIds)
+            //console.log('imgIds: ', existingPost.imgIds)
         }
-    }, []);
-    
+    }, [isOpen]);
 
     let [selectBar, setSelectBar] = useState(false)
 
@@ -491,14 +576,6 @@ function Write({ userInfo, isOpen, setIsOpen, existingPost,showHeader }) {
             addDoc(collection(dbService , "posts"), values)
             setAsync(false)
         }
-        /*
-        else {
-            setValues(defaultValues)
-            setContentImages([])
-        }
-        */
-        // 에러 임시로 없앰
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [async])
 
     const handleChange = (e) => {
@@ -508,31 +585,58 @@ function Write({ userInfo, isOpen, setIsOpen, existingPost,showHeader }) {
         });
     };
 
+    const navigate = useNavigate()
+
     const handleSubmit = (e) => {
         e.preventDefault();
     
         const imgUrls = contentImages.map(() => uuidv4());
+        const modifiedImgs = (origins, dels, adds) => {
+            if(origins.length>0){
+                const filtered = origins.filter((value, index, arr) => {
+                    return !dels.includes(value)
+                })
+                return filtered.concat(adds)
+            }
+            else{
+                return imgUrls
+            }
+            
+        }
         const postData = {
             ...values,
             'postedAt': moment().unix(),
             'userId': uid,
-            'imgUrls': imgUrls,
+            'imgUrls': modifiedImgs(imgIds, imgDeleted, imgUrls),
         };
     
-        const handleUploadImages = () => {
+        const handleUploadImages = async () => {
             for (let i = 0; i < contentImages.length; i++) {
                 const fileRef = ref(storage, imgUrls[i]);
-                uploadString(fileRef, contentImages[i], 'data_url');
+                await uploadString(fileRef, contentImages[i], 'data_url');
             }
         };
+        const handleDeleteImgs = async () => {
+
+            for(let i=0;i<=imgDeleted.length;i++){
+                const Ref = ref(storage, `/${imgDeleted[i]}`);
+                try {
+                    await deleteObject(Ref)
+                } catch (error) {
+                    console.log("error in file deletion", error)
+                }
+            }
+        }
+
     
         if (existingPost.postId) {
             const postRef = doc(dbService, "posts", existingPost.postId);
             updateDoc(postRef, postData)
                 .then(() => {
                     handleUploadImages()
+                    handleDeleteImgs()
                     .then(() => {
-                        window.location.reload();
+                        navigate(0)
                     })
                     .catch(error => {
                         console.log("Img Upload Error: ", error)
@@ -546,7 +650,7 @@ function Write({ userInfo, isOpen, setIsOpen, existingPost,showHeader }) {
                 .then(() => {
                     handleUploadImages()
                     .then(() => {
-                        window.location.reload();
+                        navigate(0)
                     })
                     .catch(error => {
                         console.log("Img Upload Error: ", error)
@@ -615,7 +719,13 @@ function Write({ userInfo, isOpen, setIsOpen, existingPost,showHeader }) {
                         
                         <form onSubmit={handleSubmit} className='modalForm'>
                             <textarea type='text' name='contents' value={values.contents} onChange={handleChange} placeholder='나누고 싶은 생각이 있으세요?'/>
-                            <DndBox contentImages={ contentImages } setContentImages={ setContentImages } />
+                            <DndBox
+                                contentImages={ contentImages }
+                                setContentImages={ setContentImages }
+                                imgIds={ imgIds }
+                                isOpen={ isOpen }
+                                setImgDeleted={ setImgDeleted }
+                            />
                             <button type='submit'>게시</button>
                         </form>
                     </div>

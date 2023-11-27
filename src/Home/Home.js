@@ -1,7 +1,6 @@
 import React from "react"
-import { getDayMinuteCounter, PostContents, PostPics, LikeBtn, CommentBtn, PlusBtn, CommentsWindow, WriteCommentContainer, addNewComment } from './supportFunctions'
+import { getDayMinuteCounter, PostContents, PostPics, LikeBtn, CommentBtn, PlusBtn, CommentsWindow, WriteCommentContainer } from './supportFunctions'
 import './Home.css'
-import { initializeApp } from 'firebase/app';
 import { Link } from "react-router-dom"
 import { dbService , auth } from '../firebase.js'
 import {
@@ -83,7 +82,7 @@ function Post(props) {
 
     useEffect(() => {
         setImgUrls([])
-        console.log(props.imgUrls.length)
+        //console.log(props.imgUrls.length)
         for(let i=0;i<props.imgUrls.length;i++){
             (async () => {
                 await getDownloadURL(ref(storage, props.imgUrls[i]))
@@ -269,7 +268,7 @@ const Posts=({ userInfo }) =>{
             });
     }, [])
     const fetchMorePosts = (key) => {
-        console.log(key)
+        //console.log(key)
         if (key > 0) {
           setNextPostsLoading(true);
           moreFetch(key)
@@ -531,8 +530,13 @@ function Write({ userInfo, isOpen, setIsOpen, existingPost,showHeader }) {
             const postRef = doc(dbService, "posts", existingPost.postId);
             updateDoc(postRef, postData)
                 .then(() => {
-                    handleUploadImages();
-                    // 업데이트 성공 시 처리
+                    handleUploadImages()
+                    .then(() => {
+                        window.location.reload();
+                    })
+                    .catch(error => {
+                        console.log("Img Upload Error: ", error)
+                    })
                 })
                 .catch(error => {
                     console.error("Error updating document: ", error);
@@ -540,8 +544,13 @@ function Write({ userInfo, isOpen, setIsOpen, existingPost,showHeader }) {
         } else {
             addDoc(collection(dbService, "posts"), postData)
                 .then(() => {
-                    handleUploadImages();
-                    // 생성 성공 시 처리
+                    handleUploadImages()
+                    .then(() => {
+                        window.location.reload();
+                    })
+                    .catch(error => {
+                        console.log("Img Upload Error: ", error)
+                    })
                 })
                 .catch(error => {
                     console.error("Error adding document: ", error);

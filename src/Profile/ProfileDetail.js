@@ -7,8 +7,9 @@ import { IoGlobeOutline } from "react-icons/io5";
 import { MdPhoneIphone, MdEmail, MdCalendarMonth } from 'react-icons/md'
 import { ProfileEditModal, ProfileIntroEditModal } from './ProfileEditModal';
 import { ProfileComment } from './ProfileComment';
+import { ProfilePost } from './ProfilePost';
 import { defaultData } from './defaultData'
-import './ProfileDetail.css';
+import './ProfilePost.css';
 import { Bars } from "react-loader-spinner";
 
 const DefaultProfileImg = 'https://s3.amazonaws.com/37assets/svn/765-default-avatar.png'
@@ -231,35 +232,6 @@ const ProfileCareer = ({userData, myProfile}) => {
   );
 };
 
-const ProfilePost = ({userData, myProfile}) => {
-  // example posts
-  const posts = [
-    { id: 1, content: 'Post 1' },
-    { id: 2, content: 'Post 2' },
-    { id: 3, content: 'Post 3' },
-    { id: 4, content: 'Post 4' },
-    { id: 5, content: 'Post 5' },
-    { id: 6, content: 'Post 6' },
-    { id: 7, content: 'Post 7' },
-    { id: 8, content: 'Post 8' },
-    { id: 9, content: 'Post 9' }
-  ];
-  const firstThreePosts = posts.slice(0, 3);
-
-  return (
-    <div className="container">
-      <main>
-        <h2>게시글</h2>
-        <div className="post">
-          {firstThreePosts.map(post => (
-            <span key={post.id}>{post.content}</span>
-        ))}
-        </div>
-      </main>
-    </div>
-  );
-};
-
 const ProfileDetail = () => {
   const introRef = useRef(null);
   const careerRef = useRef(null);
@@ -361,8 +333,8 @@ useEffect(() => {
         </div>
         <div ref={introRef}><ProfileIntro userData={profileUserData} myProfile={myProfile}/></div>
         <div ref={careerRef}><ProfileCareer userData={profileUserData} myProfile={myProfile}/></div>
-        <div ref={postRef}><ProfilePost userData={profileUserData} myProfile={myProfile}/></div>
-        <div ref={commentRef}><ProfileComment currentUserData={currentUserData} myProfile={myProfile} profileUid = {uid}/></div>
+        <div ref={postRef}><ProfilePost userData={profileUserData} myProfile={myProfile} profileUid={uid}/></div>
+        <div ref={commentRef}><ProfileComment currentUserData={currentUserData} myProfile={myProfile} profileUid={uid}/></div>
     </div>
     </div>
   )

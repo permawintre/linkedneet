@@ -206,14 +206,3 @@ main {
     /* -webkit-text-decoration: underline wavy var(--color_1); */
     /* text-decoration: underline wavy var(--color_1); */
 }
-.post {
-    overflow-x: auto;
-    white-space: nowrap;
-}
-.post span {
-    display: inline-block;
-    width: 300px;
-    margin: 5px;
-    border: 1px solid #ccc;
-    padding: 10px
-}

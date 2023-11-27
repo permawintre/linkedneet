@@ -16,6 +16,7 @@ import { ProjectDetail } from './ProjectPage/ProjectDetail.js'
 import { ProjectCreate } from './ProjectPage/ProjectCreate.js'
 import { ProjectJoin } from './ProjectPage/ProjectJoin.js'
 import { ProjectManage } from './ProjectPage/ProjectManage.js'
+import { ProjectHome } from './ProjectPage/ProjectHome.js'
 
 import ProfileCareerDetail from './Profile/ProfileCareerDetail.js'
 
@@ -59,6 +60,7 @@ function App() {
             <Route path="/projectjoin/:projectId" element={isLoggedIn ? <ProjectJoin/> : <RedirectToLogIn/>}></Route>
             <Route path="/projectcreate" element={isLoggedIn ? <ProjectCreate/> : <RedirectToLogIn/>}></Route>
             <Route path="/projectmanage/:projectId" element={isLoggedIn ? <ProjectManage/>: <RedirectToLogIn/>}></Route>
+            <Route path="/projecthome/:projectId" element={isLoggedIn ? <ProjectHome/>: <RedirectToLogIn/>}></Route>
 
             <Route path="/neetCompany" element={isLoggedIn ? <NeetCompany/> : <RedirectToLogIn/>}></Route>
             <Route path="/profile" element={isLoggedIn ? <Profile/> : <RedirectToLogIn/>}></Route>

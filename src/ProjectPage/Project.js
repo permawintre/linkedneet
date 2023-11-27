@@ -15,7 +15,11 @@ const UserProject = ({ uid, project }) => {
         ) : (
           <img src={project.image.imageUrl} alt={project.name} />
         )}
-        <div className={style.name}>{project.name}</div>
+        <Link to={`/projectDetail/${project.id}`} style={{ textDecoration: 'none' }} className={style.name}>
+        {/* <div className={style.name}> */}
+          {project.name}
+        {/* </div> */}
+        </Link>
         <div className={style.comment}>{project.shortDescription}</div>
       </div>
     );
@@ -120,7 +124,7 @@ const MyProject = ({ uid, myProjects }) => {
   };
 
 const ProjectList = ({ projects }) => {
-  
+
     projects.forEach((project) => {
       setProjectStatus(project);
     });

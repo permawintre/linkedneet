@@ -2,19 +2,18 @@ import React, { useState, useEffect } from "react"
 import style from './ProjectJoin.module.css'
 import { FcAlarmClock, FcCalendar, FcCheckmark, FcGlobe } from "react-icons/fc";
 import { doc, getDoc, addDoc, collection, where, getDocs, query } from 'firebase/firestore';
-import { useParams } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { auth, dbService } from '../firebase.js'
 import moment from 'moment'
 import { useNavigate } from 'react-router-dom';
 
-function formatDateKR(timestamp) {
-    return new Date(timestamp.seconds * 1000).toLocaleDateString('ko-KR', {
+function formatDate(timestamp) {
+  return new Date(timestamp.seconds * 1000).toLocaleDateString('en-CA', {
       year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  }
+      month: '2-digit',
+      day: '2-digit'
+    })
+}
 
 const ProjectHeader = (project) => {
     const { projectId } = useParams();
@@ -34,14 +33,14 @@ const ProjectHeader = (project) => {
                   <FcAlarmClock />
                   <span className={style.infoTitle}>모집기간</span>
                   <span className={style.infoContent}>
-                    {formatDateKR(project.recruitStartDate)} ~ {formatDateKR(project.recruitEndDate)}
+                    {formatDate(project.recruitStartDate)} ~ {formatDate(project.recruitEndDate)}
                   </span>
                 </div>
                 <div>
                   <FcCalendar />
                   <span className={style.infoTitle}>운영기간</span>
                   <span className={style.infoContent}>
-                    {formatDateKR(project.runningStartDate)} ~ {formatDateKR(project.runningEndDate)}
+                    {formatDate(project.runningStartDate)} ~ {formatDate(project.runningEndDate)}
                   </span>
                 </div>
                 <div>
@@ -56,7 +55,7 @@ const ProjectHeader = (project) => {
                 </div>
               </div>
               <div className={style.info}>
-                <Link to={`/projectDetail/${projectId}`} style={{ color: 'gray' }}>
+                <Link to={`/projectDetail/${projectId}`} style={{ color: 'gray', textDecoration: 'underline' }}>
                     상세보기
                 </Link>
               </div>

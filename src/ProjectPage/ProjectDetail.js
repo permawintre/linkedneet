@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react"
 import style from './ProjectDetail.module.css'
 import { FcAlarmClock, FcCalendar, FcCheckmark, FcGlobe } from "react-icons/fc";
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, where, getDocs, collection, query } from 'firebase/firestore';
 import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { auth, dbService } from '../firebase.js'
+import { is } from "date-fns/locale";
 
 const defaultLeaderImg = 'https://s3.amazonaws.com/37assets/svn/765-default-avatar.png';
 
@@ -42,18 +43,15 @@ const setProjectStatus = (project) => {
   }
 }
 
-function formatDateKR(timestamp) {
-    return new Date(timestamp.seconds * 1000).toLocaleDateString('ko-KR', {
+function formatDate(timestamp) {
+  return new Date(timestamp.seconds * 1000).toLocaleDateString('en-CA', {
       year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  }
-function formatDate(date) {
-    return new Date(date).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit' });
+      month: '2-digit',
+      day: '2-digit'
+    })
 }
 
-const ProjectHeader = ({project, uid}) => {
+const ProjectHeader = ({project, uid, isMember}) => {
     return (
         <div className={style.projectDetail}>
           <div className={style.projectBoxDetail}>
@@ -68,14 +66,14 @@ const ProjectHeader = ({project, uid}) => {
                 <FcAlarmClock />
                 <span className={style.infoTitle}>모집기간</span>
                 <span className={style.infoContent}>
-                  {formatDateKR(project.recruitStartDate)} ~ {formatDateKR(project.recruitEndDate)}
+                  {formatDate(project.recruitStartDate)} ~ {formatDate(project.recruitEndDate)}
                 </span>
               </div>
               <div>
                 <FcCalendar />
                 <span className={style.infoTitle}>운영기간</span>
                 <span className={style.infoContent}>
-                  {formatDateKR(project.runningStartDate)} ~ {formatDateKR(project.runningEndDate)}
+                  {formatDate(project.runningStartDate)} ~ {formatDate(project.runningEndDate)}
                 </span>
               </div>
               <div>
@@ -103,12 +101,18 @@ const ProjectHeader = ({project, uid}) => {
                 소모임 관리하기
               </Link>
             ) : (
-              project.status === '모집중' ? (
-                <Link to={`/projectJoin/${project.id}`} style={{ textDecoration: 'none', color: 'black' }} className={style.recruitButton}>
-                  소모임 지원하기
+              isMember ? (
+                <Link to={`/projectHome/${project.id}`} style={{ textDecoration: 'none', color: 'black' }} className={style.recruitButton}>
+                  소모임 멤버입니다
                 </Link>
               ) : (
-                <span className={style.recruitButton}>모집기간이 아닙니다</span>
+                project.status === '모집중' ? (
+                  <Link to={`/projectJoin/${project.id}`} style={{ textDecoration: 'none', color: 'black' }} className={style.recruitButton}>
+                    소모임 지원하기
+                  </Link>
+                ) : (
+                  <span className={style.recruitButton}>모집기간이 아닙니다</span>
+                )
               )
             )}
             <span className={style.shareButton}>공유하기</span>
@@ -118,10 +122,12 @@ const ProjectHeader = ({project, uid}) => {
               <img src={project.leaderImage} alt={project.leaderName} />
             </span>
             <span className={style.leaderBody}>
+              <Link to={`/profiledetail?uid=${project.leaderId}`}>
               <div className={style.leaderName}>
                 <span>{project.leaderName}</span>
                 <span className={style.leaderCaption}>리더</span>
               </div>
+              </Link>
               <div className={style.leaderComment}>{project.leaderComment}</div>
             </span>
           </div>
@@ -161,60 +167,78 @@ const ProjectReview = (project) => {
 }
 
 export const ProjectDetail = () => {
-    const { projectId } = useParams();
-    const [project, setProject] = useState(null);
-    const [uid, setUid] = useState("");
+  const { projectId } = useParams();
+  const [project, setProject] = useState(null);
+  const [uid, setUid] = useState("");
+  const [isMember, setIsMember] = useState(false);
 
-    useEffect(() => {
-      if (auth.currentUser) {
-        setUid(auth.currentUser.uid);
+  useEffect(() => {
+    // Set uid if the user is authenticated
+    if (auth.currentUser) {
+      setUid(auth.currentUser.uid);
+    }
+  }, []);
+
+  useEffect(() => {
+    const fetchProjectAndCheckMembership = async () => {
+      try {
+        // Fetch project data
+        const projectDoc = await getDoc(doc(dbService, 'projects', projectId));
+
+        if (projectDoc.exists()) {
+          const projectData = projectDoc.data();
+
+          // Fetch leader data
+          const leaderDoc = await getDoc(doc(dbService, 'users', projectData.leaderId));
+          const leaderData = leaderDoc.data();
+
+          // Update projectData with additional properties
+          const updatedProjectData = {
+            ...projectData,
+            id: projectDoc.id,
+            leaderName: leaderData.nickname,
+            leaderComment: `니트컴퍼니 ${leaderData.generation}기. ${leaderData.intro_title}`,
+            leaderImage: leaderData.profile_img ? leaderData.profile_img : defaultLeaderImg,
+            reviews: [
+              {
+                'nickname': '유저1',
+                'content': `야외드로잉은 모여서 그리는 게 아니라 마음이 가는대로 뿔뿔히 흝어져 드로잉하는 방식이였습니다. 그게 조금 아쉬웠지만 야외에서 그리는 감각이 즐거웠습니다.
+                              후에 다같이 모여서 드로잉에 대해 얘기를 나누는 시간이 좋았습니다. 몇몇분과 저녁을 같이 먹고 한강 산책을 하고 헤어졌는데 좋은 시간이었어요.`,
+                'created_at': new Date('2023-01-30'),
+              },
+              {
+                'nickname': '유저2',
+                'content': '다양한 사람들과 친해질 수 있습니다',
+                'created_at': new Date('2023-02-28'),
+              }
+            ]
+          };
+
+          // Set project data and status
+          setProject(updatedProjectData);
+          setProjectStatus(updatedProjectData);
+        } else {
+          console.log('프로젝트를 찾을 수 없습니다.');
+        }
+      } catch (error) {
+        console.error('프로젝트를 가져오는 동안 오류 발생:', error);
       }
-    }, []);
 
-    useEffect(() => {
-        const fetchProject = async () => {
-            try {
-                const projectDoc = await getDoc(doc(dbService, 'projects', projectId));
-    
-                if (projectDoc.exists()) {
-                    const projectData = projectDoc.data();
-                    const leaderDoc = await getDoc(doc(dbService, 'users', projectData.leaderId));
-                    const leaderData = leaderDoc.data();
-                    
-                    // Update projectData with additional properties
-                    const updatedProjectData = {
-                        ...projectData,
-                        id: projectDoc.id,
-                        leaderName: leaderData.nickname,
-                        leaderComment: `니트컴퍼니 ${leaderData.generation}기. ${leaderData.intro_title}`,
-                        leaderImage: leaderData.profile_img ? leaderData.profile_img : defaultLeaderImg,
-                        reviews: [
-                            {
-                                'nickname': '유저1',
-                                'content': `야외드로잉은 모여서 그리는 게 아니라 마음이 가는대로 뿔뿔히 흝어져 드로잉하는 방식이였습니다. 그게 조금 아쉬웠지만 야외에서 그리는 감각이 즐거웠습니다.
-                                후에 다같이 모여서 드로잉에 대해 얘기를 나누는 시간이 좋았습니다. 몇몇분과 저녁을 같이 먹고 한강 산책을 하고 헤어졌는데 좋은 시간이었어요.`,
-                                'created_at': new Date('2023-01-30'),
-                            },
-                            {
-                                'nickname': '유저2',
-                                'content': '다양한 사람들과 친해질 수 있습니다',
-                                'created_at': new Date('2023-02-28'),
-                            }
-                        ]
-                    };
-    
-                    setProject(updatedProjectData);
-                    setProjectStatus(updatedProjectData); // Move this line inside the if block
-                } else {
-                    console.log('프로젝트를 찾을 수 없습니다.');
-                }
-            } catch (error) {
-                console.error('프로젝트를 가져오는 동안 오류 발생:', error);
-            }
-        };
-    
-        fetchProject();
-    }, [dbService, projectId]);
+      try {
+        // Fetch projectMember document where userId and projectId match
+        const projectMemberCollection = collection(dbService, 'projectMember');
+        const memberQuery = query(projectMemberCollection, where('userId', '==', uid), where('projectId', '==', projectId));
+        const memberQuerySnapshot = await getDocs(memberQuery);
+
+        // Update isMember state based on whether the document exists
+        setIsMember(!memberQuerySnapshot.empty);
+      } catch (error) {
+        console.error('Error checking project membership: ', error);
+      }
+    };
+
+    fetchProjectAndCheckMembership();
+  }, [dbService, projectId, uid]);
 
     const [activeSection, setActiveSection] = useState('projectBodySection');
     const scrollToElement = (elementId) => {
@@ -232,7 +256,7 @@ export const ProjectDetail = () => {
     }
     return (
     <div className={style.body} style={{ overflowY: 'auto' }}>
-        {ProjectHeader({'project': project, 'uid': uid})}
+        {ProjectHeader({'project': project, 'uid': uid, 'isMember': isMember})}
         <div className={style.projectBoxButtons}>
             <span
             className={`${style.projectButton} ${style[activeSection === 'projectBodySection' ? 'active' : '']}`}

@@ -240,12 +240,25 @@ main {
 }
 
 .profile-comment button {
+    border-radius: 20px;
+    border: none;
     width: 10%;
     font-size: 13px;
     font-weight: 500;
     padding: 2%;
     background-color: var(--color_4);
     cursor: pointer;
+    letter-spacing: 1px;
+}
+
+.profile-comment-toggle button {
+    width: 100%;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 0.25%;
+    background-color: gray;
+    cursor: pointer;
+    letter-spacing: 1px;
 }
   .message {
     padding: 5px 20px;

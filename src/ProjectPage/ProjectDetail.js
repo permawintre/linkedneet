@@ -57,7 +57,9 @@ const ProjectHeader = ({project, uid, isMember}) => {
           <div className={style.projectBoxDetail}>
             <span className={`${style.tag} ${style[getTagColor(project.status)]}`}>{project.status}</span>
             <img src={project.image.imageUrl} alt={project.name} />
-            <div className={`${style.name} ${style[getTagColor(project.status)]}`}>{project.name}</div>
+            <Link to={`/projecthome/${project.id}`} className={`${style.name} ${style[getTagColor(project.status)]}`}>
+              {project.name}
+            </Link>
             <div className={style.comment}>
               <div>{project.shortDescription}</div>
             </div>

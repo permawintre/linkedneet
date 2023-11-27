@@ -15,10 +15,8 @@ const UserProject = ({ uid, project }) => {
         ) : (
           <img src={project.image.imageUrl} alt={project.name} />
         )}
-        <Link to={`/projectDetail/${project.id}`} style={{ textDecoration: 'none' }} className={style.name}>
-        {/* <div className={style.name}> */}
+        <Link to={`/projecthome/${project.id}`} style={{ textDecoration: 'none' }} className={style.name}>
           {project.name}
-        {/* </div> */}
         </Link>
         <div className={style.comment}>{project.shortDescription}</div>
       </div>

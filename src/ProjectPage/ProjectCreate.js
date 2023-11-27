@@ -587,6 +587,7 @@ const CompletionForm = ({ prevStep, formData, setFormData, mainImage }) => {
 
 
 export const ProjectCreate = () => {
+    window.scrollTo(0, 0);
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({
         name: '',

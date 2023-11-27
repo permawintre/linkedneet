@@ -764,6 +764,7 @@ a {
     font-size: 22px;
     text-align: center;
     background-color: lightblue;
+    word-break: keep-all;
 }
 .projectBoxDetail .comment {
     display: flex;
@@ -772,6 +773,8 @@ a {
     padding: 10px 5px;
     font-size: 14px;
     background-color: rgb(238, 238, 238);
+    text-align: center;
+    word-break: keep-all;
 }
 .projectBoxDetail .info {
     width: 100%;

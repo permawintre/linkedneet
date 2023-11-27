@@ -219,7 +219,6 @@ const Posts=({ projectId, userInfo }) =>{
                 limit(5)
             );
             const data = await getDocs(q);
-            console.log("DATA", data);
             data.forEach((doc) => {
                 posts.push({
                     ...doc.data(),
@@ -661,6 +660,16 @@ export const ProjectHome = () => {
     const [users, setUsers] = useState([]);
     const [userInfo, setUserInfo] = useState(null);
     const [isWriteOpen, setIsWriteOpen] = useState(false);
+    const [uid, setUid] = useState("");
+    const [isMember, setIsMember] = useState(false);
+
+    // checking whether a member
+    useEffect(() => {
+        // Set uid if the user is authenticated
+        if (auth.currentUser) {
+          setUid(auth.currentUser.uid);
+        }
+      }, []);
 
     // get userInfo & project
     useEffect(() => {
@@ -689,9 +698,23 @@ export const ProjectHome = () => {
                 console.error('데이터를 가져오는 동안 오류 발생:', error);
             }
         };
+        const checkMember = async () => {
+            try {
+                // Fetch projectMember document where userId and projectId match
+                const projectMemberCollection = collection(dbService, 'projectMember');
+                const memberQuery = query(projectMemberCollection, where('userId', '==', uid), where('projectId', '==', projectId));
+                const memberQuerySnapshot = await getDocs(memberQuery);
+        
+                // Update isMember state based on whether the document exists
+                setIsMember(!memberQuerySnapshot.empty);
+              } catch (error) {
+                console.error('Error checking project membership: ', error);
+              }
+        };
     
         fetchData();
-    }, [projectId]);
+        checkMember();
+    }, [dbService, projectId, uid]);
 
     return(
         <div className={style.home}>
@@ -702,7 +725,9 @@ export const ProjectHome = () => {
             
             {/* Write and Posts ONLY RELATED TO PROJECT */}
             <div className={style.postsContainer}>
-                <Write projectId={projectId} isOpen={isWriteOpen} setIsOpen={setIsWriteOpen} existingPost={{}} showHeader={true}/>
+                { isMember ? (
+                    <Write projectId={projectId} isOpen={isWriteOpen} setIsOpen={setIsWriteOpen} existingPost={{}} showHeader={true}/>
+                ) : (null)}
                 <Posts projectId={projectId} userInfo={userInfo}/>
             </div>
 

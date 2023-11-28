@@ -47,6 +47,7 @@ function Post(props) {
     const contents = props.contents
     const [postUserInfo, setPostUserInfo] = useState({ profileImage: '', nickname: '' });
     const postWhere = props.postWhere;
+    const modified = props.modified;
 
     const addNewComment = (newComment) => {
         setComments(prevComments => [...prevComments, newComment]);
@@ -184,7 +185,7 @@ function Post(props) {
                             <div className='inGroup'>
                                     {postUserInfo.generation+'기' || companyClass+'기'}{moims.map((moim, idx)=>(<span key={idx}>{', '}{moim}</span>))}
                             </div>
-                            <div className="postedWhen">{getDayMinuteCounter(postedAt)}</div>
+                            <div className="postedWhen">{getDayMinuteCounter(postedAt)}{modified ? '·수정됨' : null}</div>
                         </Link>
                     </div>
                     {auth.currentUser.uid === userId && (
@@ -222,6 +223,7 @@ function Post(props) {
                 isOpen={isWriteOpen}
                 setIsOpen={setIsWriteOpen}
                 existingPost={{
+                    postedAt: postedAt,
                     contents: contents,
                     imgIds: props.imgUrls,
                     postId: postId,
@@ -336,6 +338,7 @@ const Posts=({ userInfo }) =>{
                     userId= {post.userId}
                     postWhere = {post.postWhere}
                     userInfo={userInfo}
+                    modified = {post.modified}
                 />
                 <div className='postFooter'>
                 </div>
@@ -526,7 +529,7 @@ function DndBox(props) {
     )
 }
 
-function Write({ userInfo, isOpen, setIsOpen, existingPost,showHeader }) {
+function Write({ userInfo, isOpen, setIsOpen, existingPost ,showHeader }) {
 
     const defaultValues = {
         contents: '',
@@ -535,6 +538,7 @@ function Write({ userInfo, isOpen, setIsOpen, existingPost,showHeader }) {
         postedAt: null,
         whoLikes: [],
         postWhere: 'profile',
+        modified: false,
     }
     let [values, setValues] = useState(defaultValues)
     let [async, setAsync] = useState(false)
@@ -552,6 +556,7 @@ function Write({ userInfo, isOpen, setIsOpen, existingPost,showHeader }) {
                 postWhere: existingPost.postWhere,
                 whoLikes: existingPost.whoLikes,
                 numOfLikes: existingPost.numOfLikes,
+                modified: true,
             });
             setImgIds(existingPost.imgIds)
             //console.log('imgIds: ', existingPost.imgIds)
@@ -605,7 +610,7 @@ function Write({ userInfo, isOpen, setIsOpen, existingPost,showHeader }) {
         }
         const postData = {
             ...values,
-            'postedAt': moment().unix(),
+            'postedAt': existingPost ? existingPost.postedAt/1000 : moment().unix(),
             'userId': uid,
             'imgUrls': modifiedImgs(imgIds, imgDeleted, imgUrls),
         };

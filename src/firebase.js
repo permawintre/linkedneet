@@ -27,12 +27,8 @@ const firebaseConfig = {
 
 
 // Initialize Firebase
-<<<<<<< HEAD
-const app = initializeApp(firebaseConfig);
-=======
 initializeApp(firebaseConfig);
 export const app = initializeApp(firebaseConfig);
->>>>>>> hojun
 export const auth = getAuth();
 export const dbService = getFirestore(app);
 export const storage = getStorage(app);

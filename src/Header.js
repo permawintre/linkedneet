@@ -9,17 +9,10 @@ export const Header = () => {
         <div className='header'>
         <div className='header__inner'>
             <ul className="header__left">
-<<<<<<< HEAD
-                    <Link to="/" className="header__item link">home</Link>
-                    <Link to="/project" className="header__item link">project</Link>
-                    <Link to="/neetCompany" className="header__item link">neetCompany</Link>
-                    <Link to="/profile" className="header__item link">profile</Link>
-=======
                     <Link to="/" className="header__item link">HOME</Link>
                     <Link to="/project" className="header__item link">PROJECT</Link>
                     <Link to="/neetCompany" className="header__item link">NEET COMPANY</Link>
                     <Link to="/profiledetail" className="header__item link">PROFILE</Link>
->>>>>>> hojun
             </ul>
             <div className='header__mid'>
                 <Link to="/" className="link">

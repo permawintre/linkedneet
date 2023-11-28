@@ -150,7 +150,7 @@
     position: relative;
     top: 15px;
     left: 15px;
-    filter: grayscale(100%) brightness(300%) opacity(70%);
+    filter: grayscale(100%) brightness(100%) opacity(70%);
 }
 .placeHolder {
     height: 50px;
@@ -160,6 +160,8 @@
     height: 50px;
     width: 50px;
     cursor: pointer;
+    border-radius: 50%;
+    background: radial-gradient( rgba(255, 255, 255, 0.7) , rgba(255, 255, 255, 0) 50%);
 }
 .prev img {
     transform: rotate(-90deg)
@@ -168,13 +170,15 @@
     height: 50px;
     width: 50px;
     cursor: pointer;
+    border-radius: 50%;
+    background: radial-gradient( rgba(255, 255, 255, 0.7) , rgba(255, 255, 255, 0) 50%);
 }
 .next img {
     transform: rotate(90deg)
 }
 
 .numOfLikes {
-    margin-left: 10px;
+    display: inline;
     font-weight: 400;
     font-size: 15px;
 }

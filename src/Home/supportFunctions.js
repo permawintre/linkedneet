@@ -110,7 +110,7 @@ export const PostContents = ({contents}) => {
  */
 export const PostPics = ({imgs}) => {
 
-  console.log(imgs)
+  //console.log(imgs)
   /* 리스너 설치하기 */
   //console.log({imgs})
   let [idx, setIdx] = useState(0); // 슬라이드 현재 번호

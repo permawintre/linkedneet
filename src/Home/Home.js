@@ -138,10 +138,10 @@ function Post(props) {
     }
 
     const handleDelete = async () => {
-        setLoading(true)
         //console.log('삭제 클릭');
         const confirmDelete = window.confirm("정말로 삭제하시겠습니까?");
         if (confirmDelete) {
+            setLoading(true)
             // Firebase에서 게시물 삭제
             try {
                 await deleteDoc(doc(dbService, "posts", postId));
@@ -220,12 +220,19 @@ function Post(props) {
                     whoLikes = {whoLikes}
                     setWhoLikes = {setWhoLikes}
                 />
-                <CommentBtn />
+                <div className='numOfLikes'>
+                {numOfLikes===0? <span>{postUserInfo.nickname}님에게 응원의 표시를 남기세요</span> : <span>{numOfLikes}명이 응원합니다 </span>}
+                </div>
+
+
+                {/*<CommentBtn />*/}
             </div>
+{/*
             <hr></hr>
             <div className='numOfLikes'>
                 {numOfLikes===0? <span></span> : <span>{numOfLikes}명이 응원합니다 </span>}
             </div>
+*/}
             <CommentsWindow comments={comments} numOfComments={comments.length}/>
             <WriteCommentContainer userProfileImage = {props.userInfo?.profile_image} postId = {postId} userId ={auth.currentUser.uid} addNewComment={addNewComment}/>
             <Write
@@ -494,7 +501,7 @@ function DndBox(props) {
                 tmpImgs.splice(e.target.dataset.key, 1);
                 setContentImages(tmpImgs);
                 setDeleted(false)
-                console.log('추가데이터', e.target.dataset.key, e.target.dataset.value)
+                //console.log('추가데이터', e.target.dataset.key, e.target.dataset.value)
             }
             else{
                 let tmpImgs = imgUrls;
@@ -509,7 +516,7 @@ function DndBox(props) {
                 }
                 setImgIds(deleteImgId(e.target.dataset.value))
                 setImgDeleted(prev => [...prev, e.target.dataset.value])
-                console.log('기존데이터', e.target.dataset.key, e.target.dataset.value)
+                //console.log('기존데이터', e.target.dataset.key, e.target.dataset.value)
             }
         }
         if(deleted) deleteImg(deleted)

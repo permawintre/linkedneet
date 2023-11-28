@@ -510,10 +510,12 @@ hr {
     position: sticky;
     top: 118px; /* 항상 상단에 고정 */
 }
-
+.homePostsMarginControl {
+    margin: 0 10px;
+}
 .postsContainer {
     width: 550px;
-    margin: 0 10px;
+    margin: auto;
     display: flex;
     flex-direction: column;
 }

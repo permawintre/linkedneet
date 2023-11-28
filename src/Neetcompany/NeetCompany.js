@@ -1,9 +1,11 @@
+import { ShowPosts } from "../Home/Home"
+import "./NeetCompany.css"
+
 export const NeetCompany = () => {
 
     return(
-        <div>
-            <h1>NeetCompany Page</h1>
-            <p>notImplemented</p>
+        <div className="neetCompanyBody">
+            <ShowPosts currentLocation={'neetCompany'}/>
         </div>
     )
 }

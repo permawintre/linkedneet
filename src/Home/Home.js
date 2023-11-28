@@ -258,22 +258,91 @@ function Post(props) {
 
 
 
-const Posts=({ userInfo }) =>{
+const Posts=({ userInfo, currentLocation }) =>{
     const [posts, setPosts] = useState([]);
     const [lastKey, setLastKey] = useState(0);
     const [nextPosts_loading, setNextPostsLoading] = useState(false);
 
+    const setQuery = () => {
+        if(currentLocation === 'home'){
+            return query(
+                collection(dbService, 'posts'),
+                orderBy("postedAt", "desc"),
+                limit(5)
+            )
+        }
+        if(currentLocation === 'neetCompany'){
+            return query(
+                collection(dbService, 'posts'),
+                where("postWhere", "==", 'neetCompany'),
+                orderBy("postedAt", "desc"),
+                limit(5)
+            )
+        }
+        if(currentLocation === 'profile'){
+            return query(
+                collection(dbService, 'posts'),
+                where("postWhere", "==", "profile"),
+                orderBy("postedAt", "desc"),
+                limit(5)
+            )
+        }
+        if(currentLocation === 'project'){
+            return query(
+                collection(dbService, 'posts'),
+                where("postWhere", "==", "project"),
+                orderBy("postedAt", "desc"),
+                limit(5)
+            )
+        }
+    }
+
+    const setQueryMore = (key) => {
+
+        
+        if(currentLocation === 'home'){
+            return query(
+                collection(dbService, 'posts'),
+                orderBy("postedAt", "desc"),
+                startAfter(key),
+                limit(1)
+            );
+        }
+        if(currentLocation === 'neetCompany'){
+            return query(
+                collection(dbService, 'posts'),
+                where("postWhere", "==", "neetCompany"),
+                orderBy("postedAt", "desc"),
+                startAfter(key),
+                limit(1)
+            )
+        }
+        if(currentLocation === 'profile'){
+            return query(
+                collection(dbService, 'posts'),
+                where("postWhere", "==", "profile"),
+                orderBy("postedAt", "desc"),
+                startAfter(key),
+                limit(1)
+            )
+        }
+        if(currentLocation === 'project'){
+            return query(
+                collection(dbService, 'posts'),
+                where("postWhere", "==", "project"),
+                orderBy("postedAt", "desc"),
+                startAfter(key),
+                limit(1)
+            )
+        }
+    }
 
     const initFetch = async () => {
         
         try {
             let posts = [];
             let lastKey = '';
-            const q = query(
-                collection(dbService, 'posts'),
-                orderBy("postedAt", "desc"),
-                limit(5)
-            );
+            const q = setQuery();
             const data = await getDocs(q);
             data.forEach((doc) => {
                 posts.push({
@@ -292,12 +361,7 @@ const Posts=({ userInfo }) =>{
         try {
             let posts = [];
             let lastKey = '';
-            const q = query(
-                collection(dbService, 'posts'),
-                orderBy("postedAt", "desc"),
-                startAfter(key),
-                limit(1)
-            );
+            const q = setQueryMore(key);
             const data = await getDocs(q);
             data.forEach((doc) => {
                 posts.push({
@@ -552,15 +616,35 @@ function DndBox(props) {
     )
 }
 
-function Write({ isOpen, setIsOpen, existingPost ,showHeader }) {
+function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLocation }) {
 
+    const defaultPostWhere = () => {
+
+        if(currentLocation === 'home' || currentLocation === 'profile' ) return 'profile';
+        if(currentLocation === 'neetCompany') return 'neetCompany';
+        if(currentLocation === 'project') return 'project';
+    }
+    const writeTxt = () => {
+
+        if(currentLocation === 'home' || currentLocation === 'profile' ) return '당신의 일상을 공유해주세요!';
+        if(currentLocation === 'neetCompany') return '오늘 진행한 업무를 공유해주세요!';
+        if(currentLocation === 'project') return '활동을 팀원들과 공유해보세요!';
+    }
+    
+    const modalTxt = () => {
+
+        if(currentLocation === 'home' || currentLocation === 'profile' ) return '나누고 싶은 생각이 있으세요?';
+        if(currentLocation === 'neetCompany') return '오늘도 열심히 일한 당신! 수고했어요.';
+        if(currentLocation === 'project') return '팀원들과 어떤 내용을 공유할까요?';
+    }
+    
     const defaultValues = {
         contents: '',
         numOfComments: 0,
         numOfLikes: 0,
         postedAt: null,
         whoLikes: [],
-        postWhere: 'profile',
+        postWhere: defaultPostWhere(),
         modified: false,
     }
     let [values, setValues] = useState(defaultValues)
@@ -719,7 +803,7 @@ function Write({ isOpen, setIsOpen, existingPost ,showHeader }) {
             {showHeader && (
                 <div className='postHeader' onClick={ () => setIsOpen(true) }>
                 <div className='profileImg'><img src={userInfo?.profile_image || profile1Img} alt="profileImg"/></div>
-                <div className='popModal'>당신의 일상을 공유해주세요!</div>
+                <div className='popModal'>{writeTxt()}</div>
                 </div>
             )}
             {isOpen && (
@@ -761,7 +845,7 @@ function Write({ isOpen, setIsOpen, existingPost ,showHeader }) {
                         </div>
                         
                         <form onSubmit={handleSubmit} className='modalForm'>
-                            <textarea type='text' name='contents' value={values.contents} onChange={handleChange} placeholder='나누고 싶은 생각이 있으세요?'/>
+                            <textarea type='text' name='contents' value={values.contents} onChange={handleChange} placeholder={modalTxt()}/>
                             <DndBox
                                 contentImages={ contentImages }
                                 setContentImages={ setContentImages }
@@ -784,6 +868,40 @@ function Write({ isOpen, setIsOpen, existingPost ,showHeader }) {
     )
 }
 
+
+
+export const ShowPosts = (props) => {
+
+    const [userInfo, setUserInfo] = useState(null);
+    const [isWriteOpen, setIsWriteOpen] = useState(false);
+
+    const currentLocation = props.currentLocation;
+
+    useEffect(() => { // 유저 정보 코드
+        const fetchUserInfo = async () => {
+            if (auth.currentUser) {
+                const userRef = doc(dbService, "users", auth.currentUser.uid);
+                const docSnap = await getDoc(userRef);
+
+                if (docSnap.exists()) {
+                    setUserInfo(docSnap.data());
+                } else {
+                    console.log("No such document!");
+                }
+            }
+        };
+
+        fetchUserInfo();
+    }, []);
+
+    return(
+
+        <div className='postsContainer'>
+            <Write isOpen={isWriteOpen} setIsOpen={setIsWriteOpen} existingPost={false} showHeader={true} currentLocation={currentLocation}/>
+            <Posts userInfo={userInfo} currentLocation={currentLocation}/>
+        </div>
+    )
+}
 
 
 export const Home = () => {
@@ -843,12 +961,9 @@ export const Home = () => {
                 <button>내 프로필</button>
                 </Link>
             </aside>
-            
-            <div className='postsContainer'>
-                <Write isOpen={isWriteOpen} setIsOpen={setIsWriteOpen} existingPost={false} showHeader={true}/>
-                <Posts userInfo={userInfo}/>
+            <div className="homePostsMarginControl">
+                <ShowPosts currentLocation={'home'}/>
             </div>
-
             <aside className="right-sidebar">
                 <ul className="interestList">
                     {users.map(user => (

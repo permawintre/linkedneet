@@ -192,7 +192,7 @@ hr {
 .postComment {
     display: flex;
     align-items: flex-start;
-    margin-left: 10px;
+    margin: 10px 0 0 10px;
 }
 
 .commentHeader {
@@ -441,7 +441,7 @@ hr {
     border: none;
     font-size: 20px;
     overflow-y: scroll;
-    height: 300px;
+    height: 360px;
     resize: none;
 }
 .modalForm textarea:focus {
@@ -634,11 +634,10 @@ hr {
   }
 
 .left-sidebar {
-    z-index: 0;
+    
     display: flex;
     flex-direction: column;
     background-color: white;
-    border: solid 1px #ccc;
     border-radius: 20px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     padding: 20px;

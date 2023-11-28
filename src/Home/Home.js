@@ -82,12 +82,12 @@ function Post(props) {
 
     useEffect(() => {
         setImgUrls([])
-        //console.log(props.imgUrls.length)
+        console.log(props.imgUrls)
         for(let i=0;i<props.imgUrls.length;i++){
             (async () => {
                 await getDownloadURL(ref(storage, props.imgUrls[i]))
                     .then((downloadUrl) => {
-                        setImgUrls(prev => [...prev, downloadUrl])
+                        setImgUrls(prev => prev.concat(downloadUrl))
                     })
             })()
         }
@@ -529,7 +529,7 @@ function DndBox(props) {
     )
 }
 
-function Write({ userInfo, isOpen, setIsOpen, existingPost ,showHeader }) {
+function Write({ isOpen, setIsOpen, existingPost ,showHeader }) {
 
     const defaultValues = {
         contents: '',
@@ -565,14 +565,25 @@ function Write({ userInfo, isOpen, setIsOpen, existingPost ,showHeader }) {
 
     let [selectBar, setSelectBar] = useState(false)
 
+    const [userInfo, setUserInfo] = useState(null);
+    useEffect(() => { // 유저 정보 코드
+        const fetchUserInfo = async () => {
+            if (auth.currentUser) {
+                setUid(auth.currentUser.uid)
+                const userRef = doc(dbService, "users", auth.currentUser.uid);
+                const docSnap = await getDoc(userRef);
 
+                if (docSnap.exists()) {
+                    setUserInfo(docSnap.data());
+                } else {
+                    console.log("No such document!");
+                }
+            }
+        };
 
+        fetchUserInfo();
+    }, []);
 
-    useEffect(() => {
-        if(auth.currentUser) {
-        setUid(auth.currentUser.uid)
-        }
-    }, [])
     
 
     useEffect( () => {
@@ -677,10 +688,9 @@ function Write({ userInfo, isOpen, setIsOpen, existingPost ,showHeader }) {
     return(
         <div className='homePost write'>
             {showHeader && (
-                <div className='postHeader'>
-
+                <div className='postHeader' onClick={ () => setIsOpen(true) }>
                 <div className='profileImg'><img src={userInfo?.profile_image || profile1Img} alt="profileImg"/></div>
-                <div className='popModal' onClick={ () => setIsOpen(true) }>당신의 일상을 공유해주세요!</div>
+                <div className='popModal'>당신의 일상을 공유해주세요!</div>
                 </div>
             )}
             {isOpen && (
@@ -691,7 +701,7 @@ function Write({ userInfo, isOpen, setIsOpen, existingPost ,showHeader }) {
                             <div className='modalProfile' onClick={ () => setSelectBar(!selectBar) }>
                                 <div className='profileImg'><img src={userInfo?.profile_image || profile1Img} alt="profileImg"/></div>
                                 <div>
-                                    <div className="userName">{userName}</div>
+                                    <div className="userName">{userInfo?.nickname || userName}</div>
                                     <div className="postWhere">게시 위치 ▸{values.postWhere}</div>
                                 </div>
                             </div>
@@ -792,18 +802,18 @@ export const Home = () => {
     return(
         
         <div className='home'>
-            <Link to={`/profiledetail?uid=${auth.currentUser.uid}`}>
-                <aside className="left-sidebar">
-                    <div className="background-img-container">
-                        <img src={userInfo?.imgUrls || profile1Img} alt="background" className="homeProfile-background-img"/> 
-                    </div>
-                    <img src={userInfo?.profile_image} alt="profile" className="profile-img1" />
-                    <div className="profile-info">
-                        <h3>{userInfo?.nickname || 'undefined'}</h3>
-                    </div>
-                    <button>내 프로필</button>
-                </aside>
-            </Link>
+            <aside className="left-sidebar">
+                <div className="background-img-container">
+                    <img src={userInfo?.imgUrls || profile1Img} alt="background" className="homeProfile-background-img"/> 
+                </div>
+                <img src={userInfo?.profile_image} alt="profile" className="profile-img1" />
+                <div className="profile-info">
+                    <h3>{userInfo?.nickname || 'undefined'}</h3>
+                </div>
+                <Link to={`/profiledetail?uid=${auth.currentUser.uid}`}>
+                <button>내 프로필</button>
+                </Link>
+            </aside>
             
             <div className='postsContainer'>
                 <Write isOpen={isWriteOpen} setIsOpen={setIsWriteOpen} existingPost={false} showHeader={true}/>

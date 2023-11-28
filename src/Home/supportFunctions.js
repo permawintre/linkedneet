@@ -444,3 +444,16 @@ export const WritePost = ({profile})  =>{
     </>
   );
 }
+
+export const LoadingEffect = () => {
+
+  return (
+    <div className='graybackground'>
+      <div className='outercircle'>
+        <div className='innercircle'>
+          <span>uploading...</span>
+        </div>
+      </div>
+    </div>
+  )
+}

@@ -1,5 +1,5 @@
 import React from "react"
-import { getDayMinuteCounter, PostContents, PostPics, LikeBtn, CommentBtn, PlusBtn, CommentsWindow, WriteCommentContainer } from './supportFunctions'
+import { getDayMinuteCounter, PostContents, PostPics, LikeBtn, CommentBtn, PlusBtn, CommentsWindow, WriteCommentContainer, LoadingEffect } from './supportFunctions'
 import './Home.css'
 import { Link, useNavigate } from "react-router-dom"
 import { dbService , auth } from '../firebase.js'
@@ -48,6 +48,8 @@ function Post(props) {
     const [postUserInfo, setPostUserInfo] = useState({ profileImage: '', nickname: '' });
     const postWhere = props.postWhere;
     const modified = props.modified;
+
+    const [loading, setLoading] = useState(false)
 
     const addNewComment = (newComment) => {
         setComments(prevComments => [...prevComments, newComment]);
@@ -136,6 +138,7 @@ function Post(props) {
     }
 
     const handleDelete = async () => {
+        setLoading(true)
         //console.log('삭제 클릭');
         const confirmDelete = window.confirm("정말로 삭제하시겠습니까?");
         if (confirmDelete) {
@@ -240,7 +243,9 @@ function Post(props) {
                 showHeader={false}
             />
             
+            {loading ? <LoadingEffect/> : null}
         </div>
+
     )
 }
 
@@ -402,6 +407,7 @@ function DndBox(props) {
     const contentImages = props.contentImages;
     const setContentImages = props.setContentImages;
     const imgIds = props.imgIds;
+    const setImgIds = props.setImgIds;
     const [imgUrls, setImgUrls] = useState(false)
     const isOpen = props.isOpen;
     const setImgDeleted = props.setImgDeleted;
@@ -488,18 +494,22 @@ function DndBox(props) {
                 tmpImgs.splice(e.target.dataset.key, 1);
                 setContentImages(tmpImgs);
                 setDeleted(false)
-                //console.log('추가데이터', e.target.dataset.key)
+                console.log('추가데이터', e.target.dataset.key, e.target.dataset.value)
             }
             else{
                 let tmpImgs = imgUrls;
                 tmpImgs.splice(e.target.dataset.key, 1);
                 setImgUrls(tmpImgs);
                 setDeleted(false);
-                setImgDeleted(prev => ([
-                    ...prev,
-                    e.target.dataset.value
-                ]))
-                //console.log('기존데이터', e.target.dataset.key)
+                const deleteImgId = (del) => {
+                    const filtered = imgIds.filter((value, index, arr) => {
+                        return del !== value
+                    })
+                    return filtered
+                }
+                setImgIds(deleteImgId(e.target.dataset.value))
+                setImgDeleted(prev => [...prev, e.target.dataset.value])
+                console.log('기존데이터', e.target.dataset.key, e.target.dataset.value)
             }
         }
         if(deleted) deleteImg(deleted)
@@ -552,6 +562,8 @@ function Write({ isOpen, setIsOpen, existingPost ,showHeader }) {
     let [uid, setUid] = useState("")
     let [imgIds, setImgIds] = useState(false)
     let [imgDeleted, setImgDeleted] = useState([])
+
+    const [loading, setLoading] = useState(false)
 
     useEffect(() => {
         if (existingPost) {
@@ -610,9 +622,11 @@ function Write({ isOpen, setIsOpen, existingPost ,showHeader }) {
     const navigate = useNavigate()
 
     const handleSubmit = (e) => {
+        setLoading(true)
         e.preventDefault();
     
         const imgUrls = contentImages.map(() => uuidv4());
+        console.log('handleSubmit에서 확인', imgIds, imgDeleted)
         const modifiedImgs = (origins, dels, adds) => {
             if(origins.length>0){
                 const filtered = origins.filter((value, index, arr) => {
@@ -655,18 +669,20 @@ function Write({ isOpen, setIsOpen, existingPost ,showHeader }) {
             const postRef = doc(dbService, "posts", existingPost.postId);
             updateDoc(postRef, postData)
                 .then(() => {
-                    handleUploadImages()
-                    handleDeleteImgs()
-                    .then(() => {
-                        navigate(0)
-                    })
-                    .catch(error => {
-                        console.log("Img Upload Error: ", error)
-                    })
+                    handleDeleteImgs().then(() => 
+                        handleUploadImages()
+                        .then(() => {
+                            navigate(0)
+                        })
+                        .catch(error => {
+                            console.log("Img Upload Error: ", error)
+                        })
+                    )
                 })
                 .catch(error => {
                     console.error("Error updating document: ", error);
                 });
+                
         } else {
             addDoc(collection(dbService, "posts"), postData)
                 .then(() => {
@@ -743,6 +759,7 @@ function Write({ isOpen, setIsOpen, existingPost ,showHeader }) {
                                 contentImages={ contentImages }
                                 setContentImages={ setContentImages }
                                 imgIds={ imgIds }
+                                setImgIds = {setImgIds}
                                 isOpen={ isOpen }
                                 setImgDeleted={ setImgDeleted }
                             />
@@ -755,6 +772,7 @@ function Write({ isOpen, setIsOpen, existingPost ,showHeader }) {
             
             }
             
+            {loading ? <LoadingEffect/> : null}
         </div>
     )
 }

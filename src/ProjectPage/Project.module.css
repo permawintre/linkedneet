@@ -1,0 +1,199 @@
+/* css file for ProjectList, ProjectDetail, and ProjectCreate */
+:root {
+    
+    --color_1: #FFA500;
+    --color_2: #DFE0DF;
+    --color_3: #1e1f38;
+    --color_4: #FF4B2B;
+
+}
+
+.tagBeforeRecruiting,
+.tagBeforeRunning {
+    background-color: lightblue;
+}
+
+.tagRecruiting {
+    background-color: #edae49;
+}
+.tagInProgress {
+    background-color: #d1495b;
+}
+.tagCompleted {
+    background-color: #00798c;
+}
+
+.body {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
+
+.myProjects { 
+    width: 940px;
+    padding: 10px;
+    border-radius: 15px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+.myProjects .projectsTitle {
+    margin-bottom: 5px;
+}
+.projects {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+  
+.projectsRow {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.projectsRecommand {
+    position: relative;
+    width: 940px;
+    height: 426px;
+}
+.newProject {
+    position: absolute;
+    top: 0;
+    left: -175px;
+    width: 160px;
+    height: 120px;
+    margin: 5px;
+    text-align: center;
+}
+.newProject .newProjectSmall {
+    font-size: 13px;
+    background-color: darkgray;
+    padding-top: 50px;
+    padding-bottom: 10px;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+}
+.newProject .newProjectLarge {
+    font-size: 18px;
+    background-color: var(--color_3);
+    padding: 10px 0;
+    color: white;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+.projectsTitle {
+    font-weight: bold;
+    font-size: 20px;
+    padding: 0 10px;
+    text-align: center;
+}
+.projectsTitleHeader .line {
+    display: inline-block;
+    width: 330px;
+    font-size: 4px;
+    vertical-align: middle;
+    background-color: var(--color_3);
+    margin-bottom: 8px;
+}
+.projectsTitleHeader {
+    margin-bottom: 10px;
+}
+.navigation {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+.navigation button {
+    width: 50px;
+    height: 30px;
+    padding: 0;
+    margin: 0px 10px;
+    cursor: pointer;
+}
+
+.projectBox {
+    width: 300px;
+    height: 200px;
+    margin: 5px;
+    background-color: #f8f8f8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    border: solid 2px;
+}
+  
+.projectBox img {
+    width: 100%;
+    height: 50%;
+    object-fit: cover;
+}
+
+.projectBox .name {
+    text-align: center;
+    box-sizing: border-box;
+    width: 100%;
+    height: 20%;
+    font-weight: bold;
+    position: absolute;
+    top: 50%;
+    overflow-wrap: break-word;
+    padding: 15px 5px 5px 5px;
+    font-size: 15px;
+    border-top: solid 2px;
+    color: black;
+}
+.projectBox .comment {
+    box-sizing: border-box;
+    width: 100%;
+    height: 30%;
+    position: absolute;
+    top: 70%;
+    padding: 5px 15px;
+    font-size: 12px;
+}
+.projectBox .tag {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 3px 5px;
+    border-left: solid 2px;
+    border-bottom: solid 2px;
+}
+
+.projectsFilter {
+    width: 930px;
+    display: flex;
+}
+
+.projectsFilter .dropdown{
+    display: inline-block;
+    align-items: center;
+    margin-left: 10px;
+}
+.projectsFilter .searchbar {
+    display: inline-block;
+    align-items: center;
+    margin-right: 385px;
+}
+.projectsFilter .dropdown select {
+    width: 100px;
+    height: 30px;
+    cursor: pointer;
+    padding: 0 5px;
+    margin-top: 2px;
+}
+.projectsFilter .dropdown div,
+.projectsFilter .searchbar div {
+    font-size: 13px;
+}
+.projectsFilter input {
+    width: 200px;
+    height: 30px;
+    padding: 0 5px;
+    margin-top: 2px;
+    border: solid 1px;
+    text-align: center;
+    border-radius: 0;
+}

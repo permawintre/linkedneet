@@ -1,0 +1,253 @@
+@import url("../App.css");
+/***** GLOBAL VARIABLE *****/
+
+:root {
+  --edit-window-size: 16px;
+  --intro-edit-window-width: 480px;
+  --intro-edit-window-height: 200px;
+  --intro-edit-photo-width: 300px;
+}
+
+/***** BUTTON SECTION *****/
+
+.edit-button {
+  background-image: url("../images/8666681_edit_icon.png");
+  background-color: transparent; /* make the button transparent */
+  background-repeat: no-repeat;  /* make the background image appear only once */
+  background-size: contain;
+  background-position: 50% 50%;
+  border: none;
+  cursor: pointer;
+  height: 16px;
+  width: 16px;
+  float: right;
+}
+
+.edit-save-button {
+  float: right;
+  font-size: 14px;
+  padding: 10px 20px;
+  border: none;
+  background-color: var(--color_1);
+  border-radius: 10px;
+  color: white;
+  font-weight: 200;
+  margin-left: 50px;
+  margin-bottom: 15px;
+  cursor: pointer;
+  &:hover {
+    background-color: #898989;
+  }
+}
+.edit-back-button {
+  float: right;
+  font-size: 14px;
+  padding: 10px 20px;
+  border: none;
+  background-color: var(--color_3);
+  border-radius: 10px;
+  color: white;
+  font-weight: 200;
+  margin-left: 5px;
+  margin-right: 2.5%;
+  cursor: pointer;
+  &:hover {
+    background-color: #898989;
+  }
+
+}
+
+.career-delete {
+  background-image: url("../images/delete.png");
+  background-color: transparent; /* make the button transparent */
+  background-repeat: no-repeat;  /* make the background image appear only once */
+  background-size: contain;
+  background-position: 50% 50%;
+  border: none;
+  cursor: pointer;
+  height: 16px;
+  width: 16px;
+  float: right;
+}
+
+.career-add {
+    background-image: url("../images/plus-icon.png");
+    background-color: transparent; /* make the button transparent */
+    background-repeat: no-repeat;  /* make the background image appear only once */
+    background-size: contain;
+    background-position: 50% 50%;
+    border-radius: 2px;
+    float: right;
+    width: 20px;
+    padding: 10px;
+    height: 10px;
+    cursor: pointer;
+    margin: 15px;
+    margin-right: 37px;
+    border: 2px solid var(--color_3);
+    i {
+      color: #5d5d5d;
+      font-size: 30px;
+    }
+}
+
+.edit-link-icon {
+  background-image: url("../images/5402394_internet_link_hyperlink_url_web_icon.png");
+  background-color: transparent; /* make the button transparent */
+  background-repeat: no-repeat;  /* make the background image appear only once */
+  background-size: contain;
+  background-position: 50% 50%;
+  border: none;
+  cursor: pointer;
+  vertical-align: middle;
+  height: var(--edit-window-size);
+  width: var(--edit-window-size);
+}
+
+.image-edit-button {
+  position: relative; 
+  background-color: white;
+
+  width: fit-content;
+  height: fit-content;
+  font-size: 12.5px;
+  margin: -30px 0px 40px 0px;
+  padding: 2px 16px 2px 16px;
+  border: 1px solid black;
+  border-radius: 15px;
+
+  text-orientation: right;
+  text-align: center; 
+
+  cursor: pointer;
+}
+
+/***** CONTENTS SECTION *****/
+
+.edit-section {
+  width: 50%;
+  height: var(--edit-window-size);
+  background-color: var(--color_2);
+}
+
+.career-detail-text {
+  margin: 5px;
+  font-size: 15px;
+}
+
+.career-edit-section {
+  width: 200px;
+  height: 5px;
+  margin: 2.5px;
+  margin-bottom: 10px;
+  background-color: var(--color_2);
+}
+
+
+.career-detail-edit-section {
+  border-radius: 20px;
+  border: 2px solid #bbbbbb;
+  margin-top: 10px;
+  padding: 10px 10px 10px 10px;
+  overflow: auto;
+  width: 840px;
+  height: 10px;
+  background-color: var(--color_2);
+  resize: none;
+  font-size: 12.5px;
+}
+
+.intro-edit-section {
+  width: 92%;
+  height: var(--edit-window-size);
+  margin: 2.5px;
+  background-color: var(--color_2);
+}
+
+.intro-detail-edit-section {
+  border-radius: 7.5px;
+  border: 2px solid #bbbbbb;
+  margin-top: 10px;
+  padding: 10px 10px 10px 10px;
+  overflow: auto;
+  width: var(--intro-edit-window-width);
+  height: var(--intro-edit-window-height);
+  background-color: var(--color_2);
+  resize: none;
+  font-size: 12.5px;
+}
+
+.edit-wrapper {
+  display: flex;
+}
+
+.edit-overlay {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+}
+
+.edit-modal-wrap {
+  width: 1000px;
+  height: fit-content;
+  border-radius: 15px;
+  background-color: #fff;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  h1 {
+    font-size: 30px;
+    font-weight: 600;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    margin-left: 20px;
+  }
+}
+
+.edit-contents {
+  margin: 30px 30px;
+  img {
+    margin-top: 60px;
+    width: 300px;
+  }
+}
+
+.edit-profile-image {
+  float: right;
+  margin: 30px;
+  display: inline;
+  
+  img {
+    color: #5d5d5d;
+    margin-top: 2.5%;
+
+    cursor: pointer;
+    border: 2px solid var(--color_2);
+  }
+}
+
+.edit-profile-intro {
+  margin-left: 400px;
+}
+.edit-profile-intro-image {
+  margin: 2px 80px 0px 0px;
+  float: left;
+
+  img {
+    width: var(--intro-edit-photo-width);
+    height: calc(25px + var(--intro-edit-window-height)); 
+    color: #5d5d5d;
+    margin-top: 2.5%;
+
+    cursor: pointer;
+    border: 2px solid var(--color_2);
+  }
+}

@@ -1,0 +1,144 @@
+:root {
+    
+  --color_1: #FFA500;
+  --color_2: #DFE0DF;
+  --color_3: #1e1f38;
+  --color_4: #FF4B2B;
+
+}
+
+.profile__body {
+text-align: center;
+display: block;
+}
+
+
+.friend-texts {
+display: flex;
+padding-top: 3px;
+padding-bottom: 4px;
+width: 720px;
+height: 35px;
+justify-content: center;
+align-items: center;
+
+font-size: 14px;
+
+border: 5px solid var(--color-2, #1E1F38);
+border-radius: 15px;
+background: var(--60, #FFF);
+}
+
+.friend-profiles {
+display: flex;
+flex-direction: column;
+align-items: center;
+padding-top: 15px;
+}
+
+.friend-profiles-last {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px 0px;
+  }
+
+.profiles-row {
+overflow-x: auto; /*가로 스크롤 활성화*/
+white-space: nowrap; /*가로로 이어지게 설정*/
+display: flex;
+padding: 15px 0px 0px 0px;
+justify-content: left;
+width: 730px; /* 두 개의 카드가 들어갈 수 있는 너비 */
+gap: 20px; /* 프로필 사이의 간격 설정 */
+}
+
+.profiles-row-center {
+  padding-top: 15px;
+}
+
+/* 스크롤 바 스타일링 */
+.profiles-row::-webkit-scrollbar {
+  height: 8px; /* 스크롤 바 높이 */
+}
+
+.profiles-row::-webkit-scrollbar-thumb {
+  background-color: #c0c0c0; /* 스크롤 바 색상 */
+  border-radius: 4px;
+}
+
+.profiles-row::-webkit-scrollbar-track {
+  background-color: transparent; /* 트랙 색상 */
+}
+
+.user-profile {
+position: relative;
+width: 350px;
+height: 350px;
+/* margin-left: 10px; */
+/* margin-right: 10px; */
+
+border: 1px solid var(--grey, #989898);
+border-radius: 15px;
+background: var(--pure-white, #FFF);
+}
+
+.background-img {
+width: 350px;
+height: 188px;
+
+border: 1px solid var(--grey, #989898);
+border-radius: 15px 15px 0px 0px;
+background: var(--pure-white, #FFF);
+}
+
+.profile-img {
+position: absolute;
+top: 125px;
+left: 199px;
+width: 126px;
+height: 126px;
+
+border: 1px solid var(--grey, #989898);
+border-radius: 50%;
+background: var(--pure-white, #FFF);
+object-fit: cover; /* 이미지가 비율을 유지하면서 컨테이너를 채우도록 설정 */
+overflow: hidden; /* 컨테이너를 넘어가는 이미지 부분을 숨김 */
+}
+
+
+.profile-info {
+font-family: IBM Plex Sans KR;
+font-size: 14px;
+font-weight: 500;
+}
+
+.profile-name {
+position: absolute;
+left: 29px;
+margin: 5px 0;
+text-decoration: none;
+
+color: #000;
+font-size: 28px;
+font-weight: bold;
+}
+
+.profile-group {
+position: absolute;
+top: 50px;
+left: 29px;
+margin: 5px 0;
+
+color: var(--text-grey, #6C6C6C);
+}
+
+
+.profile-friend {
+position: absolute;
+top: 90px;
+left: 29px;
+margin: 5px 0;
+
+color: var(--grey, #989898);
+}

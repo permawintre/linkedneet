@@ -8,6 +8,8 @@ import {
     createUserWithEmailAndPassword, //email 회원가입
     signOut // 로그아웃
 } from "firebase/auth";
+import { getFirestore } from "firebase/firestore"
+import { getStorage } from "firebase/storage";
 
 
 
@@ -25,9 +27,15 @@ const firebaseConfig = {
 
 
 // Initialize Firebase
+<<<<<<< HEAD
 const app = initializeApp(firebaseConfig);
+=======
+initializeApp(firebaseConfig);
+export const app = initializeApp(firebaseConfig);
+>>>>>>> hojun
 export const auth = getAuth();
-
+export const dbService = getFirestore(app);
+export const storage = getStorage(app);
 
 //Email 로그인
 export const loginEmail = (email, password) => {

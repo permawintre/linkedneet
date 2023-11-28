@@ -1,0 +1,414 @@
+:root {
+    
+    --color_1: #FFA500;
+    --color_2: #DFE0DF;
+    --color_3: #1e1f38;
+    --color_4: #FF4B2B;
+
+}
+.projectDetail {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 15px;
+}
+.projectBoxDetail {
+    display: flex;
+    flex-direction: row;
+    width: 700px;
+    height: 350px;
+    position: relative;
+    margin: 0 auto;
+}
+.titleBox {
+    position: relative;
+}
+.joinTitle {
+    text-align: center;
+    margin: 30px auto;
+    font-size: 30px;
+    font-weight: bold;
+}
+.joinTitle::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    height: 150%;
+    border: 2px dotted;
+    border-radius: 50%;
+    box-sizing: border-box;
+}
+/* Project Info Box */
+.projectBoxDetail .projectBoxColumn {
+    width: 50%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border: solid 2px;
+    background-color: #f8f8f8;
+}
+.projectBoxDetail .projectBoxColumn:first-child {
+    margin-right: 10px;
+}
+.projectBoxDetail .projectBoxColumn img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.projectBoxDetail .projectBoxColumn .name {
+    height: 30%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    overflow-wrap: break-word;
+    padding: 5px;
+    font-size: 22px;
+    border-bottom: solid 1px;
+    text-align: center;
+    background-color: var(--color_1);
+}
+.projectBoxDetail .projectBoxColumn .comment {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 25%;
+    padding: 5px 15px;
+    font-size: 14px;
+    border-bottom: solid 1px;
+    background-color: lemonchiffon;
+}
+.projectBoxDetail .projectBoxColumn .info {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    color: dimgray;
+    padding: 5px 16px;
+    font-size: 14px;
+}
+.projectBoxDetail .projectBoxColumn .info > div {
+    text-align: left;
+    padding: 3px 0;
+}
+.projectBoxDetail .projectBoxColumn .info .infoTitle {
+    display: inline-block;
+    width: 70px;
+    padding-left: 3px;
+}
+/* Apply Form */
+.projectBody {
+    width: 700px;
+    margin: 0 auto;
+    text-align: left;
+    border: solid 2px;
+    padding: 10px;
+    background-color: white;
+    box-sizing: border-box;
+    padding-bottom: 20px;
+}
+.projectBody:last-child {
+    margin-bottom: 20px;
+}
+.projectBody .bodyTitle {
+    font-weight: bold;
+    font-size: 25px;
+    padding: 10px;
+}
+/* Buttons */
+.Buttons {
+    width: 700px;
+    text-align: center;
+    margin: 10px auto;
+}
+.buttonItem {
+    display: inline-block;
+    width: 130px;
+    margin: 0 2px;
+}
+.buttonItem .text {
+    cursor: pointer;
+}
+.buttonItem.active .text {
+    font-weight: bold;
+}
+/* ApplyForm */
+.bodyBox .applicantBox {
+    margin-bottom: 10px;
+    border: 1px dotted;
+    padding: 10px;
+}
+.bodyBox .applicantBox .userInfo {
+    display: flex;
+}
+.bodyBox .applicantBox .applicantName,
+.bodyBox .applicantBox .applicantEmail {
+    display: inline-block;
+}
+.bodyBox .applicantBox .applicantName {
+    font-weight: bold;
+    font-size: 18px;
+    margin-right: 10px;
+}
+.bodyBox .applicantBox .applicantEmail {
+    padding-top: 6px;
+    font-size: 13px;
+}
+.bodyBox .applicantBox .formItem {
+    margin: 10px auto;
+}
+.bodyBox .applicantBox .formTitle {
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 15px;
+}
+.bodyBox .applicantBox .formAnswer {
+    border: 2px solid lightgray;
+    border-radius: 5px;
+    padding: 7px 10px;
+    font-size: 15px;
+}
+.bulkActionButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.bulkActionButton button {
+    margin: 5px;
+    cursor: pointer;
+    padding: 10px 40px;
+    font-size: 15px;
+}
+.applicantButton input {
+    margin-right: 4px;
+}
+.applicantButton {
+    font-size: 13px;
+}
+/* Edit Section */
+.formPage {
+    padding: 10px 0;
+    border-bottom: 2px solid;
+    background-color: #f3f3f3;
+}
+.formBox {
+    width: 600px;
+    margin: 10px auto;
+    text-align: left;
+}
+.formBox .formTitle {
+    font-weight: bold;
+    padding: 5px 0;
+}
+.formBox .formContent {
+    font-size: 13px;
+    padding-bottom: 5px;
+}
+.formBox input {
+    width: 600px;
+    box-sizing: border-box;
+    border: 2px solid lightgray;
+    border-radius: 20px;
+    margin: 0;
+}
+.formBox .formButton3 {
+    display: inline-block;
+    width: 196px;
+    text-align: center;
+    box-sizing: border-box;
+    padding: 7px 0;
+    cursor: pointer;
+}
+.formBox div {
+    margin-right: 5px;
+}
+.divStyle div:nth-child(2) {
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+}
+.divStyle div:last-child {
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
+    margin: 0px;
+}
+.formBox .formButton2 {
+    display: inline-block;
+    width: 297px;
+    text-align: center;
+    box-sizing: border-box;
+    padding: 7px 0;
+    cursor: pointer;
+}
+.datePicker label {
+    display: inline-block;
+}
+.datePicker label:first-child {
+    margin-right: 5px;
+}
+.datePicker :global(.react-datepicker__input-container) input {
+    width: 295px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    outline: none;
+}
+.datePicker :global(.react-datepicker) {
+    font-size: 14px;
+}
+.formFooter {
+    position: relative;
+    width: 600px;
+    height: 40px;
+    margin: 10px auto;
+}
+.formFooter .prevButton {
+    position: absolute;
+    left: 6px;
+    width: 80px;
+    height: 40px;
+    padding: 0;
+    border-radius: 5px;
+    font-weight: normal;
+    font-size: 13px;
+    cursor: pointer;
+    background-color: var(--color_1);
+    border: none;
+}
+.formFooter .nextButton {
+    position: absolute;
+    right: 6px;
+    width: 80px;
+    height: 40px;
+    padding: 0;
+    border-radius: 5px;
+    font-weight: normal;
+    font-size: 13px;
+    cursor: pointer;
+    border: none;
+}
+.formBox .formBody {
+    border-radius: 0;
+    width: 600px;
+}
+.formBox .formBody textarea {
+    width: 600px;
+    height: 100px;
+    border: 1px solid lightgray;
+    background-color: white;
+    box-sizing: border-box;
+    padding: 10px;
+}
+.formBox .formImageBox {
+    width: 100%;
+}
+.formBox .formImageBox > input {
+    border-radius: 0;
+    border: 0;
+}
+.formBox .formImageBox .formImage {
+    width: 100%;
+    max-height: 300px;
+    object-fit: scale-down;
+    background-color: whitesmoke;
+    padding: 15px 0;
+}
+.formBox .formImageBox div.formImage {
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.formBox .formImageBox div.formImage .formImageDescription {
+    font-size: 12px;
+}
+.imageNames {
+    white-space: pre-line;
+    background-color: white;
+    width: 600px;
+    box-sizing: border-box;
+    padding: 0 15px 15px 15px;
+    font-size: 13px;
+}
+.imageNames .subImageContainer {
+    margin-bottom: 5px;
+}
+.imageNames button {
+    font-weight: normal;
+    padding: 4px 10px;
+    border-radius: 10px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+.tagInputContainer {
+    width: 600px;
+}
+  
+.tagList .tag {
+    display: inline-block;
+    padding: 0 4px;
+    margin-top: 7px;
+    background-color: var(--color_1);
+    color: darkslategray;
+    font-weight: normal;
+    font-size: 15px;
+}
+.tagList .tag button {
+    cursor: pointer;
+    color: gray;
+    padding: 0 4px;
+    border: none;
+    font-weight: normal;
+    background-color: var(--color_1);
+}
+.formBox .recruitBox {
+    background-color: whitesmoke;
+    box-sizing: border-box;
+    padding: 5px 10px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    font-size: 14px;
+}
+.formBox .recruitBox span {
+    display: inline-block;
+    width: 500px;
+    
+}
+.recruitFormContainer .recruitBox button {
+    padding: 0;
+}
+.recruitInputBox {
+    display: flex;
+    margin-top: 10px;
+}
+.recruitInputBox input {
+    border-radius: 0;
+    margin-right: 5px;
+}
+.recruitInputBox button {
+    padding: 0;
+    width: 80px;
+    background-color: yellowgreen;
+    border: 0;
+    cursor: pointer;
+    font-weight: normal;
+}
+.recruitFormBox {
+    display: flex;
+    margin-bottom: 10px;
+}
+.recruitFormBox .recruitBox {
+    width: 570px;
+    margin: 0;
+}
+.recruitFormBox .recruitButton {
+    padding: 0;
+    width: 30px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 15px;
+    padding: 2px 0;
+}

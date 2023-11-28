@@ -189,7 +189,7 @@ function Post(props) {
                     </div>
                     {auth.currentUser.uid === userId && (
                         <div className="menuIcon" onClick={postWriteEditBtnClick} ref={dropDownRef}>
-                            <FontAwesomeIcon icon={faEllipsisV} />
+                            <FontAwesomeIcon icon={faEllipsisV} className="dropDownBtn"/>
                             {showDropdown && (
                                 <div className="dropdownMenu">
                                     <div className="menuItem" onClick={handleDelete}>삭제</div>

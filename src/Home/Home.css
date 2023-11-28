@@ -64,6 +64,15 @@
     padding: 5px; /* 아이콘 주변의 여백 */
     cursor: pointer; /* 마우스 오버시 포인터 모양 변경 */
   }
+.menuIcon>.dropDownBtn {
+    width: 20px;
+    height: 20px;
+    padding: 10px;
+    border-radius: 50%;
+}
+.menuIcon>.dropDownBtn:hover {
+    background-color: #eeeeee;
+}
   .dropdownMenu {
     position: absolute;
     top: 100%; /* 아이콘의 바로 아래 */

@@ -449,10 +449,9 @@ export const LoadingEffect = () => {
 
   return (
     <div className='graybackground'>
-      <div className='outercircle'>
-        <div className='innercircle'>
-          <span>uploading...</span>
-        </div>
+      <div className='outline'>
+        <div className='waves'></div>
+        <div className='loadingIcon'>loading...</div>
       </div>
     </div>
   )

@@ -81,17 +81,23 @@ function Post(props) {
     }, [userId]);
 
     useEffect(() => {
-        setImgUrls([])
-        console.log(props.imgUrls)
-        for(let i=0;i<props.imgUrls.length;i++){
-            (async () => {
-                await getDownloadURL(ref(storage, props.imgUrls[i]))
-                    .then((downloadUrl) => {
-                        setImgUrls(prev => prev.concat(downloadUrl))
-                    })
-            })()
-        }
-    },[])
+        setImgUrls([]);
+        
+        const fetchImageUrls = async () => {
+            for (let i = 0; i < props.imgUrls.length; i++) {
+            try {
+                const downloadUrl = await getDownloadURL(ref(storage, props.imgUrls[i]));
+                setImgUrls((prev) => [...prev, downloadUrl]);
+            } catch (error) {
+                console.error(`Error fetching URL for image ${i + 1}:`, error);
+                // Handle error as needed
+            }
+            }
+        };
+        
+        fetchImageUrls();
+    }, [props.imgUrls]);
+        
 
     useEffect(() => {
         const fetchComments = async () => {

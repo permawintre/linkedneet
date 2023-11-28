@@ -695,8 +695,7 @@ function Write({ isOpen, setIsOpen, existingPost ,showHeader }) {
             )}
             {isOpen && (
                 <div className='modalBG' onClick={ () => setIsOpen(false) }>
-                <div onClick={ (e) => e.stopPropagation() }> {/** event 버블링 방지 */}
-                    <div className='modalWrite'>
+                    <div className='modalWrite' onClick={ (e) => e.stopPropagation() }>
                         <div className='modalHeader'>
                             <div className='modalProfile' onClick={ () => setSelectBar(!selectBar) }>
                                 <div className='profileImg'><img src={userInfo?.profile_image || profile1Img} alt="profileImg"/></div>
@@ -744,7 +743,6 @@ function Write({ isOpen, setIsOpen, existingPost ,showHeader }) {
                             <button type='submit'>게시</button>
                         </form>
                     </div>
-                </div>
                 </div>
             )
 

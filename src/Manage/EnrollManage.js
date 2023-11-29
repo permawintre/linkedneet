@@ -80,13 +80,14 @@ const ApplySection = ({ applicants, handleApprove, handleReject }) => {
             선택하기
           </div>
           <div className={style.userInfo}>
-            <div className={style.applicantName}>{applicant.userNickname}</div>
-            <div className={style.applicantEmail}>{applicant.userEmail}</div>
+            <div className={style.applicantName}>{applicant.nickname}</div>
+            <div className={style.applicantEmail}>{applicant.email}</div>
+            <div className={style.applicantEmail}>{applicant.generation}기</div>
           </div>
-          <div className={style.formItem}>
+          {/* <div className={style.formItem}>
             <div className={style.formTitle}>▶ 지원 동기</div>
             <div className={style.formAnswer}>{applicant.applyReason}</div>
-          </div>
+          </div> */}
         </div>))}
       </div>
       <div className={style.bulkActionButton}>

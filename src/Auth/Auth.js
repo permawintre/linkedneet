@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { loginEmail, loginGoogle, auth, dbService } from '../firebase.js'
 import { Link } from "react-router-dom"
-import { collection, setDoc, doc } from "firebase/firestore"
+import { collection, setDoc, doc, query, where, getDocs } from "firebase/firestore"
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import './Auth.css'
 
@@ -40,15 +40,27 @@ export const Signup = () => {
     const onSubmit = async (event) => {
         event.preventDefault();
         // SignUp
+        const userRef = collection(dbService, "users");
+
+        const nicknameQuery = query(userRef, where("nickname", "==", nickname));
+        const nicknameQuerySnapshot = await getDocs(nicknameQuery);
+        if (!nicknameQuerySnapshot.empty) {
+            // Nickname already exists, handle the error
+            alert("이미 사용 중인 닉네임입니다.");
+            return;
+        }
+
+        if( generation < 1 || generation > 20) {
+            alert("올바르지 않은 기수입니다");
+            return;
+        }
+
         createUserWithEmailAndPassword(auth, email, password)
         .then(async(userCredential) => {
-            // user Table attribute
-            
-            // add initial profile for user (key = uid)
-            const userRef = collection(dbService, "users");
-            
+            // add initial profile for user (key = uid) 
             // doc (userRef, __SOME KEY__) => add new default profile if login.
             // in this situation, key is uid in in authobj
+
             await setDoc(doc(userRef, auth.currentUser.uid), {
                 // user profile header
                 nickname: nickname,
@@ -175,22 +187,22 @@ export class Login extends React.Component {
 
     render() {
         return (
-            <div className="body">
-                <form onSubmit={this.handleSubmit} className="body__inner">
+            <div className="signin__body">
+                <form onSubmit={this.handleSubmit} className="signin__body__inner">
                     <h2>이메일로 로그인</h2>
-                    <hr className="body__partition"></hr>
-                    <div className="body__inputline">
-                        <p className="body__inputline--description">이메일 주소</p>
-                        <input className="body__inputline--input" type="text" value={this.state.email} placeholder="이메일 주소를 입력해 주세요" onChange={this.handleEmail} />
+                    <hr className="signin__body__partition"></hr>
+                    <div className="signin__body__inputline">
+                        <p className="signin__body__inputline--description">이메일 주소</p>
+                        <input className="signin__body__inputline--input" type="text" value={this.state.email} placeholder="이메일 주소를 입력해 주세요" onChange={this.handleEmail} />
                     </div>
-                    <div className="body__inputline">
-                        <p className="body__inputline--description">비밀번호</p>
-                        <input className="body__inputline--input" type="password" value={this.state.pw} placeholder="비밀번호를 입력해 주세요" onChange={this.handlePw} />
+                    <div className="signin__body__inputline">
+                        <p className="signin__body__inputline--description">비밀번호</p>
+                        <input className="signin__body__inputline--input" type="password" value={this.state.pw} placeholder="비밀번호를 입력해 주세요" onChange={this.handlePw} />
                     </div>
                     
-                    <button type="submit" className="body__submitbtn">로그인</button>
-                    <Link to="/signUp" className="body__signup">회원가입</Link>
-                    <hr className="body__partition"></hr>
+                    <button type="submit" className="signin__body__submitbtn">로그인</button>
+                    <Link to="/signUp" className="signin__body__signup">회원가입</Link>
+                    <hr className="signin__body__partition"></hr>
                     <Google/>
                 </form>
             </div>

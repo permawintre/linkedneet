@@ -7,6 +7,7 @@ export const defaultData = {
   
   profile_image: 'https://s3.amazonaws.com/37assets/svn/765-default-avatar.png',
   background_image: 'https://images.pexels.com/photos/1731427/pexels-photo-1731427.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
+  intro_image: 'https://cdn.imweb.me/upload/S20191010288d21675b22f/e33c22faf15bc.jpg',
   
   // website: 'github.com/kakao',
   // facebook: 'kakao.brandmedia',

@@ -42,15 +42,7 @@ function DateParser(yourDate) {
 
 const ProfileEditModal = ({EditModalClose}) => {
       // user Table Attribute (need to add more)
-    const [userObj, setUserObj] = useState ({
-      nickname: "",
-      profile_image: "",
-      website: "",
-      instagram:"",
-      facebook:"",
-      tel:"",
-      email:"",
-    });
+    const [userObj, setUserObj] = useState({ ...defaultData });
 
     useEffect(() => {
       const fetchUserData = async () => {
@@ -62,9 +54,6 @@ const ProfileEditModal = ({EditModalClose}) => {
             // If the document exists, setUserData with the document data
             if (userDoc.exists()) {
                 setUserObj(userObj => ({...userObj, ...userDoc.data()}));
-                await updateDoc(userDoc, {
-                  profile_image: getDownloadURL(ref(userDoc, `${auth.currentUser.uid}/profile_images/${userDoc.profile_image}`))
-                });
             } else {
                 console.log('User not found');
             }
@@ -215,11 +204,7 @@ const ProfileEditModal = ({EditModalClose}) => {
 };
 
 const ProfileIntroEditModal = ({EditModalClose}) => {
-  const [userObj, setUserObj] = useState ({
-    intro_image: "",
-    intro_content: "",
-    intro_title: ""
-  });
+  const [userObj, setUserObj] = useState({ ...defaultData });
   useEffect(() => {
     const fetchUserData = async () => {
       try {

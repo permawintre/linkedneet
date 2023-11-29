@@ -42,7 +42,7 @@ const ProfileCareerDetail = () => {
           })
           alert("성공적으로 삭제되었습니다");
           // if successfully edit, then refresh < 새로고침 > 
-          window.location.reload();
+          window.location.replace('/profiledetail');
       } catch (e) {
           console.log(e);
       }

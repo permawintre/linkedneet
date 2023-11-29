@@ -57,7 +57,7 @@ const ProfileEditModal = ({EditModalClose}) => {
             if (userDoc.exists()) {
                 setUserObj(userObj => ({...userObj, ...userDoc.data()}));
                 await updateDoc(userDoc, {
-                  profile_image: getDownloadURL(ref(userDoc, `profile_images/${userDoc.profile_image}`))
+                  profile_image: getDownloadURL(ref(userDoc, `${auth.currentUser.uid}/profile_images/${userDoc.profile_image}`))
                 });
             } else {
                 console.log('User not found');
@@ -132,7 +132,7 @@ const ProfileEditModal = ({EditModalClose}) => {
             const storage = getStorage();
             const img = userObj.profile_image[0]
             const imgName = userObj.profile_image[1]
-            const imageRef = ref(storage, `profile_images/${imgName}`);
+            const imageRef = ref(storage, `${auth.currentUser.uid}/profile_images/${imgName}`);
             const imageUrlPromise = await uploadAndReturnUrl(imageRef, img);
             await updateDoc(userDocRef, {
               profile_image: imageUrlPromise
@@ -225,7 +225,7 @@ const ProfileIntroEditModal = ({EditModalClose}) => {
           if (userDoc.exists()) {
               setUserObj(userObj => ({...userObj, ...userDoc.data()}));
               await updateDoc(userDoc, {
-                intro_image: getDownloadURL(ref(userDoc, `profile_intro_images/${userDoc.intro_image}`))
+                intro_image: getDownloadURL(ref(userDoc, `${auth.currentUser.uid}/profile_intro_images/${userDoc.intro_image}`))
               });
           } else {
               console.log('User not found');
@@ -299,7 +299,7 @@ const ProfileIntroEditModal = ({EditModalClose}) => {
         if (ImageChanged && (userObj.intro_image !== undefined || userObj.intro_image !== null)){
           const img = userObj.intro_image[0]
           const imgName = userObj.intro_image[1]
-          const imageRef = ref(storage, `profile_intro_images/${imgName}`);
+          const imageRef = ref(storage, `${auth.currentUser.uid}/profile_intro_images/${imgName}`);
           const imageUrlPromise = await uploadAndReturnUrl(imageRef, img);
           
           // update DB using user input 

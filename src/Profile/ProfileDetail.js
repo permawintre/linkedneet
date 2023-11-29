@@ -41,15 +41,11 @@ const ProfileHeader = ({userData, myProfile}) => {
   };
 
 
-  const isFollowed = () => {
-    return userData.followers.includes(auth.currentUser.uid);
-  };
-  
   const [IsFollowed, setIsFollowed] = useState(userData.followers.includes(auth.currentUser.uid));
   const [followerlen, setFollowerLen] = useState(userData.followers.length);
   const followinglen = userData.followings.length;
-
   const [followBtn, setFollowBtn] = useState("Follow");
+
   const handleFollow = async () => {
     try {
       const currentUserID = auth.currentUser.uid;
@@ -58,6 +54,7 @@ const ProfileHeader = ({userData, myProfile}) => {
       setFollowBtn("UnFollow");
       setFollowerLen(followerlen + 1);
       setIsFollowed(true);
+      setUnFollowBtn("UnFollow");
       
       const otherUserRef = doc(dbService, "users", otherUserID);
       await updateDoc(otherUserRef, {
@@ -83,6 +80,7 @@ const ProfileHeader = ({userData, myProfile}) => {
       setUnFollowBtn("Follow");
       setFollowerLen(followerlen - 1);
       setIsFollowed(false);
+      setFollowBtn("Follow");
 
       const otherUserRef = doc(dbService, "users", otherUserID);
       await updateDoc(otherUserRef, {

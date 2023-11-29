@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Link, useLocation } from "react-router-dom"
 import { dbService, auth } from '../firebase';
-import { doc, getDoc, updateDoc, arrayUnion, collection, addDoc, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, query, where, getDocs, orderBy } from 'firebase/firestore';
 import { FaFacebookSquare, FaInstagramSquare} from 'react-icons/fa';
 import { IoGlobeOutline } from "react-icons/io5";
 import { MdPhoneIphone, MdEmail, MdCalendarMonth } from 'react-icons/md'
@@ -19,9 +19,9 @@ const ProfileHeader = ({userData, myProfile}) => {
   const bgImageStyle = {
       backgroundImage: `url(${userData.background_image})`
     };
-  const website_url = 'https://' + userData.website;
-  const facebook_url = 'https://www.facebook.com/' + userData.facebook;
-  const insta_url = 'https://www.instagram.com/' + userData.instagram;
+  const website_url = userData.website;
+  const facebook_url = userData.facebook;
+  const insta_url = userData.instagram;
 
   // Profile Edit
   const [EditClicked, setEditClicked] = useState(false);
@@ -41,18 +41,21 @@ const ProfileHeader = ({userData, myProfile}) => {
   };
 
 
-  // Following Handle 
-  /* TODO!
-   * IsFollowed() 구현 => 이미 Follow 된 사람들에 한해서 Follow 비활성화
-   * 자기 페이지 Follow 비활성화
-   * Optimistic Following 구현 
-   */
+  const [IsFollowed, setIsFollowed] = useState(userData.followers.includes(auth.currentUser.uid));
+  const [followerlen, setFollowerLen] = useState(userData.followers.length);
+  const followinglen = userData.followings.length;
+  const [followBtn, setFollowBtn] = useState("Follow");
 
   const handleFollow = async () => {
     try {
       const currentUserID = auth.currentUser.uid;
-      const otherUserID = userData.uid;
-
+      const otherUserID = userData.uid; 
+      
+      setFollowBtn("UnFollow");
+      setFollowerLen(followerlen + 1);
+      setIsFollowed(true);
+      setUnFollowBtn("UnFollow");
+      
       const otherUserRef = doc(dbService, "users", otherUserID);
       await updateDoc(otherUserRef, {
         followers: arrayUnion(currentUserID),
@@ -68,6 +71,32 @@ const ProfileHeader = ({userData, myProfile}) => {
     }
   }
 
+  const [UnFollowBtn, setUnFollowBtn] = useState("UnFollow");
+  const handleUnFollow = async() => {
+    try {
+      const currentUserID = auth.currentUser.uid;
+      const otherUserID = userData.uid; 
+      
+      setUnFollowBtn("Follow");
+      setFollowerLen(followerlen - 1);
+      setIsFollowed(false);
+      setFollowBtn("Follow");
+
+      const otherUserRef = doc(dbService, "users", otherUserID);
+      await updateDoc(otherUserRef, {
+        followers: arrayRemove(currentUserID),
+      })
+      
+      const userRef = doc(dbService, "users", currentUserID);
+      await updateDoc(userRef, {
+        followings: arrayRemove(otherUserID),
+      })
+
+    } catch(error) {
+      console.log(error);
+    }
+  }
+
   return (
     <div className="header-container">
         <div className="bg-image" style={bgImageStyle}>
@@ -76,20 +105,19 @@ const ProfileHeader = ({userData, myProfile}) => {
         <div className="profile-header">
             <div className="header-left">
                 <div className="header-left1">
-                    <span className="nickname">{userData.nickname}</span>
-                    <span className="info">니트컴퍼니 {userData.generation}기</span>
+                <div className="nickname">{userData.nickname}</div>
+                    <div className="info">니트컴퍼니 {userData.generation}기</div>
                 </div>
                 <div className="header-left2">
-                  <Link to="/profile">
-                    <span className="info">팔로워 {userData.followers.length - 1}명</span>
-                    <span className="info">팔로잉 {userData.followings.length - 1}명</span>
+                  <Link to={`/profile?uid=${userData.uid}`}>
+                    <span className="info">팔로워 {followerlen}명 · 팔로잉 {followinglen}명</span>
                   </Link>
                 </div>
                 <div className="header-left3">
                   {myProfile ? (
                     <h3> </h3>
-                  ) : (
-                    <button onClick={handleFollow}>Follow</button>
+                  ) : ( IsFollowed ? <button onClick={handleUnFollow}>{UnFollowBtn}</button> :
+                    <button onClick={handleFollow}>{followBtn}</button>
                   )}
                 </div>
             </div>
@@ -109,28 +137,26 @@ const ProfileHeader = ({userData, myProfile}) => {
                     </a>
                 </div>
                 <div className="header-right2">
-                    <div className="phone-number">
-                        <MdPhoneIphone size="16"/>&nbsp;
-                        {userData.tel}
-                    </div>
                     <div className="email">
                         <MdEmail size="16"/>&nbsp;
                         {userData.email}
                     </div>
-                    <span className="calendar">
-                        <MdCalendarMonth size="16"/>&nbsp;
-                        비행일정 확인하기
-                    </span>
-                    <span className="edit-profile-header">
-                      {EditButton()}
-                      {myProfile && EditClicked && (
-                        <ProfileEditModal
-                          user={null}
-                          EditModalClose={EditModalClose}
-                        />
-                      )}
-                    </span>
+                    <div className="phone-number">
+                        <MdPhoneIphone size="16"/>&nbsp;
+                        {userData.tel}
+                    </div>
                 </div>
+            </div>
+            <div className="header-additional-right">
+              <span className="edit-profile-header">
+                {EditButton()}
+                {myProfile && EditClicked && (
+                  <ProfileEditModal
+                    user={null}
+                    EditModalClose={EditModalClose}
+                  />
+                )}
+              </span>
             </div>
         </div>
       </main>
@@ -202,18 +228,26 @@ const ProfileIntro = ({userData, myProfile}) => {
 };
 
 const ProfileCareer = ({userData, myProfile}) => {
-
+  const sortedCareerList = Object.fromEntries(
+    Object.entries(userData.career).sort(function([, a], [, b]) {
+      a = a.from.split('/').join('');
+      b = b.from.split('/').join('');
+      return a > b ? 1 : a < b ? -1 : 0;
+  }));
+  
   return (
     <div className="career-container">
       <main>
         <h2 style={{margin: "0px 0px 10px 0px"}}>나는 이런 <span className="highlight">경험</span>을 했어요</h2>
-        {Object.keys(userData.career).map((job, index) => (
+        {Object.keys(sortedCareerList).map((job, index) => (
           <div className="career-body" key={index}>
             <div className="career-index"/>
             <div className="career-wrapper" key={index}>
-              <div className="career-title-">{job}</div>
+              <div className="career-title-">
+                {job} ({userData.career[job]["from"].slice(0, 7)} ~ {userData.career[job]["to"].slice(0, 7)})
+              </div>
               <div className="career-content">
-                {userData.career[job].map((item, i) => (
+                {userData.career[job]["detail_list"].map((item, i) => (
                   <li key={i}>{item}</li>
                 ))}
               </div>
@@ -299,7 +333,9 @@ useEffect(() => {
     }
   };
 
-  fetchProfileUserData();
+  if (currentUserDataLoaded) {
+    fetchProfileUserData();
+  }
 }, [uid, currentUserData]);
 
   // firebase에서 모든 data가 fetch되기 전까지 Loading... 띄우기
@@ -333,7 +369,7 @@ useEffect(() => {
         </div>
         <div ref={introRef}><ProfileIntro userData={profileUserData} myProfile={myProfile}/></div>
         <div ref={careerRef}><ProfileCareer userData={profileUserData} myProfile={myProfile}/></div>
-        <div ref={postRef}><ProfilePost userData={profileUserData} myProfile={myProfile} profileUid={uid}/></div>
+        <div ref={postRef}><ProfilePost userData={profileUserData} myProfile={myProfile}/></div>
         <div ref={commentRef}><ProfileComment currentUserData={currentUserData} myProfile={myProfile} profileUid={uid}/></div>
     </div>
     </div>

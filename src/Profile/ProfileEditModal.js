@@ -10,6 +10,9 @@ import './ProfileEditModal.css'
 import './ProfileDetail.css';
 import { defaultData } from './defaultData';
 
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+
 // How to add button?
 
 /* // Profile Edit
@@ -31,8 +34,11 @@ import { defaultData } from './defaultData';
     )}
   </div> */
 
-const DefaultProfileImg = 'https://s3.amazonaws.com/37assets/svn/765-default-avatar.png'
-const DefaultIntroImg = 'https://cdn.imweb.me/upload/S20191010288d21675b22f/e33c22faf15bc.jpg'
+function DateParser(yourDate) {
+  const offset = yourDate.getTimezoneOffset()
+  yourDate = new Date(yourDate.getTime() - (offset*60*1000))
+  return yourDate.toISOString().split('T')[0]
+}
 
 const ProfileEditModal = ({EditModalClose}) => {
       // user Table Attribute (need to add more)
@@ -57,7 +63,7 @@ const ProfileEditModal = ({EditModalClose}) => {
             if (userDoc.exists()) {
                 setUserObj(userObj => ({...userObj, ...userDoc.data()}));
                 await updateDoc(userDoc, {
-                  profile_image: getDownloadURL(ref(userDoc, `profile_images/${userDoc.profile_image}`))
+                  profile_image: getDownloadURL(ref(userDoc, `${auth.currentUser.uid}/profile_images/${userDoc.profile_image}`))
                 });
             } else {
                 console.log('User not found');
@@ -132,7 +138,7 @@ const ProfileEditModal = ({EditModalClose}) => {
             const storage = getStorage();
             const img = userObj.profile_image[0]
             const imgName = userObj.profile_image[1]
-            const imageRef = ref(storage, `profile_images/${imgName}`);
+            const imageRef = ref(storage, `${auth.currentUser.uid}/profile_images/${imgName}`);
             const imageUrlPromise = await uploadAndReturnUrl(imageRef, img);
             await updateDoc(userDocRef, {
               profile_image: imageUrlPromise
@@ -225,7 +231,7 @@ const ProfileIntroEditModal = ({EditModalClose}) => {
           if (userDoc.exists()) {
               setUserObj(userObj => ({...userObj, ...userDoc.data()}));
               await updateDoc(userDoc, {
-                intro_image: getDownloadURL(ref(userDoc, `profile_intro_images/${userDoc.intro_image}`))
+                intro_image: getDownloadURL(ref(userDoc, `${auth.currentUser.uid}/profile_intro_images/${userDoc.intro_image}`))
               });
           } else {
               console.log('User not found');
@@ -299,7 +305,7 @@ const ProfileIntroEditModal = ({EditModalClose}) => {
         if (ImageChanged && (userObj.intro_image !== undefined || userObj.intro_image !== null)){
           const img = userObj.intro_image[0]
           const imgName = userObj.intro_image[1]
-          const imageRef = ref(storage, `profile_intro_images/${imgName}`);
+          const imageRef = ref(storage, `${auth.currentUser.uid}/profile_intro_images/${imgName}`);
           const imageUrlPromise = await uploadAndReturnUrl(imageRef, img);
           
           // update DB using user input 
@@ -367,9 +373,11 @@ const ProfileCareerEditModal = ({job, EditModalClose}) => {
   const [userObj, setUserObj] = useState({ ...defaultData });
   const [nextId, setNextId] = useState(1);
   const [details, setDetails] = useState([]);
-  
+  const [FromDate, setFromDate] = useState(false);
+  const [ToDate, setToDate] = useState(false);
+
   const fetchCareer = (userDoc) => {
-    const newList = Object.entries(userDoc.career[job]).map(([idx, value]) => ({
+    const newList = Object.entries(userDoc.career[job]["detail_list"]).map(([idx, value]) => ({
       id: idx,
       name: value
     }));
@@ -386,8 +394,10 @@ const ProfileCareerEditModal = ({job, EditModalClose}) => {
         return prevDetails;
       }
     });
+    setFromDate(userDoc.career[job]["from"]);
+    setToDate(userDoc.career[job]["to"]);
     
-    setNextId((prevNextId) => prevNextId + Object.entries(userDoc.career[job]).length);
+    setNextId((prevNextId) => prevNextId + Object.entries(userDoc.career[job]["detail_list"]).length);
   };
   
   useEffect(() => {
@@ -445,8 +455,17 @@ const ProfileCareerEditModal = ({job, EditModalClose}) => {
     </div>
   );
 
+  const onToChange = (e) => {
+    const value = e.target.value;
+    setToDate(value)
+  };
+  const onFromChange = (e) => {
+    const value = e.target.value;
+    setFromDate(value)
+  };
+
   const onJobChange = (e) => {
-    const { name, value } = e.target;
+    const value = e.target.value;
     setJob(value)
   };
 
@@ -465,7 +484,11 @@ const ProfileCareerEditModal = ({job, EditModalClose}) => {
         await updateDoc(userDocRef, {
           career: {
             ...userObj.career,
-            [Job]: Object.values(details).map(item => item.name)
+            [Job]: {
+              "from": DateParser(FromDate),
+              "to": DateParser(ToDate), 
+              "detail_list": Object.values(details).map(item => item.name)
+            }
           }
         })
         alert("성공적으로 저장되었습니다");
@@ -486,7 +509,11 @@ const ProfileCareerEditModal = ({job, EditModalClose}) => {
             <div class="edit-contents">
               <h4>경력</h4>
                 <input type="text" class="career-edit-section" name="job" placeholder="경력" value = {Job || ""} onChange={onJobChange}/>
-              <h4 style={{margin: "2px"}}>세부사항</h4>
+            <h4>시작 기간</h4>
+              <DatePicker className="career-edit-section" dateFormat="yyyy/MM" selected = {new Date(FromDate) || ""} onChange={date => setFromDate(date)} shouldCloseOnSelect/> 
+            <h4>종료 기간</h4>
+              <DatePicker className="career-edit-section" dateFormat="yyyy/MM" selected = {new Date(ToDate) || ""} onChange={date => setToDate(date)} shouldCloseOnSelect/>
+            <h4 style={{margin: "2px"}}>세부사항</h4>
                 {detailList}
                 <input 
                   class="career-detail-edit-section"
@@ -510,6 +537,9 @@ const ProfileCareerAddModal = ({AddModalClose}) => {
   const [userObj, setUserObj] = useState({ ...defaultData });
   const [nextId, setNextId] = useState(1);
   const [details, setDetails] = useState([]);
+  const [FromDate, setFromDate] = useState(false);
+  const [ToDate, setToDate] = useState(false);
+
   // states for DB
   const [Job, setJob] = useState("");
   
@@ -559,8 +589,16 @@ const ProfileCareerAddModal = ({AddModalClose}) => {
       <li class="career-detail-text">{detail.name}<button class="career-delete" onClick={() => handleDelete(detail.id)}/> </li>
     </div>
   );
+  const onToChange = (e) => {
+    const value = e.target.value;
+    setToDate(value)
+  };
+  const onFromChange = (e) => {
+    const value = e.target.value;
+    setFromDate(value)
+  };
   const onJobChange = (e) => {
-    const { name, value } = e.target;
+    const value = e.target.value;
     setJob(value)
   };
 
@@ -571,7 +609,11 @@ const ProfileCareerAddModal = ({AddModalClose}) => {
         await updateDoc(userDocRef, {
           career: {
             ...userObj.career,
-            [Job]: Object.values(details).map(item => item.name)
+            [Job]: {
+              "from": DateParser(FromDate),
+              "to": DateParser(ToDate), 
+              "detail_list": Object.values(details).map(item => item.name)
+            }
           }
         })
         alert("성공적으로 저장되었습니다");
@@ -591,6 +633,10 @@ const ProfileCareerAddModal = ({AddModalClose}) => {
           <div class="edit-contents">
             <h4>경력</h4>
               <input type="text" class="career-edit-section" name="job" placeholder="경력" value = {Job || ""} onChange={onJobChange}/>
+            <h4>시작 기간</h4>
+              <DatePicker className="career-edit-section" dateFormat="yyyy/MM" selected = {new Date(FromDate) || ""} onChange={date => setFromDate(date)} shouldCloseOnSelect/> 
+            <h4>종료 기간</h4>
+              <DatePicker className="career-edit-section" dateFormat="yyyy/MM" selected = {new Date(ToDate) || ""} onChange={date => setToDate(date)} shouldCloseOnSelect/>
             <h4 style={{margin: "2px"}}>세부사항</h4>
               {detailList}
               <input 

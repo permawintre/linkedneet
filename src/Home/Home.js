@@ -1,5 +1,5 @@
 import React from "react"
-import { getDayMinuteCounter, PostContents, PostPics, LikeBtn, CommentBtn, PlusBtn, CommentsWindow, WriteCommentContainer } from './supportFunctions'
+import { getDayMinuteCounter, PostContents, PostPics, LikeBtn, CommentBtn, CommentsWindow, WriteCommentContainer, LoadingEffect } from './supportFunctions'
 import './Home.css'
 import { Link, useNavigate } from "react-router-dom"
 import { dbService , auth } from '../firebase.js'
@@ -26,6 +26,7 @@ import { v4 as uuidv4 } from 'uuid'; // 랜덤 식별자를 생성해주는 라�
 import { storage } from '../firebase.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
 
 import profile1Img from '../images/profile1Img.jpg'
@@ -48,6 +49,9 @@ function Post(props) {
     const [postUserInfo, setPostUserInfo] = useState({ profileImage: '', nickname: '' });
     const postWhere = props.postWhere;
     const modified = props.modified;
+    const [projectName, setProjectName] = useState('');
+
+    const [loading, setLoading] = useState(false)
 
     const addNewComment = (newComment) => {
         setComments(prevComments => [...prevComments, newComment]);
@@ -81,17 +85,23 @@ function Post(props) {
     }, [userId]);
 
     useEffect(() => {
-        setImgUrls([])
-        console.log(props.imgUrls)
-        for(let i=0;i<props.imgUrls.length;i++){
-            (async () => {
-                await getDownloadURL(ref(storage, props.imgUrls[i]))
-                    .then((downloadUrl) => {
-                        setImgUrls(prev => prev.concat(downloadUrl))
-                    })
-            })()
-        }
-    },[])
+        setImgUrls([]);
+        
+        const fetchImageUrls = async () => {
+            for (let i = 0; i < props.imgUrls.length; i++) {
+            try {
+                const downloadUrl = await getDownloadURL(ref(storage, props.imgUrls[i]));
+                setImgUrls((prev) => [...prev, downloadUrl]);
+            } catch (error) {
+                console.error(`Error fetching URL for image ${i + 1}:`, error);
+                // Handle error as needed
+            }
+            }
+        };
+        
+        fetchImageUrls();
+    }, [props.imgUrls]);
+        
 
     useEffect(() => {
         const fetchComments = async () => {
@@ -111,6 +121,30 @@ function Post(props) {
     
         fetchComments();
     }, [postId]);
+
+    useEffect(() => {
+        const fetchProjectName = async () => {
+            if (props.postWhere === 'project' && props.projectId) {
+                try {
+                    const projectRef = doc(dbService, 'projects', props.projectId);
+                    const projectSnap = await getDoc(projectRef);
+
+                    if (projectSnap.exists()) {
+                        setProjectName(projectSnap.data().name);
+                    } else {
+                        console.log("Project not found!");
+                    }
+                } catch (error) {
+                    console.error("Error fetching project data: ", error);
+                }
+            }
+        };
+        fetchProjectName();
+    }, [props.postWhere, props.postId]);
+    useEffect(() => {
+        console.log(`postWhere: ${props.postWhere}, projectName: ${props.projectId}`);
+    }, [props.projectId]);
+
 
     const postWriteEditBtnClick = ()=> {
         setShowDropdown(!showDropdown);
@@ -133,6 +167,7 @@ function Post(props) {
         //console.log('삭제 클릭');
         const confirmDelete = window.confirm("정말로 삭제하시겠습니까?");
         if (confirmDelete) {
+            setLoading(true)
             // Firebase에서 게시물 삭제
             try {
                 await deleteDoc(doc(dbService, "posts", postId));
@@ -181,7 +216,18 @@ function Post(props) {
                     </Link>
                     <div className='postInfo'>
                         <Link to={`/profiledetail?uid=${props.userId}`}>
-                            <div className="userName">{postUserInfo.nickname || userName}<div className="postWhere">▸{postWhere}</div></div>
+                            <div className="userName">{postUserInfo.nickname || userName}
+                            {props.postWhere === 'project' && (
+                                <div className="postWhere">
+                                    ▸project ▸{projectName}
+                                </div>
+                            )}
+                            {props.postWhere != 'project' && (
+                                <div className="postWhere">
+                                    ▸{postWhere}
+                                </div>
+                            )}
+                            </div>
                             <div className='inGroup'>
                                     {postUserInfo.generation+'기' || companyClass+'기'}{moims.map((moim, idx)=>(<span key={idx}>{', '}{moim}</span>))}
                             </div>
@@ -211,14 +257,21 @@ function Post(props) {
                     whoLikes = {whoLikes}
                     setWhoLikes = {setWhoLikes}
                 />
-                <CommentBtn />
+                <div className='numOfLikes'>
+                {numOfLikes===0? <span>{postUserInfo.nickname}님에게 응원의 표시를 남기세요</span> : <span>{numOfLikes}명이 응원합니다 </span>}
+                </div>
+
+
+                {/*<CommentBtn />*/}
             </div>
+{/*
             <hr></hr>
             <div className='numOfLikes'>
                 {numOfLikes===0? <span></span> : <span>{numOfLikes}명이 응원합니다 </span>}
             </div>
+*/}
             <CommentsWindow comments={comments} numOfComments={comments.length}/>
-            <WriteCommentContainer userProfileImage = {props.userInfo?.profile_image} postId = {postId} userId ={auth.currentUser.uid} addNewComment={addNewComment}/>
+            <WriteCommentContainer userProfileImage = {props.userInfo?.profile_image} postId = {postId} userId ={auth.currentUser.uid} addNewComment={addNewComment} />
             <Write
                 isOpen={isWriteOpen}
                 setIsOpen={setIsWriteOpen}
@@ -234,28 +287,99 @@ function Post(props) {
                 showHeader={false}
             />
             
+            {loading ? <LoadingEffect/> : null}
         </div>
+
     )
 }
 
 
 
-const Posts=({ userInfo }) =>{
+const Posts=({ userInfo, currentLocation }) =>{
     const [posts, setPosts] = useState([]);
     const [lastKey, setLastKey] = useState(0);
     const [nextPosts_loading, setNextPostsLoading] = useState(false);
 
+    const setQuery = () => {
+        if(currentLocation === 'home'){
+            return query(
+                collection(dbService, 'posts'),
+                orderBy("postedAt", "desc"),
+                limit(5)
+            )
+        }
+        if(currentLocation === 'neetCompany'){
+            return query(
+                collection(dbService, 'posts'),
+                where("postWhere", "==", 'neetCompany'),
+                orderBy("postedAt", "desc"),
+                limit(5)
+            )
+        }
+        if(currentLocation === 'profile'){
+            return query(
+                collection(dbService, 'posts'),
+                where("postWhere", "==", "profile"),
+                orderBy("postedAt", "desc"),
+                limit(5)
+            )
+        }
+        if(currentLocation === 'project'){
+            return query(
+                collection(dbService, 'posts'),
+                where("postWhere", "==", "project"),
+                orderBy("postedAt", "desc"),
+                limit(5)
+            )
+        }
+    }
+
+    const setQueryMore = (key) => {
+
+        
+        if(currentLocation === 'home'){
+            return query(
+                collection(dbService, 'posts'),
+                orderBy("postedAt", "desc"),
+                startAfter(key),
+                limit(1)
+            );
+        }
+        if(currentLocation === 'neetCompany'){
+            return query(
+                collection(dbService, 'posts'),
+                where("postWhere", "==", "neetCompany"),
+                orderBy("postedAt", "desc"),
+                startAfter(key),
+                limit(1)
+            )
+        }
+        if(currentLocation === 'profile'){
+            return query(
+                collection(dbService, 'posts'),
+                where("postWhere", "==", "profile"),
+                orderBy("postedAt", "desc"),
+                startAfter(key),
+                limit(1)
+            )
+        }
+        if(currentLocation === 'project'){
+            return query(
+                collection(dbService, 'posts'),
+                where("postWhere", "==", "project"),
+                orderBy("postedAt", "desc"),
+                startAfter(key),
+                limit(1)
+            )
+        }
+    }
 
     const initFetch = async () => {
         
         try {
             let posts = [];
             let lastKey = '';
-            const q = query(
-                collection(dbService, 'posts'),
-                orderBy("postedAt", "desc"),
-                limit(5)
-            );
+            const q = setQuery();
             const data = await getDocs(q);
             data.forEach((doc) => {
                 posts.push({
@@ -274,12 +398,7 @@ const Posts=({ userInfo }) =>{
         try {
             let posts = [];
             let lastKey = '';
-            const q = query(
-                collection(dbService, 'posts'),
-                orderBy("postedAt", "desc"),
-                startAfter(key),
-                limit(1)
-            );
+            const q = setQueryMore(key);
             const data = await getDocs(q);
             data.forEach((doc) => {
                 posts.push({
@@ -339,6 +458,7 @@ const Posts=({ userInfo }) =>{
                     postWhere = {post.postWhere}
                     userInfo={userInfo}
                     modified = {post.modified}
+                    projectId = {post.projectId}
                 />
                 <div className='postFooter'>
                 </div>
@@ -396,6 +516,7 @@ function DndBox(props) {
     const contentImages = props.contentImages;
     const setContentImages = props.setContentImages;
     const imgIds = props.imgIds;
+    const setImgIds = props.setImgIds;
     const [imgUrls, setImgUrls] = useState(false)
     const isOpen = props.isOpen;
     const setImgDeleted = props.setImgDeleted;
@@ -482,18 +603,22 @@ function DndBox(props) {
                 tmpImgs.splice(e.target.dataset.key, 1);
                 setContentImages(tmpImgs);
                 setDeleted(false)
-                //console.log('추가데이터', e.target.dataset.key)
+                //console.log('추가데이터', e.target.dataset.key, e.target.dataset.value)
             }
             else{
                 let tmpImgs = imgUrls;
                 tmpImgs.splice(e.target.dataset.key, 1);
                 setImgUrls(tmpImgs);
                 setDeleted(false);
-                setImgDeleted(prev => ([
-                    ...prev,
-                    e.target.dataset.value
-                ]))
-                //console.log('기존데이터', e.target.dataset.key)
+                const deleteImgId = (del) => {
+                    const filtered = imgIds.filter((value, index, arr) => {
+                        return del !== value
+                    })
+                    return filtered
+                }
+                setImgIds(deleteImgId(e.target.dataset.value))
+                setImgDeleted(prev => [...prev, e.target.dataset.value])
+                //console.log('기존데이터', e.target.dataset.key, e.target.dataset.value)
             }
         }
         if(deleted) deleteImg(deleted)
@@ -529,15 +654,35 @@ function DndBox(props) {
     )
 }
 
-function Write({ isOpen, setIsOpen, existingPost ,showHeader }) {
+function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLocation }) {
 
+    const defaultPostWhere = () => {
+
+        if(currentLocation === 'home' || currentLocation === 'profile' ) return 'profile';
+        if(currentLocation === 'neetCompany') return 'neetCompany';
+        if(currentLocation === 'project') return 'project';
+    }
+    const writeTxt = () => {
+
+        if(currentLocation === 'home' || currentLocation === 'profile' ) return '당신의 일상을 공유해주세요!';
+        if(currentLocation === 'neetCompany') return '오늘 진행한 업무를 공유해주세요!';
+        if(currentLocation === 'project') return '활동을 팀원들과 공유해보세요!';
+    }
+    
+    const modalTxt = () => {
+
+        if(currentLocation === 'home' || currentLocation === 'profile' ) return '나누고 싶은 생각이 있으세요?';
+        if(currentLocation === 'neetCompany') return '오늘도 열심히 일한 당신! 수고했어요.';
+        if(currentLocation === 'project') return '팀원들과 어떤 내용을 공유할까요?';
+    }
+    
     const defaultValues = {
         contents: '',
         numOfComments: 0,
         numOfLikes: 0,
         postedAt: null,
         whoLikes: [],
-        postWhere: 'profile',
+        postWhere: defaultPostWhere(),
         modified: false,
     }
     let [values, setValues] = useState(defaultValues)
@@ -546,6 +691,8 @@ function Write({ isOpen, setIsOpen, existingPost ,showHeader }) {
     let [uid, setUid] = useState("")
     let [imgIds, setImgIds] = useState(false)
     let [imgDeleted, setImgDeleted] = useState([])
+
+    const [loading, setLoading] = useState(false)
 
     useEffect(() => {
         if (existingPost) {
@@ -604,9 +751,11 @@ function Write({ isOpen, setIsOpen, existingPost ,showHeader }) {
     const navigate = useNavigate()
 
     const handleSubmit = (e) => {
+        setLoading(true)
         e.preventDefault();
     
         const imgUrls = contentImages.map(() => uuidv4());
+        console.log('handleSubmit에서 확인', imgIds, imgDeleted)
         const modifiedImgs = (origins, dels, adds) => {
             if(origins.length>0){
                 const filtered = origins.filter((value, index, arr) => {
@@ -624,6 +773,7 @@ function Write({ isOpen, setIsOpen, existingPost ,showHeader }) {
             'postedAt': existingPost ? existingPost.postedAt/1000 : moment().unix(),
             'userId': uid,
             'imgUrls': modifiedImgs(imgIds, imgDeleted, imgUrls),
+            'projectId': selectedProjectId,
         };
     
         const handleUploadImages = async () => {
@@ -649,18 +799,20 @@ function Write({ isOpen, setIsOpen, existingPost ,showHeader }) {
             const postRef = doc(dbService, "posts", existingPost.postId);
             updateDoc(postRef, postData)
                 .then(() => {
-                    handleUploadImages()
-                    handleDeleteImgs()
-                    .then(() => {
-                        navigate(0)
-                    })
-                    .catch(error => {
-                        console.log("Img Upload Error: ", error)
-                    })
+                    handleDeleteImgs().then(() => 
+                        handleUploadImages()
+                        .then(() => {
+                            navigate(0)
+                        })
+                        .catch(error => {
+                            console.log("Img Upload Error: ", error)
+                        })
+                    )
                 })
                 .catch(error => {
                     console.error("Error updating document: ", error);
                 });
+                
         } else {
             addDoc(collection(dbService, "posts"), postData)
                 .then(() => {
@@ -683,6 +835,48 @@ function Write({ isOpen, setIsOpen, existingPost ,showHeader }) {
         setContentImages([]);
     };
     
+    const [showProjectDropdown, setShowProjectDropdown] = useState(false);
+
+    const toggleProjectDropdown = () => {
+    setShowProjectDropdown(!showProjectDropdown);
+    };
+
+    const fetchUserProjects = async () => {
+        const userProjects = [];
+        const userProjectTitles = [];
+      
+        const q = query(collection(dbService, 'projectMember'), where('userId', '==', auth.currentUser.uid));
+      
+        try {
+          const querySnapshot = await getDocs(q);
+          for (const docSnapshot of querySnapshot.docs) {
+                const projectId = docSnapshot.data().projectId;
+                const projectRef = doc(dbService, 'projects', projectId);
+                const projectSnap = await getDoc(projectRef);
+        
+                if (projectSnap.exists()) {
+                userProjectTitles.push(projectSnap.data().name);
+                userProjects.push({ id: projectId, name: projectSnap.data().name });
+                }
+            }
+        } catch (error) {
+          console.error("프로젝트 가져오기 중 에러 발생:", error);
+        }
+      
+        return userProjects;
+    }
+    const [userProjects, setUserProjects] = useState([]);
+    useEffect(() => {
+        // 컴포넌트가 마운트될 때 사용자가 속한 프로젝트 목록을 가져옵니다.
+        fetchUserProjects().then(projects => {
+          setUserProjects(projects);
+        });
+      }, []);
+
+    const [selectedProjectId, setSelectedProjectId] = useState(null);
+    const selectProject = (projectId) => {
+    setSelectedProjectId(projectId);
+    };
 
 
     return(
@@ -690,7 +884,7 @@ function Write({ isOpen, setIsOpen, existingPost ,showHeader }) {
             {showHeader && (
                 <div className='postHeader' onClick={ () => setIsOpen(true) }>
                 <div className='profileImg'><img src={userInfo?.profile_image || profile1Img} alt="profileImg"/></div>
-                <div className='popModal'>당신의 일상을 공유해주세요!</div>
+                <div className='popModal'>{writeTxt()}</div>
                 </div>
             )}
             {isOpen && (
@@ -701,7 +895,7 @@ function Write({ isOpen, setIsOpen, existingPost ,showHeader }) {
                                 <div className='profileImg'><img src={userInfo?.profile_image || profile1Img} alt="profileImg"/></div>
                                 <div>
                                     <div className="userName">{userInfo?.nickname || userName}</div>
-                                    <div className="postWhere">게시 위치 ▸{values.postWhere}</div>
+                                    <div className="postWhere">게시 위치 ▸{values.postWhere}{values.postWhere === 'project' &&(<div>[{values.projectName}]</div>)}</div>
                                 </div>
                             </div>
                             {selectBar ? 
@@ -711,19 +905,32 @@ function Write({ isOpen, setIsOpen, existingPost ,showHeader }) {
                                         'postWhere': 'profile',})
                                     );
                                     setSelectBar(!selectBar)
-                                    }}>profile</div>
+                                }}>profile
+                                </div>
+
                                     <div onClick={ () => {setValues((prev) =>
                                         ({...prev,
                                         'postWhere': 'neetCompany',})
                                     );
                                     setSelectBar(!selectBar)
-                                    }}>neetCompany</div>
-                                    <div onClick={ () => {setValues((prev) =>
-                                        ({...prev,
-                                        'postWhere': 'project',})
-                                    );
-                                    setSelectBar(!selectBar)
-                                    }}>project</div>{/*가입한 그룹이랑 연동하는것 구현필요*/}
+                                }}>neetCompany
+                                </div>
+
+                                <div onClick={toggleProjectDropdown}>project</div>
+                                {showProjectDropdown && (
+                                    <div className="projectDropdown">
+                                        {userProjects.map((project, index) => (
+                                        <div key={index} onClick={() => {
+                                            setValues(prev => ({...prev, 'postWhere': 'project','projectName':project.name}));
+                                            selectProject(project.id);
+                                            setShowProjectDropdown(false); // 드롭다운 닫기
+                                        }}>
+                                            {project.name} {/* 프로젝트 제목 렌더링 */}
+                                        </div>
+                                        ))}
+                                    </div>
+                                )}
+
                                 </div>
                                 :
                                 null
@@ -732,11 +939,12 @@ function Write({ isOpen, setIsOpen, existingPost ,showHeader }) {
                         </div>
                         
                         <form onSubmit={handleSubmit} className='modalForm'>
-                            <textarea type='text' name='contents' value={values.contents} onChange={handleChange} placeholder='나누고 싶은 생각이 있으세요?'/>
+                            <textarea type='text' name='contents' value={values.contents} onChange={handleChange} placeholder={modalTxt()}/>
                             <DndBox
                                 contentImages={ contentImages }
                                 setContentImages={ setContentImages }
                                 imgIds={ imgIds }
+                                setImgIds = {setImgIds}
                                 isOpen={ isOpen }
                                 setImgDeleted={ setImgDeleted }
                             />
@@ -749,10 +957,45 @@ function Write({ isOpen, setIsOpen, existingPost ,showHeader }) {
             
             }
             
+            {loading ? <LoadingEffect/> : null}
         </div>
     )
 }
 
+
+
+export const ShowPosts = (props) => {
+
+    const [userInfo, setUserInfo] = useState(null);
+    const [isWriteOpen, setIsWriteOpen] = useState(false);
+
+    const currentLocation = props.currentLocation;
+
+    useEffect(() => { // 유저 정보 코드
+        const fetchUserInfo = async () => {
+            if (auth.currentUser) {
+                const userRef = doc(dbService, "users", auth.currentUser.uid);
+                const docSnap = await getDoc(userRef);
+
+                if (docSnap.exists()) {
+                    setUserInfo(docSnap.data());
+                } else {
+                    console.log("No such document!");
+                }
+            }
+        };
+
+        fetchUserInfo();
+    }, []);
+
+    return(
+
+        <div className='postsContainer'>
+            <Write isOpen={isWriteOpen} setIsOpen={setIsWriteOpen} existingPost={false} showHeader={true} currentLocation={currentLocation}/>
+            <Posts userInfo={userInfo} currentLocation={currentLocation}/>
+        </div>
+    )
+}
 
 
 export const Home = () => {
@@ -760,6 +1003,7 @@ export const Home = () => {
     const [users, setUsers] = useState([]);
     const [userInfo, setUserInfo] = useState(null);
     const [isWriteOpen, setIsWriteOpen] = useState(false);
+
 
     useEffect(() => { //오른쪽 사이드 바 코드
         const fetchUsers = async () => {
@@ -805,20 +1049,18 @@ export const Home = () => {
                     <img src={userInfo?.imgUrls || profile1Img} alt="background" className="homeProfile-background-img"/> 
                 </div>
                 <img src={userInfo?.profile_image} alt="profile" className="profile-img1" />
-                <div className="profile-info">
+                <div className="profile-info-home">
                     <h3>{userInfo?.nickname || 'undefined'}</h3>
                 </div>
                 <Link to={`/profiledetail?uid=${auth.currentUser.uid}`}>
                 <button>내 프로필</button>
                 </Link>
             </aside>
-            
-            <div className='postsContainer'>
-                <Write isOpen={isWriteOpen} setIsOpen={setIsWriteOpen} existingPost={false} showHeader={true}/>
-                <Posts userInfo={userInfo}/>
+            <div className="homePostsMarginControl">
+                <ShowPosts currentLocation={'home'}/>
             </div>
-
             <aside className="right-sidebar">
+                <h2>새로운 사람을 알아가보세요!</h2>
                 <ul className="interestList">
                     {users.map(user => (
                         <li key={user.id} className="interestItem">
@@ -826,7 +1068,7 @@ export const Home = () => {
                                 <img src={user.imgUrls || profile1Img} alt={user.nickname || 'User'}/>
                             </Link>
                             <span className="interestTitle">{user.nickname || 'Unknown User'}</span>
-                            <PlusBtn/>
+                            <FontAwesomeIcon icon={faArrowRight} className="fa-arrow-right"/>
                         </li>
                     ))}
                 </ul>

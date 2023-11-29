@@ -1,12 +1,11 @@
 import React, { useState } from "react"
 import { loginEmail, loginGoogle, auth, dbService } from '../firebase.js'
 import { Link } from "react-router-dom"
-import { collection, setDoc, doc } from "firebase/firestore"
+import { collection, setDoc, doc, query, where, getDocs, getDoc } from "firebase/firestore"
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import './Auth.css'
 
 
-//--------------------------signup--------------------------
 export const Signup = () => { 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -40,15 +39,27 @@ export const Signup = () => {
     const onSubmit = async (event) => {
         event.preventDefault();
         // SignUp
+        const userRef = collection(dbService, "users");
+
+        const nicknameQuery = query(userRef, where("nickname", "==", nickname));
+        const nicknameQuerySnapshot = await getDocs(nicknameQuery);
+        if (!nicknameQuerySnapshot.empty) {
+            // Nickname already exists, handle the error
+            alert("이미 사용 중인 닉네임입니다.");
+            return;
+        }
+
+        if( generation < 1 || generation > 20) {
+            alert("올바르지 않은 기수입니다");
+            return;
+        }
+
         createUserWithEmailAndPassword(auth, email, password)
         .then(async(userCredential) => {
-            // user Table attribute
-            
-            // add initial profile for user (key = uid)
-            const userRef = collection(dbService, "users");
-            
+            // add initial profile for user (key = uid) 
             // doc (userRef, __SOME KEY__) => add new default profile if login.
             // in this situation, key is uid in in authobj
+
             await setDoc(doc(userRef, auth.currentUser.uid), {
                 // user profile header
                 nickname: nickname,
@@ -66,11 +77,10 @@ export const Signup = () => {
                 uid: auth.currentUser.uid
             });
             
-            
             // move to home if singup is successful
             document.location.href="/";
         })
-        .catch((error) => {
+        .catch((error) => { 
             switch (error.code) {
                 case "auth/user-not-found" || "auth/wrong-password":
                   alert("이메일 혹은 비밀번호가 일치하지 않습니다.");
@@ -175,22 +185,22 @@ export class Login extends React.Component {
 
     render() {
         return (
-            <div className="body">
-                <form onSubmit={this.handleSubmit} className="body__inner">
+            <div className="signin__body">
+                <form onSubmit={this.handleSubmit} className="signin__body__inner">
                     <h2>이메일로 로그인</h2>
-                    <hr className="body__partition"></hr>
-                    <div className="body__inputline">
-                        <p className="body__inputline--description">이메일 주소</p>
-                        <input className="body__inputline--input" type="text" value={this.state.email} placeholder="이메일 주소를 입력해 주세요" onChange={this.handleEmail} />
+                    <hr className="signin__body__partition"></hr>
+                    <div className="signin__body__inputline">
+                        <p className="signin__body__inputline--description">이메일 주소</p>
+                        <input className="signin__body__inputline--input" type="text" value={this.state.email} placeholder="이메일 주소를 입력해 주세요" onChange={this.handleEmail} />
                     </div>
-                    <div className="body__inputline">
-                        <p className="body__inputline--description">비밀번호</p>
-                        <input className="body__inputline--input" type="password" value={this.state.pw} placeholder="비밀번호를 입력해 주세요" onChange={this.handlePw} />
+                    <div className="signin__body__inputline">
+                        <p className="signin__body__inputline--description">비밀번호</p>
+                        <input className="signin__body__inputline--input" type="password" value={this.state.pw} placeholder="비밀번호를 입력해 주세요" onChange={this.handlePw} />
                     </div>
                     
-                    <button type="submit" className="body__submitbtn">로그인</button>
-                    <Link to="/signUp" className="body__signup">회원가입</Link>
-                    <hr className="body__partition"></hr>
+                    <button type="submit" className="signin__body__submitbtn">로그인</button>
+                    <Link to="/signUp" className="signin__body__signup">회원가입</Link>
+                    <hr className="signin__body__partition"></hr>
                     <Google/>
                 </form>
             </div>
@@ -198,14 +208,132 @@ export class Login extends React.Component {
     }
 }
 
+
+export const GoogleSignup = () => { 
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [nickname, setNickname] = useState('');
+    const [generation, setGeneration] = useState(''); // 기수
+
+    // get an Email value from user.
+    const onChangeEmail = (e) => {
+        // need to check email (양식, 중복)
+        setEmail(e.target.value);
+    }
+
+    // get a Password from user
+    const onChangePassword = (e) => {
+        // need to check password (weak password)
+        setPassword(e.target.value);
+    }
+
+    // get a Nickname from user
+    const onChangeNickname = (e) => {
+        // need to check nickname (중복, 글자 수)
+        setNickname(e.target.value);
+    }
+
+    // get a Generation from user
+    const onChangeGeneration = (e) => {
+        // need to check generation (숫자 parsing)
+        setGeneration(e.target.value);
+    }
+    
+    const onSubmit = async (event) => {
+        event.preventDefault();
+        // SignUp
+        const userRef = collection(dbService, "users");
+
+        const nicknameQuery = query(userRef, where("nickname", "==", nickname));
+        const nicknameQuerySnapshot = await getDocs(nicknameQuery);
+        if (!nicknameQuerySnapshot.empty) {
+            // Nickname already exists, handle the error
+            alert("이미 사용 중인 닉네임입니다.");
+            return;
+        }
+
+        if( generation < 1 || generation > 20) {
+            alert("올바르지 않은 기수입니다");
+            return;
+        }
+
+        await setDoc(doc(userRef, auth.currentUser.uid), {
+            // user profile header
+            nickname: nickname,
+            email: email,
+            generation: generation,
+            facebook: "",
+            instagram: "",
+            tel: "",
+
+            // following 
+            followers: [],
+            followings: [],
+
+            // uid 
+            uid: auth.currentUser.uid
+        });
+            
+        // move to home if singup is successful
+        document.location.href="/";
+    }
+
+    return (
+        <div className="google_signupbody">
+            <form onSubmit={onSubmit} className="google_signup__body__inner">
+                <h2>기본 정보를 입력해주세요</h2>
+                <hr className="google_signup__body__partition"></hr>
+                <div className="google_signup__body__inputline">
+                    <p className="google_signup__body__inputline--description">이메일 주소</p>
+                    <input className="google_signup__body__inputline--input" name="email" type="text" value={email} placeholder="이메일 주소를 입력해 주세요" onChange={onChangeEmail} />
+                </div>
+
+                <div className="google_signup__body__inputline">
+                    <p className="google_signup__body__inputline--description">닉네임</p>
+                    <input className="google_signup__body__inputline--input" type="text" value={nickname} placeholder="닉네임을 입력해주세요" onChange={onChangeNickname} />
+                </div>
+
+                <div className="google_signup__body__inputline">
+                    <p className="google_signup__body__inputline--description">니트컴퍼니 기수</p>
+                    <input className="google_signup__body__inputline--input" type="text" value={generation} placeholder="기수를 입력해주세요 ex)12기 -> 12" onChange={onChangeGeneration} />
+                </div>
+                
+                <button type="submit" className="google_signup__body__submitbtn">회원가입</button>
+                <Link to="/logIn" className="google_signup__body__signup">로그인</Link>
+                <hr className="google_signup__body__partition"></hr>
+                <Google/>
+            </form>
+        </div>
+        
+    );
+}
+
 //--------------------------google--------------------------
 export const Google = () => {
+    const [isInit, setIsInit] = useState(true);
 
     return(
-   
-        <div class="google-btn" onClick={ ()=>{
+        <div class="google-btn" onClick={ ()=> {
             loginGoogle()
-            .then((result) => { document.location.href="/"; })
+            .then(async (result) => {
+                const userRef = doc(dbService, "users", auth.currentUser.uid);
+                const docSnap = await getDoc(userRef);
+
+                if (docSnap.exists()) {
+                    const { uid } = docSnap.data() || {};
+                    if (uid) {
+                        setIsInit(false);
+                    }
+                } else {
+                    setIsInit(true);
+                }
+
+                if (isInit) {
+                    document.location.href="/google_signup"; 
+                } else {
+                    document.location.href="/"; 
+                }
+            })
             .catch((error) => console.log(error));
         }}>
             <div class="google-icon-wrapper">

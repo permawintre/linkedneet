@@ -33,7 +33,6 @@
     width: 940px;
     padding: 10px;
     border-radius: 15px;
-    margin-top: 20px;
     margin-bottom: 10px;
 }
 .myProjects .projectsTitle {
@@ -46,7 +45,6 @@
     margin-top: 10px;
     margin-bottom: 20px;
 }
-  
 .projectsRow {
     position: relative;
     display: flex;
@@ -55,7 +53,9 @@
 .projectsRecommand {
     position: relative;
     width: 940px;
-    height: 426px;
+}
+.twoRow {
+    height: 420px;
 }
 .newProject {
     position: absolute;
@@ -65,22 +65,24 @@
     height: 120px;
     margin: 5px;
     text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 10px;
 }
 .newProject .newProjectSmall {
     font-size: 13px;
-    background-color: darkgray;
+    background-color: lightgray;
     padding-top: 50px;
     padding-bottom: 10px;
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
 }
 .newProject .newProjectLarge {
     font-size: 18px;
     background-color: var(--color_3);
     padding: 10px 0;
     color: white;
-    border-bottom-left-radius: 15px;
-    border-bottom-right-radius: 15px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
 }
 .projectsTitle {
     font-weight: bold;
@@ -121,13 +123,15 @@
     flex-direction: column;
     align-items: center;
     position: relative;
-    border: solid 2px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
-  
 .projectBox img {
     width: 100%;
     height: 50%;
     object-fit: cover;
+    border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
 }
 
 .projectBox .name {
@@ -141,7 +145,6 @@
     overflow-wrap: break-word;
     padding: 15px 5px 5px 5px;
     font-size: 15px;
-    border-top: solid 2px;
     color: black;
 }
 .projectBox .comment {
@@ -158,8 +161,8 @@
     top: 0;
     right: 0;
     padding: 3px 5px;
-    border-left: solid 2px;
-    border-bottom: solid 2px;
+    border-top-right-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .projectsFilter {

@@ -3,6 +3,7 @@
   
 .addmargin {
     margin: 20px 0;
+    padding-bottom: 300px;
 }
 
 .homePost {
@@ -150,7 +151,7 @@
     position: relative;
     top: 15px;
     left: 15px;
-    filter: grayscale(100%) brightness(300%) opacity(70%);
+    filter: grayscale(100%) brightness(100%) opacity(70%);
 }
 .placeHolder {
     height: 50px;
@@ -160,6 +161,8 @@
     height: 50px;
     width: 50px;
     cursor: pointer;
+    border-radius: 50%;
+    background: radial-gradient( rgba(255, 255, 255, 0.7) , rgba(255, 255, 255, 0) 50%);
 }
 .prev img {
     transform: rotate(-90deg)
@@ -168,13 +171,15 @@
     height: 50px;
     width: 50px;
     cursor: pointer;
+    border-radius: 50%;
+    background: radial-gradient( rgba(255, 255, 255, 0.7) , rgba(255, 255, 255, 0) 50%);
 }
 .next img {
     transform: rotate(90deg)
 }
 
 .numOfLikes {
-    margin-left: 10px;
+    display: inline;
     font-weight: 400;
     font-size: 15px;
 }
@@ -242,7 +247,12 @@ hr {
 
     /* 기타 스타일 */
 }
-
+.commentMenuIcon{
+    position: absolute;
+    top: 0;
+    right: 20px;
+    cursor: pointer;
+}
 
 .writecommentcontainer {
     width: 100%;
@@ -391,6 +401,7 @@ hr {
 }
 .modalHeader .selectBar {
     display: flex;
+    position: relative;
 }
 .modalHeader .selectBar>div {
     padding: 20px;
@@ -399,6 +410,22 @@ hr {
 }.modalHeader .selectBar>div:hover {
     cursor: pointer;
     background-color: #eeeeee;
+}
+.projectDropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    border-radius: 5px;
+    background-color: white;
+  }
+.projectDropdown div {
+    transition: background-color 0.3s ease;
+    border-radius: 8px; /* 덜 라운드된 테두리 */
+    cursor: pointer;
+}
+.projectDropdown div:hover {
+    /* 배경색 변경 */
+    background-color: #f0f0f0;
 }
 .modalProfile {
     display: flex;
@@ -506,10 +533,12 @@ hr {
     position: sticky;
     top: 118px; /* 항상 상단에 고정 */
 }
-
+.homePostsMarginControl {
+    margin: 0 10px;
+}
 .postsContainer {
     width: 550px;
-    margin: 0 10px;
+    margin: auto;
     display: flex;
     flex-direction: column;
 }
@@ -668,18 +697,19 @@ hr {
     position: absolute;
   }
   
-  .profile-info { 
+  .profile-info-home { 
     width: 100%; 
     text-align: center; 
     margin-top: 10px; 
     position: relative;
-  }
+}
 
-  .profile-info h3 {
-    margin: 0;
+  .profile-info-home h3 {
+    margin: 0 auto;
     margin-top: 50px; 
     color: #000000;
     font-size: 1.2em; 
+    display: inline-block; 
 
   }
   
@@ -692,6 +722,9 @@ hr {
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     padding: 20px;
     box-sizing: border-box;
+}
+.right-sidebar h2 {
+    margin-bottom: 20px;
 }
 
 .interestList {
@@ -708,6 +741,7 @@ hr {
 
 .interestItem:hover {
     background-color: #ccc;
+    border-radius: 10px;
 }
 
 .interestItem:last-child {
@@ -727,10 +761,11 @@ hr {
     color: black;
 }
 
-.plusSign {
+.fa-arrow-right {
     font-weight: bold;
     font-size: 24px;
     cursor: pointer;
+    margin-right: 10px;
 }
 
 .plusSign.active {
@@ -740,4 +775,63 @@ hr {
 a {
     text-decoration: none; /* 링크의 밑줄을 제거 */
   }
+
+.graybackground {
+    z-index: 10000;
+    position: fixed;
+    height: 100vh;
+    width: 100vw;
+    top: 0px;
+    left: 0px;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+.outline {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    flex-wrap: wrap; }
   
+.waves {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background: #ffffff;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+}
+.waves:before, .waves:after {
+    content: '';
+    position: absolute;
+    background: white;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    animation: wave 2s infinite linear;
+}
+.waves:after {
+    opacity: 0;
+    animation: wave 2s 1s infinite linear;
+}
+@keyframes wave {
+    0% {
+      transform: scale(1);
+      opacity: 1; }
+    100% {
+      transform: scale(2);
+      opacity: 0; }
+}
+.outline>.loadingIcon {
+    position: absolute;
+    top: -70px;
+    color: #1e1f38;
+    font-size: 20px;
+    font-weight: 900;
+    margin: 50px auto;
+    text-align: center;
+}

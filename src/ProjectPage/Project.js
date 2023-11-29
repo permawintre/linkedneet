@@ -15,9 +15,11 @@ const UserProject = ({ uid, project }) => {
         ) : (
           <img src={project.image.imageUrl} alt={project.name} />
         )}
-        <Link to={`/projecthome/${project.id}`} style={{ textDecoration: 'none' }} className={style.name}>
-          {project.name}
-        </Link>
+        {project.default ? ( <div className={style.name}>{project.name}</div> ) : (
+          <Link to={`/projecthome/${project.id}`} style={{ textDecoration: 'none' }} className={style.name}>
+            {project.name}
+          </Link>
+        )}
         <div className={style.comment}>{project.shortDescription}</div>
       </div>
     );
@@ -68,6 +70,7 @@ const setProjectStatus = (project) => {
 }
 
 const MyProject = ({ uid, myProjects }) => {
+    const myProjectsCount = myProjects.length;
     // For Navigation Button
     const itemsPerRow = 3; // 한 줄 당 아이템 수
     const totalRows = 1; // 총 줄 수
@@ -111,11 +114,13 @@ const MyProject = ({ uid, myProjects }) => {
               )
             ))}
           </div>
-          <div className={style.navigation}>
-            <button onClick={showPreviousPage} disabled={page === 0}>{'<'}</button>
-            <span>{page + 1} / {totalPages}</span>
-            <button onClick={showNextPage} disabled={page === totalPages - 1}>{'>'}</button>
-          </div>
+          {myProjectsCount === 0? null : (
+            <div className={style.navigation}>
+              <button onClick={showPreviousPage} disabled={page === 0}>{'<'}</button>
+              <span>{page + 1} / {totalPages}</span>
+              <button onClick={showNextPage} disabled={page === totalPages - 1}>{'>'}</button>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -126,6 +131,16 @@ const ProjectList = ({ projects }) => {
     projects.forEach((project) => {
       setProjectStatus(project);
     });
+    const projectCount = projects.length;
+    let rowClass;
+    if (projectCount === 0) {
+      rowClass = "zeroRow";
+    } else if (projectCount <= 3) {
+      rowClass = "oneRow";
+    } else {
+      rowClass = "twoRow";
+    }
+    console.log(rowClass);
 
     // For Search Bar
     const [searchTerm, setSearchTerm] = useState(''); // 검색어 상태 추가
@@ -222,7 +237,7 @@ const ProjectList = ({ projects }) => {
               </div>
             </div>
           </div>
-          <div className={style.projectsRecommand}>
+          <div className={`${style.projectsRecommand} ${style[rowClass]}`}>
             <div className={style.newProject}>
               <div className={style.newProjectSmall}>원하는 소모임이 없다면?</div>
               <Link to="/projectcreate" style={{ textDecoration: 'none' }}>
@@ -296,9 +311,6 @@ export const Project = () => {
   
     fetchProjects();
   }, [uid]);
-
-    console.log(myProjects);
-    console.log(recommendProjects);
 
     return (
         <div className={style.body}>

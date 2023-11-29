@@ -43,6 +43,7 @@ function DateParser(yourDate) {
 const ProfileEditModal = ({EditModalClose}) => {
       // user Table Attribute (need to add more)
     const [userObj, setUserObj] = useState({ ...defaultData });
+    const [userObjLoaded, setUserObjLoaded] = useState(false);
 
     useEffect(() => {
       const fetchUserData = async () => {
@@ -57,10 +58,11 @@ const ProfileEditModal = ({EditModalClose}) => {
             } else {
                 console.log('User not found');
             }
-
           } catch (error) {
             console.error('Error fetching user data:', error);
-          } 
+          } finally {
+            setUserObjLoaded(true);
+          }
       };
       fetchUserData();
     }, []);
@@ -94,6 +96,9 @@ const ProfileEditModal = ({EditModalClose}) => {
     
     // Profile 사진 
     const [Image, setImage] = useState(userObj.profile_image);
+    useEffect(() => {
+      setImage(userObj.profile_image);
+    }, [userObj.profile_image]);
     const [ImageChanged, setImageChanged] = useState(false);
     const fileInput = useRef(null);
     
@@ -215,9 +220,6 @@ const ProfileIntroEditModal = ({EditModalClose}) => {
           // If the document exists, setUserData with the document data
           if (userDoc.exists()) {
               setUserObj(userObj => ({...userObj, ...userDoc.data()}));
-              await updateDoc(userDoc, {
-                intro_image: getDownloadURL(ref(userDoc, `${auth.currentUser.uid}/profile_intro_images/${userDoc.intro_image}`))
-              });
           } else {
               console.log('User not found');
           }
@@ -258,6 +260,9 @@ const ProfileIntroEditModal = ({EditModalClose}) => {
   
   // Profile 사진 
   const [Image, setImage] = useState(userObj.intro_image);
+  useEffect(() => {
+    setImage(userObj.intro_image);
+  }, [userObj.intro_image]);
   const [ImageChanged, setImageChanged] = useState(false);
   const fileInput = useRef(null);
 

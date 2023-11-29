@@ -167,6 +167,64 @@ input {
 }
 
 
+.google_signupbody{
+
+  display: flex;
+  justify-content: center;
+  box-shadow: 3px #000000;
+
+  .google_signup__body__inner{
+
+      background-color: white;
+      border-radius: 30px;
+      margin-top: 100px;
+      padding: 30px;
+      width: 500px;
+      height: 500px;
+      
+      .google_signup__body__partition{
+
+          margin-top: 20px;
+          margin-bottom: 20px;
+          border: solid black 2px;
+      }
+
+      .google_signup__body__inputline{
+
+          display: flex;
+          margin: 10px;
+          .google_signup__body__inputline--description{
+              flex: 2;
+              display: flex;
+              align-items: center;
+              text-align: left;
+              font-weight: 600;
+              
+          }
+          .google_signup__body__inputline--input{
+              flex: 5;
+          }
+          
+      }
+
+      .google_signup__body__submitbtn{
+
+          display: block;
+          margin: 40px 10px;
+          margin-bottom: 10px;
+          width: 480px;
+      }
+
+      .google_signup__body__signup{
+
+          display: block;
+          text-align: right;
+          margin: 0 20px;
+      }
+  }
+
+}
+
 
 
 

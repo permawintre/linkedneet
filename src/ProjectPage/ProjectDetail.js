@@ -105,7 +105,7 @@ const ProjectHeader = ({project, uid, isMember}) => {
             ) : (
               isMember ? (
                 <Link to={`/projectHome/${project.id}`} style={{ textDecoration: 'none', color: 'black' }} className={style.recruitButton}>
-                  소모임 멤버입니다
+                  소모임 페이지로 이동하기
                 </Link>
               ) : (
                 project.status === '모집중' ? (
@@ -140,7 +140,6 @@ const ProjectHeader = ({project, uid, isMember}) => {
 const ProjectBody = (project) => {
     return (
         <div className={`${style.projectDetail} ${style.projectBody}`}>
-          <div className={style.bodyTitle}>소모임 소개</div>
           <div className={style.bodyImages}>
               {project.subImages.map((image, index) => (
                   <img key={index} src={image.imageUrl} alt={`Subimage ${index + 1}`} />
@@ -151,10 +150,24 @@ const ProjectBody = (project) => {
       );
 }
 
+const ProjectMember = ({memberInfos}) => {
+  console.log(memberInfos);
+  return (
+      <div className={`${style.projectDetail} ${style.projectBody}`}>
+        <div className={style.bodyContent}>
+          {memberInfos.map((memberInfo, index) => (
+            <div key={index}>
+              {memberInfo.nickname}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+}
+
 const ProjectReview = ({isReview, isMember, uid, projectId}) => {
     return (
         <div className={`${style.projectDetail} ${style.projectBody}`}>
-          <div className={style.bodyTitle}>소모임 후기</div>
           <div className={style.bodyContent}>
             { !isReview && !isMember ?
               '작성된 후기가 없습니다' :
@@ -171,6 +184,8 @@ export const ProjectDetail = () => {
   const [uid, setUid] = useState("");
   const [isMember, setIsMember] = useState(false);
   const [isReview, setIsReview] = useState(false);
+  const [members, setMembers] = useState(null);
+  const [memberInfos, setMemberInfos] = useState(null);
 
   useEffect(() => {
     // Set uid if the user is authenticated
@@ -180,7 +195,7 @@ export const ProjectDetail = () => {
   }, []);
 
   useEffect(() => {
-    const fetchProjectAndCheckMembership = async () => {
+    const fetchProjectAndMembers = async () => {
       try {
         // Fetch project data
         const projectDoc = await getDoc(doc(dbService, 'projects', projectId));
@@ -225,15 +240,32 @@ export const ProjectDetail = () => {
       }
 
       try {
-        // Fetch projectMember document where userId and projectId match
         const projectMemberCollection = collection(dbService, 'projectMember');
-        const memberQuery = query(projectMemberCollection, where('userId', '==', uid), where('projectId', '==', projectId));
+        const memberQuery = query(projectMemberCollection, where('projectId', '==', projectId));
         const memberQuerySnapshot = await getDocs(memberQuery);
 
-        // Update isMember state based on whether the document exists
-        setIsMember(!memberQuerySnapshot.empty);
+        const memberIds = memberQuerySnapshot.docs.map(doc => doc.data().userId);
+        setMembers(memberIds);
+
+        const isUserMember = memberIds.includes(uid);
+        setIsMember(isUserMember);
+
+          // 'users' 컬렉션에서 각 userId에 해당하는 문서 가져오기
+        const memberInfosPromises = memberIds.map(async (userId) => {
+          const userDocRef = doc(dbService, 'users', userId);
+          const userDocSnapshot = await getDoc(userDocRef);
+
+          if (userDocSnapshot.exists()) {
+            return userDocSnapshot.data();
+          }
+        });
+
+        const memberInfos = await Promise.all(memberInfosPromises);
+        const validMemberInfos = memberInfos.filter((info) => info);
+        setMemberInfos(validMemberInfos);
+
       } catch (error) {
-        console.error('Error checking project membership: ', error);
+        console.error('Error checking project members: ', error);
       }
 
       try {
@@ -248,7 +280,7 @@ export const ProjectDetail = () => {
       }
     };
 
-    fetchProjectAndCheckMembership();
+    fetchProjectAndMembers();
   }, [dbService, projectId, uid]);
 
     const [activeSection, setActiveSection] = useState('projectBodySection');
@@ -285,13 +317,13 @@ export const ProjectDetail = () => {
             className={`${style.projectButton} ${style[activeSection === 'projectPreparationSection' ? 'active' : '']}`}
             onClick={() => handleButtonClick('projectPreparationSection')}
             >
-            <span className={style.text}>준비물</span>
+            <span className={style.text}>준비물/위치</span>
             </span>
             <span
-            className={`${style.projectButton} ${style[activeSection === 'projectLocationSection' ? 'active' : '']}`}
-            onClick={() => handleButtonClick('projectLocationSection')}
+            className={`${style.projectButton} ${style[activeSection === 'currentMemberSection' ? 'active' : '']}`}
+            onClick={() => handleButtonClick('currentMemberSection')}
             >
-            <span className={style.text}>소모임 위치</span>
+            <span className={style.text}>멤버</span>
             </span>
             <span
             className={`${style.projectButton} ${style[activeSection === 'projectReviewSection' ? 'active' : '']}`}
@@ -318,6 +350,9 @@ export const ProjectDetail = () => {
               <div className={style.bodyContent}>{project.location}</div>
             </div>
             }
+        </div>
+        <div id="currentMemberSection">
+          {activeSection === 'currentMemberSection' && ProjectMember({memberInfos})}
         </div>
         <div id="projectReviewSection">
             {activeSection === 'projectReviewSection' && ProjectReview({isReview, isMember, uid, projectId})}

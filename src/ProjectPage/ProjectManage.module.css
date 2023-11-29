@@ -48,8 +48,9 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    border: solid 2px;
     background-color: #f8f8f8;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 15px;
 }
 .projectBoxDetail .projectBoxColumn:first-child {
     margin-right: 10px;
@@ -58,6 +59,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    border-radius: 15px;
 }
 .projectBoxDetail .projectBoxColumn .name {
     height: 30%;
@@ -68,9 +70,10 @@
     overflow-wrap: break-word;
     padding: 5px;
     font-size: 22px;
-    border-bottom: solid 1px;
     text-align: center;
     background-color: var(--color_1);
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
 }
 .projectBoxDetail .projectBoxColumn .comment {
     display: flex;
@@ -79,7 +82,6 @@
     height: 25%;
     padding: 5px 15px;
     font-size: 14px;
-    border-bottom: solid 1px;
     background-color: lemonchiffon;
 }
 .projectBoxDetail .projectBoxColumn .info {
@@ -105,11 +107,11 @@
     width: 700px;
     margin: 0 auto;
     text-align: left;
-    border: solid 2px;
     padding: 10px;
     background-color: white;
     box-sizing: border-box;
     padding-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 .projectBody:last-child {
     margin-bottom: 20px;

@@ -53,7 +53,9 @@
 .projectsRecommand {
     position: relative;
     width: 940px;
-    height: 426px;
+}
+.twoRow {
+    height: 420px;
 }
 .newProject {
     position: absolute;

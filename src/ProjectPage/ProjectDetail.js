@@ -51,7 +51,7 @@ function formatDate(timestamp) {
     })
 }
 
-const ProjectHeader = ({project, uid, isMember}) => {
+const ProjectHeader = ({project, uid, isMember, isApply}) => {
     return (
         <div className={style.projectDetail}>
           <div className={style.projectBoxDetail}>
@@ -108,15 +108,18 @@ const ProjectHeader = ({project, uid, isMember}) => {
                   소모임 페이지로 이동하기
                 </Link>
               ) : (
-                project.status === '모집중' ? (
-                  <Link to={`/projectJoin/${project.id}`} style={{ textDecoration: 'none', color: 'black' }} className={style.recruitButton}>
-                    소모임 지원하기
-                  </Link>
+                isApply ? (
+                  <span className={style.recruitButton}>지원 이력이 있습니다</span>
                 ) : (
-                  <span className={style.recruitButton}>모집기간이 아닙니다</span>
+                  project.status === '모집중' ? (
+                    <Link to={`/projectJoin/${project.id}`} style={{ textDecoration: 'none', color: 'black' }} className={style.recruitButton}>
+                      소모임 지원하기
+                    </Link>
+                  ) : (
+                    <span className={style.recruitButton}>모집기간이 아닙니다</span>
+                  )
                 )
-              )
-            )}
+            ))}
             <span className={style.shareButton}>공유하기</span>
           </div>
           <div className={style.projectBoxLeader}>
@@ -151,7 +154,6 @@ const ProjectBody = (project) => {
 }
 
 const ProjectMember = ({memberInfos}) => {
-  console.log(memberInfos);
   return (
       <div className={`${style.projectDetail} ${style.projectBody}`}>
         <div className={style.bodyContent}>
@@ -183,8 +185,8 @@ export const ProjectDetail = () => {
   const [project, setProject] = useState(null);
   const [uid, setUid] = useState("");
   const [isMember, setIsMember] = useState(false);
+  const [isApply, setIsApply] = useState(false);
   const [isReview, setIsReview] = useState(false);
-  const [members, setMembers] = useState(null);
   const [memberInfos, setMemberInfos] = useState(null);
 
   useEffect(() => {
@@ -213,20 +215,7 @@ export const ProjectDetail = () => {
             id: projectDoc.id,
             leaderName: leaderData.nickname,
             leaderComment: `니트컴퍼니 ${leaderData.generation}기. ${leaderData.intro_title}`,
-            leaderImage: leaderData.profile_img ? leaderData.profile_img : defaultLeaderImg,
-            reviews: [
-              {
-                'nickname': '유저1',
-                'content': `야외드로잉은 모여서 그리는 게 아니라 마음이 가는대로 뿔뿔히 흝어져 드로잉하는 방식이였습니다. 그게 조금 아쉬웠지만 야외에서 그리는 감각이 즐거웠습니다.
-                              후에 다같이 모여서 드로잉에 대해 얘기를 나누는 시간이 좋았습니다. 몇몇분과 저녁을 같이 먹고 한강 산책을 하고 헤어졌는데 좋은 시간이었어요.`,
-                'created_at': new Date('2023-01-30'),
-              },
-              {
-                'nickname': '유저2',
-                'content': '다양한 사람들과 친해질 수 있습니다',
-                'created_at': new Date('2023-02-28'),
-              }
-            ]
+            leaderImage: leaderData.profile_img ? leaderData.profile_img : defaultLeaderImg
           };
 
           // Set project data and status
@@ -245,7 +234,6 @@ export const ProjectDetail = () => {
         const memberQuerySnapshot = await getDocs(memberQuery);
 
         const memberIds = memberQuerySnapshot.docs.map(doc => doc.data().userId);
-        setMembers(memberIds);
 
         const isUserMember = memberIds.includes(uid);
         setIsMember(isUserMember);
@@ -266,6 +254,18 @@ export const ProjectDetail = () => {
 
       } catch (error) {
         console.error('Error checking project members: ', error);
+      }
+
+      try {
+        // Fetch projectMember document where userId and projectId match
+        const projectApplyCollection = collection(dbService, 'projectApply');
+        const applyQuery = query(projectApplyCollection, where('userId', '==', uid), where('projectId', '==', projectId));
+        const applyQuerySnapshot = await getDocs(applyQuery);
+
+        // Update isMember state based on whether the document exists
+        setIsApply(!applyQuerySnapshot.empty);
+      } catch (error) {
+        console.error('Error checking project applications: ', error);
       }
 
       try {
@@ -299,7 +299,7 @@ export const ProjectDetail = () => {
     }
     return (
     <div className={style.body} style={{ overflowY: 'auto' }}>
-        {ProjectHeader({'project': project, 'uid': uid, 'isMember': isMember})}
+        {ProjectHeader({'project': project, 'uid': uid, 'isMember': isMember, 'isApply': isApply})}
         <div className={style.projectBoxButtons}>
             <span
             className={`${style.projectButton} ${style[activeSection === 'projectBodySection' ? 'active' : '']}`}

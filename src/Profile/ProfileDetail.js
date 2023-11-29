@@ -76,13 +76,13 @@ const ProfileHeader = ({userData, myProfile}) => {
         <div className="profile-header">
             <div className="header-left">
                 <div className="header-left1">
-                    <span className="nickname">{userData.nickname}</span>
-                    <span className="info">니트컴퍼니 {userData.generation}기</span>
+                    <div className="nickname">{userData.nickname}</div>
+                    <div className="info">니트컴퍼니 {userData.generation}기</div>
                 </div>
                 <div className="header-left2">
                   <Link to="/profile">
-                    <span className="info">팔로워 {userData.followers.length - 1}명</span>
-                    <span className="info">팔로잉 {userData.followings.length - 1}명</span>
+                    <span className="info">팔로워 {userData.followers.length}명</span>
+                    <span className="info">팔로잉 {userData.followings.length}명</span>
                   </Link>
                 </div>
                 <div className="header-left3">
@@ -109,28 +109,26 @@ const ProfileHeader = ({userData, myProfile}) => {
                     </a>
                 </div>
                 <div className="header-right2">
-                    <div className="phone-number">
-                        <MdPhoneIphone size="16"/>&nbsp;
-                        {userData.tel}
-                    </div>
                     <div className="email">
                         <MdEmail size="16"/>&nbsp;
                         {userData.email}
                     </div>
-                    <span className="calendar">
-                        <MdCalendarMonth size="16"/>&nbsp;
-                        비행일정 확인하기
-                    </span>
-                    <span className="edit-profile-header">
-                      {EditButton()}
-                      {myProfile && EditClicked && (
-                        <ProfileEditModal
-                          user={null}
-                          EditModalClose={EditModalClose}
-                        />
-                      )}
-                    </span>
+                    <div className="phone-number">
+                        <MdPhoneIphone size="16"/>&nbsp;
+                        {userData.tel}
+                    </div>
                 </div>
+            </div>
+            <div className="header-additional-right">
+              <span className="edit-profile-header">
+                {EditButton()}
+                {myProfile && EditClicked && (
+                  <ProfileEditModal
+                    user={null}
+                    EditModalClose={EditModalClose}
+                  />
+                )}
+              </span>
             </div>
         </div>
       </main>

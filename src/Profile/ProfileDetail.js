@@ -47,12 +47,19 @@ const ProfileHeader = ({userData, myProfile}) => {
    * 자기 페이지 Follow 비활성화
    * Optimistic Following 구현 
    */
+  const isFollowed = () => {
+    return userData.followers.includes(auth.currentUser.uid);
+  };
+
+  const [followerlen, setFollowerLen] = useState(userData.followers.length);
+  const followinglen = userData.followings.length;
 
   const handleFollow = async () => {
     try {
       const currentUserID = auth.currentUser.uid;
-      const otherUserID = userData.uid;
-
+      const otherUserID = userData.uid; 
+      
+      setFollowerLen(followerlen + 1);
       const otherUserRef = doc(dbService, "users", otherUserID);
       await updateDoc(otherUserRef, {
         followers: arrayUnion(currentUserID),
@@ -81,14 +88,14 @@ const ProfileHeader = ({userData, myProfile}) => {
                 </div>
                 <div className="header-left2">
                   <Link to="/profile">
-                    <span className="info">팔로워 {userData.followers.length - 1}명</span>
-                    <span className="info">팔로잉 {userData.followings.length - 1}명</span>
+                    <span className="info">팔로워 {followerlen}명</span>
+                    <span className="info">팔로잉 {followinglen}명</span>
                   </Link>
                 </div>
                 <div className="header-left3">
                   {myProfile ? (
                     <h3> </h3>
-                  ) : (
+                  ) : ( isFollowed() ? <button>Followed ✓</button> :
                     <button onClick={handleFollow}>Follow</button>
                   )}
                 </div>

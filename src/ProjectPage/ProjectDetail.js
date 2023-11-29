@@ -97,15 +97,16 @@ const ProjectHeader = ({project, uid, isMember, isApply}) => {
             </div>
           </div>
           <div className={style.projectBoxButtons}>
+            <Link to={`/projectHome/${project.id}`} style={{ textDecoration: 'none', color: 'black' }} className={style.pageButton}>
+              소모임 페이지로 이동
+            </Link>
             {project.leaderId === uid ? (
               <Link to={`/projectManage/${project.id}`} style={{ textDecoration: 'none', color: 'black' }} className={style.recruitButton}>
                 소모임 관리하기
               </Link>
             ) : (
               isMember ? (
-                <Link to={`/projectHome/${project.id}`} style={{ textDecoration: 'none', color: 'black' }} className={style.recruitButton}>
-                  소모임 페이지로 이동하기
-                </Link>
+                <span className={style.recruitButton}>구성원입니다</span>
               ) : (
                 isApply ? (
                   <span className={style.recruitButton}>지원 이력이 있습니다</span>

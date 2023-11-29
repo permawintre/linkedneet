@@ -486,7 +486,7 @@ const Posts=({ userInfo, currentLocation, id }) =>{
       return (
         <div>
             <div>{allPosts}</div>
-            <div className="addmargin" style={{ textAlign: "center" }}>
+            <div className={style.addmargin} style={{ textAlign: "center" }}>
                 {nextPosts_loading ? (
                     <p>Loading..</p>
                 ) : (
@@ -923,7 +923,7 @@ function formatDate(timestamp) {
       })
 }
 
-const ProjectHeader = ({ project, projectId }) => {
+const ProjectHeader = ({ uid, project, projectId }) => {
     return (
         <div className={style.projectDetail}>
           <div className={style.projectBoxDetail}>
@@ -964,10 +964,15 @@ const ProjectHeader = ({ project, projectId }) => {
                   <span className={style.infoContent}>{project.type}</span>
                 </div>
               </div>
-              <div className={style.info}>
-                <Link to={`/projectDetail/${projectId}`} style={{ color: 'gray', textDecoration: 'underline' }}>
+              <div className={style.infoBottom}>
+                <Link to={`/projectDetail/${projectId}`} className={style.detail}>
                     상세보기
                 </Link>
+                { project.leaderId === uid ? (
+                <Link to={`/projectManage/${projectId}`} className={style.manage}>
+                    관리하기
+                </Link>
+                ) : (null) }
               </div>
           </div>
         </div>
@@ -1107,7 +1112,7 @@ export const ProjectHome = () => {
         <div className={style.home}>
             {/* left sidebar - project info */}
             <aside className={style.leftSidebar}>
-                {project? ProjectHeader({project, projectId}) : 'loading'}
+                {project? ProjectHeader({uid, project, projectId}) : 'loading'}
             </aside>
             
             {/* Write and Posts ONLY RELATED TO PROJECT */}

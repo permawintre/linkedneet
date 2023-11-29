@@ -105,11 +105,21 @@
     text-align: center;
     margin: 10px auto;
 }
-.projectBoxButtons .recruitButton {
+.projectBoxButtons .pageButton {
     display: inline-block;
-    width: 520px;
+    width: 250px;
     padding: 10px 0;
     background-color: yellowgreen;
+    margin-right: 15px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.projectBoxButtons .recruitButton {
+    display: inline-block;
+    width: 250px;
+    padding: 10px 0;
+    background-color: silver;
     margin-right: 15px;
     box-sizing: border-box;
     border-radius: 10px;

@@ -1,6 +1,11 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;200;300;400;500;600;700;800;900&display=swap');
   
+.addmargin {
+    margin: 20px 0;
+    padding-bottom: 400px;
+}
+
 .homePost {
     width: 550px;
     background-color: white;
@@ -795,4 +800,16 @@ a {
     display: inline-block;
     width: 70px;
     padding-left: 3px;
+}
+
+.leftSidebar .projectBoxDetail .infoBottom .detail,
+.leftSidebar .projectBoxDetail .infoBottom .manage {
+    color: gray;
+    text-decoration: underline;
+    margin-right: 10px;
+}
+.leftSidebar .projectBoxDetail .infoBottom {
+    width: 100%;
+    padding: 5px 16px;
+    font-size: 12px;
 }

@@ -167,7 +167,9 @@ export const Profile = () => {
       }
     };
 
-    fetchProfileUserData();
+    if (currentUserDataLoaded) {
+      fetchProfileUserData();
+    }
   }, [uid, currentUserData]);
 
   useEffect(() => {  // Random User IDs Fetch
@@ -196,7 +198,9 @@ export const Profile = () => {
       setCurrentRandomDataLoaded(true);
     };
 
-    fetchUserIds();
+    if (currentUserDataLoaded) {
+      fetchUserIds();
+    }
   }, [currentUserDataLoaded, currentUserData]);
 
   

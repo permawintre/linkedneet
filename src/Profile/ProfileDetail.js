@@ -19,9 +19,9 @@ const ProfileHeader = ({userData, myProfile}) => {
   const bgImageStyle = {
       backgroundImage: `url(${userData.background_image})`
     };
-  const website_url = 'https://' + userData.website;
-  const facebook_url = 'https://www.facebook.com/' + userData.facebook;
-  const insta_url = 'https://www.instagram.com/' + userData.instagram;
+  const website_url = userData.website;
+  const facebook_url = userData.facebook;
+  const insta_url = userData.instagram;
 
   // Profile Edit
   const [EditClicked, setEditClicked] = useState(false);
@@ -325,7 +325,9 @@ useEffect(() => {
     }
   };
 
-  fetchProfileUserData();
+  if (currentUserDataLoaded) {
+    fetchProfileUserData();
+  }
 }, [uid, currentUserData]);
 
   // firebase에서 모든 data가 fetch되기 전까지 Loading... 띄우기

@@ -50,7 +50,7 @@ const ProfilePost = ({userData, myProfile}) => {
                 <div className="profile-post-list">
                     {postList.length === 0 ? (
                       <div className="no-posts-message">
-                          게시글이 아직 없어요 T^T
+                          아직 게시글이 없어요 T^T
                       </div>
                     ) : (
                         // postList.map(post => (

@@ -6,8 +6,7 @@ import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { auth, dbService } from '../firebase.js'
 import { ProjectDetailComment } from './ProjectDetailComment';
-
-const defaultLeaderImg = 'https://s3.amazonaws.com/37assets/svn/765-default-avatar.png';
+import defaultProfileImg from '../images/default_profile_image.jpg'
 
 const getTagColor = (status) => {
     switch (status) {
@@ -98,15 +97,16 @@ const ProjectHeader = ({project, uid, isMember, isApply}) => {
             </div>
           </div>
           <div className={style.projectBoxButtons}>
+            <Link to={`/projectHome/${project.id}`} style={{ textDecoration: 'none', color: 'black' }} className={style.pageButton}>
+              소모임 페이지로 이동
+            </Link>
             {project.leaderId === uid ? (
               <Link to={`/projectManage/${project.id}`} style={{ textDecoration: 'none', color: 'black' }} className={style.recruitButton}>
                 소모임 관리하기
               </Link>
             ) : (
               isMember ? (
-                <Link to={`/projectHome/${project.id}`} style={{ textDecoration: 'none', color: 'black' }} className={style.recruitButton}>
-                  소모임 페이지로 이동하기
-                </Link>
+                <span className={style.recruitButton}>구성원입니다</span>
               ) : (
                 isApply ? (
                   <span className={style.recruitButton}>지원 이력이 있습니다</span>
@@ -156,10 +156,19 @@ const ProjectBody = (project) => {
 const ProjectMember = ({memberInfos}) => {
   return (
       <div className={`${style.projectDetail} ${style.projectBody}`}>
-        <div className={style.bodyContent}>
+        <div className={`${style.bodyContent} ${style.memberBody}`}>
           {memberInfos.map((memberInfo, index) => (
-            <div key={index}>
-              {memberInfo.nickname}
+            <div className={style.userProfile} key={index}>
+              <Link to={`/profiledetail?uid=${memberInfo.id}`}>
+                <img className={style.backgroundImg} src={memberInfo.background_image}/>
+                <img className={style.profileImg} src={memberInfo.profile_image} alt={memberInfo.nickname} />
+              </Link>
+              <div className={style.profileInfo}>
+                <Link to={`/profiledetail?uid=${memberInfo.id}`} className={style.profileName}>{memberInfo.nickname}</Link>
+                <p className={style.profileGroup}>니트컴퍼니 {memberInfo.generation}기</p>
+                <p className={style.profileIntroTitle}>{memberInfo.intro_title}</p>
+              {/* <p className={style.profileFriend}>{friendInfo || ''}</p> friendInfo가 없을 경우 빈 문자열 */}
+              </div>
             </div>
           ))}
         </div>
@@ -215,7 +224,7 @@ export const ProjectDetail = () => {
             id: projectDoc.id,
             leaderName: leaderData.nickname,
             leaderComment: `니트컴퍼니 ${leaderData.generation}기. ${leaderData.intro_title}`,
-            leaderImage: leaderData.profile_img ? leaderData.profile_img : defaultLeaderImg
+            leaderImage: leaderData.profile_img ? leaderData.profile_img : defaultProfileImg
           };
 
           // Set project data and status
@@ -244,7 +253,14 @@ export const ProjectDetail = () => {
           const userDocSnapshot = await getDoc(userDocRef);
 
           if (userDocSnapshot.exists()) {
-            return userDocSnapshot.data();
+            const userData = userDocSnapshot.data();
+            const modifiedUserData = {
+              ...userData,
+              profile_image: userData.profile_image || defaultProfileImg,
+              intro_title: userData.intro_title || '',
+              id: userDocSnapshot.id
+            };
+            return modifiedUserData;
           }
         });
 

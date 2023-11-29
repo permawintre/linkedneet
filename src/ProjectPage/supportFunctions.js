@@ -110,8 +110,9 @@ export const PostContents = ({contents}) => {
  */
 export const PostPics = ({imgs}) => {
 
+  //console.log(imgs)
   /* 리스너 설치하기 */
-  console.log({imgs})
+  //console.log({imgs})
   let [idx, setIdx] = useState(0); // 슬라이드 현재 번호
   let [moveX, setMoveX] = useState(0); // 슬라이드 위치 값
   const imgsLength = JSON.parse(JSON.stringify({imgs})).imgs.length
@@ -244,7 +245,7 @@ export const CommentBtn = () => {
 }
 
 export const Comments= ({ userId, userPic, userName, postedAt, contents})=> {
-  console.log(postedAt);
+  //console.log(postedAt);
   return (
     <div className="postComment">
         <Link to={`/profiledetail?uid=${userId}`}>
@@ -264,7 +265,7 @@ export const Comments= ({ userId, userPic, userName, postedAt, contents})=> {
 }
 
 export const CommentsWindow = ({comments, numOfComments, updateComments}) => {
-  console.log("Initial comments: ", comments);
+  //console.log("Initial comments: ", comments);
   const [state,setState] = useState(true);
   const [commentsWithUserInfo, setCommentsWithUserInfo] = useState(comments);
 
@@ -272,12 +273,12 @@ export const CommentsWindow = ({comments, numOfComments, updateComments}) => {
     const fetchUserInfos = async () => {
       const updatedComments = [];
       for (const comment of comments) {
-        console.log("Comment userId:", comment.userId);
+        //console.log("Comment userId:", comment.userId);
         const userRef = doc(dbService, 'users', comment.userId);
         const userSnap = await getDoc(userRef);
 
         if (userSnap.exists()) {
-          console.log("User data: ", userSnap.data());
+          //console.log("User data: ", userSnap.data());
           updatedComments.push({
             ...comment,
             userPic: userSnap.data().profile_image,
@@ -287,7 +288,7 @@ export const CommentsWindow = ({comments, numOfComments, updateComments}) => {
       }
       updatedComments.sort((a, b) => a.postedAt - b.postedAt);
       setCommentsWithUserInfo(updatedComments);
-      console.log("Updated comments with user info: ", updatedComments);
+      //console.log("Updated comments with user info: ", updatedComments);
     };
 
     fetchUserInfos();
@@ -301,7 +302,7 @@ export const CommentsWindow = ({comments, numOfComments, updateComments}) => {
   }
   const renderComments = () => {
     return commentsWithUserInfo.map((comment, index) => {
-      console.log("Rendering comment: ", comment);
+      //console.log("Rendering comment: ", comment);
       return(
         <Comments
           key={index}
@@ -333,7 +334,7 @@ export const CommentsWindow = ({comments, numOfComments, updateComments}) => {
 }
 
 export const WriteCommentContainer = ({ userProfileImage, postId, userId, addNewComment })=> {
-  console.log(userId)
+  //console.log(userId)
   const [commentInput, setCommentInput] = useState('');
   
 
@@ -442,4 +443,16 @@ export const WritePost = ({profile})  =>{
       )}
     </>
   );
+}
+
+export const LoadingEffect = () => {
+
+  return (
+    <div className='graybackground'>
+      <div className='outline'>
+        <div className='waves'></div>
+        <div className='loadingIcon'>loading...</div>
+      </div>
+    </div>
+  )
 }

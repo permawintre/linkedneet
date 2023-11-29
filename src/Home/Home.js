@@ -36,7 +36,7 @@ const companyClass = 14
 const moims = ['모임 a', '모임 b', '모임 c']
 
 
-function Post(props) {
+export function Post(props) {
     //console.log('사진여러장로딩문제', props.imgUrls)
     const userId = props.userId;
     const postId = props.postId
@@ -654,7 +654,7 @@ function DndBox(props) {
     )
 }
 
-function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLocation }) {
+export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLocation }) {
 
     const defaultPostWhere = () => {
 

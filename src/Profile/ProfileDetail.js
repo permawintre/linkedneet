@@ -369,7 +369,7 @@ useEffect(() => {
         </div>
         <div ref={introRef}><ProfileIntro userData={profileUserData} myProfile={myProfile}/></div>
         <div ref={careerRef}><ProfileCareer userData={profileUserData} myProfile={myProfile}/></div>
-        <div ref={postRef}><ProfilePost userData={profileUserData} myProfile={myProfile}/></div>
+        <div ref={postRef}><ProfilePost currentUserData={currentUserData} userData={profileUserData} myProfile={myProfile}/></div>
         <div ref={commentRef}><ProfileComment currentUserData={currentUserData} myProfile={myProfile} profileUid={uid}/></div>
     </div>
     </div>

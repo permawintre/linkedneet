@@ -81,6 +81,12 @@ const ProfileCareerDetail = () => {
     }, []);
 
     
+    const sortedCareerList = Object.fromEntries(
+      Object.entries(userData.career).sort(function([, a], [, b]) {
+        a = a.from.split('/').join('');
+        b = b.from.split('/').join('');
+        return a > b ? 1 : a < b ? -1 : 0;
+    }));
 
     // <FontAwesomeIcon icon={faPlus} size="2xl" style={{color: "#000000",}} /> //
     if (isLoading) {
@@ -115,13 +121,15 @@ const ProfileCareerDetail = () => {
                   <FontAwesomeIcon icon={faArrowLeft} size="2xl" style={{color: "#000000",}} />
                 </div>
                 <h2 style={{margin: "0px 0px 10px 0px"}}><span className="highlight">경력</span> 수정하기</h2>
-                {Object.keys(userData.career).map((job, index) => (
+                {Object.keys(sortedCareerList).map((job, index) => (
                   <div className="career-body">
                     <div className="career-index"/>
                     <div className="career-wrapper" key={index}>
-                      <div className="career-title-">{job}</div>
+                      <div className="career-title-">
+                        {job} ({userData.career[job]["from"].slice(0, 7)} ~ {userData.career[job]["to"].slice(0, 7)})
+                      </div>
                       <div className="career-content">
-                        {userData.career[job].map((item, i) => (
+                        {userData.career[job]["detail_list"].map((item, i) => (
                           <li key={i}>{item}</li>
                         ))}
                       </div>

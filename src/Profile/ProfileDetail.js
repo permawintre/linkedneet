@@ -228,18 +228,26 @@ const ProfileIntro = ({userData, myProfile}) => {
 };
 
 const ProfileCareer = ({userData, myProfile}) => {
-
+  const sortedCareerList = Object.fromEntries(
+    Object.entries(userData.career).sort(function([, a], [, b]) {
+      a = a.from.split('/').join('');
+      b = b.from.split('/').join('');
+      return a > b ? 1 : a < b ? -1 : 0;
+  }));
+  
   return (
     <div className="career-container">
       <main>
         <h2 style={{margin: "0px 0px 10px 0px"}}>나는 이런 <span className="highlight">경험</span>을 했어요</h2>
-        {Object.keys(userData.career).map((job, index) => (
+        {Object.keys(sortedCareerList).map((job, index) => (
           <div className="career-body" key={index}>
             <div className="career-index"/>
             <div className="career-wrapper" key={index}>
-              <div className="career-title-">{job}</div>
+              <div className="career-title-">
+                {job} ({userData.career[job]["from"].slice(0, 7)} ~ {userData.career[job]["to"].slice(0, 7)})
+              </div>
               <div className="career-content">
-                {userData.career[job].map((item, i) => (
+                {userData.career[job]["detail_list"].map((item, i) => (
                   <li key={i}>{item}</li>
                 ))}
               </div>

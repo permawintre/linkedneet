@@ -246,7 +246,12 @@ hr {
 
     /* 기타 스타일 */
 }
-
+.commentMenuIcon{
+    position: absolute;
+    top: 0;
+    right: 20px;
+    cursor: pointer;
+}
 
 .writecommentcontainer {
     width: 100%;
@@ -395,6 +400,7 @@ hr {
 }
 .modalHeader .selectBar {
     display: flex;
+    position: relative;
 }
 .modalHeader .selectBar>div {
     padding: 20px;
@@ -403,6 +409,22 @@ hr {
 }.modalHeader .selectBar>div:hover {
     cursor: pointer;
     background-color: #eeeeee;
+}
+.projectDropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    border-radius: 5px;
+    background-color: white;
+  }
+.projectDropdown div {
+    transition: background-color 0.3s ease;
+    border-radius: 8px; /* 덜 라운드된 테두리 */
+    cursor: pointer;
+}
+.projectDropdown div:hover {
+    /* 배경색 변경 */
+    background-color: #f0f0f0;
 }
 .modalProfile {
     display: flex;

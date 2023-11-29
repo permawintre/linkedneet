@@ -48,6 +48,7 @@ function Post(props) {
     const [postUserInfo, setPostUserInfo] = useState({ profileImage: '', nickname: '' });
     const postWhere = props.postWhere;
     const modified = props.modified;
+    const [projectName, setProjectName] = useState('');
 
     const [loading, setLoading] = useState(false)
 
@@ -120,6 +121,30 @@ function Post(props) {
         fetchComments();
     }, [postId]);
 
+    useEffect(() => {
+        const fetchProjectName = async () => {
+            if (props.postWhere === 'project' && props.projectId) {
+                try {
+                    const projectRef = doc(dbService, 'projects', props.projectId);
+                    const projectSnap = await getDoc(projectRef);
+
+                    if (projectSnap.exists()) {
+                        setProjectName(projectSnap.data().name);
+                    } else {
+                        console.log("Project not found!");
+                    }
+                } catch (error) {
+                    console.error("Error fetching project data: ", error);
+                }
+            }
+        };
+        fetchProjectName();
+    }, [props.postWhere, props.postId]);
+    useEffect(() => {
+        console.log(`postWhere: ${props.postWhere}, projectName: ${props.projectId}`);
+    }, [props.projectId]);
+
+
     const postWriteEditBtnClick = ()=> {
         setShowDropdown(!showDropdown);
         //console.log('아이콘 클릭!');
@@ -190,7 +215,18 @@ function Post(props) {
                     </Link>
                     <div className='postInfo'>
                         <Link to={`/profiledetail?uid=${props.userId}`}>
-                            <div className="userName">{postUserInfo.nickname || userName}<div className="postWhere">▸{postWhere}</div></div>
+                            <div className="userName">{postUserInfo.nickname || userName}
+                            {props.postWhere === 'project' && (
+                                <div className="postWhere">
+                                    ▸project ▸{projectName}
+                                </div>
+                            )}
+                            {props.postWhere != 'project' && (
+                                <div className="postWhere">
+                                    ▸{postWhere}
+                                </div>
+                            )}
+                            </div>
                             <div className='inGroup'>
                                     {postUserInfo.generation+'기' || companyClass+'기'}{moims.map((moim, idx)=>(<span key={idx}>{', '}{moim}</span>))}
                             </div>
@@ -234,7 +270,7 @@ function Post(props) {
             </div>
 */}
             <CommentsWindow comments={comments} numOfComments={comments.length}/>
-            <WriteCommentContainer userProfileImage = {props.userInfo?.profile_image} postId = {postId} userId ={auth.currentUser.uid} addNewComment={addNewComment}/>
+            <WriteCommentContainer userProfileImage = {props.userInfo?.profile_image} postId = {postId} userId ={auth.currentUser.uid} addNewComment={addNewComment} />
             <Write
                 isOpen={isWriteOpen}
                 setIsOpen={setIsWriteOpen}
@@ -421,6 +457,7 @@ const Posts=({ userInfo, currentLocation }) =>{
                     postWhere = {post.postWhere}
                     userInfo={userInfo}
                     modified = {post.modified}
+                    projectId = {post.projectId}
                 />
                 <div className='postFooter'>
                 </div>
@@ -735,6 +772,7 @@ function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLocation })
             'postedAt': existingPost ? existingPost.postedAt/1000 : moment().unix(),
             'userId': uid,
             'imgUrls': modifiedImgs(imgIds, imgDeleted, imgUrls),
+            'projectId': selectedProjectId,
         };
     
         const handleUploadImages = async () => {
@@ -796,6 +834,48 @@ function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLocation })
         setContentImages([]);
     };
     
+    const [showProjectDropdown, setShowProjectDropdown] = useState(false);
+
+    const toggleProjectDropdown = () => {
+    setShowProjectDropdown(!showProjectDropdown);
+    };
+
+    const fetchUserProjects = async () => {
+        const userProjects = [];
+        const userProjectTitles = [];
+      
+        const q = query(collection(dbService, 'projectMember'), where('userId', '==', auth.currentUser.uid));
+      
+        try {
+          const querySnapshot = await getDocs(q);
+          for (const docSnapshot of querySnapshot.docs) {
+                const projectId = docSnapshot.data().projectId;
+                const projectRef = doc(dbService, 'projects', projectId);
+                const projectSnap = await getDoc(projectRef);
+        
+                if (projectSnap.exists()) {
+                userProjectTitles.push(projectSnap.data().name);
+                userProjects.push({ id: projectId, name: projectSnap.data().name });
+                }
+            }
+        } catch (error) {
+          console.error("프로젝트 가져오기 중 에러 발생:", error);
+        }
+      
+        return userProjects;
+    }
+    const [userProjects, setUserProjects] = useState([]);
+    useEffect(() => {
+        // 컴포넌트가 마운트될 때 사용자가 속한 프로젝트 목록을 가져옵니다.
+        fetchUserProjects().then(projects => {
+          setUserProjects(projects);
+        });
+      }, []);
+
+    const [selectedProjectId, setSelectedProjectId] = useState(null);
+    const selectProject = (projectId) => {
+    setSelectedProjectId(projectId);
+    };
 
 
     return(
@@ -814,7 +894,7 @@ function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLocation })
                                 <div className='profileImg'><img src={userInfo?.profile_image || profile1Img} alt="profileImg"/></div>
                                 <div>
                                     <div className="userName">{userInfo?.nickname || userName}</div>
-                                    <div className="postWhere">게시 위치 ▸{values.postWhere}</div>
+                                    <div className="postWhere">게시 위치 ▸{values.postWhere}{values.postWhere === 'project' &&(<div>[{values.projectName}]</div>)}</div>
                                 </div>
                             </div>
                             {selectBar ? 
@@ -824,19 +904,32 @@ function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLocation })
                                         'postWhere': 'profile',})
                                     );
                                     setSelectBar(!selectBar)
-                                    }}>profile</div>
+                                }}>profile
+                                </div>
+
                                     <div onClick={ () => {setValues((prev) =>
                                         ({...prev,
                                         'postWhere': 'neetCompany',})
                                     );
                                     setSelectBar(!selectBar)
-                                    }}>neetCompany</div>
-                                    <div onClick={ () => {setValues((prev) =>
-                                        ({...prev,
-                                        'postWhere': 'project',})
-                                    );
-                                    setSelectBar(!selectBar)
-                                    }}>project</div>{/*가입한 그룹이랑 연동하는것 구현필요*/}
+                                }}>neetCompany
+                                </div>
+
+                                <div onClick={toggleProjectDropdown}>project</div>
+                                {showProjectDropdown && (
+                                    <div className="projectDropdown">
+                                        {userProjects.map((project, index) => (
+                                        <div key={index} onClick={() => {
+                                            setValues(prev => ({...prev, 'postWhere': 'project','projectName':project.name}));
+                                            selectProject(project.id);
+                                            setShowProjectDropdown(false); // 드롭다운 닫기
+                                        }}>
+                                            {project.name} {/* 프로젝트 제목 렌더링 */}
+                                        </div>
+                                        ))}
+                                    </div>
+                                )}
+
                                 </div>
                                 :
                                 null
@@ -909,6 +1002,7 @@ export const Home = () => {
     const [users, setUsers] = useState([]);
     const [userInfo, setUserInfo] = useState(null);
     const [isWriteOpen, setIsWriteOpen] = useState(false);
+
 
     useEffect(() => { //오른쪽 사이드 바 코드
         const fetchUsers = async () => {

@@ -42,6 +42,7 @@ ul {
     padding-bottom: 30px;
     width: 1100px;
     display: flex;
+    text-align: center;
 }
 .header__left {
     flex: 3;
@@ -59,46 +60,77 @@ ul {
 .header__mid {
     flex: 2;
     text-align: center;
+    padding-top: 15px;
 }
 .linkedneet_logo {
     font-size: 3rem;
     font-family: 'Gabarito', cursive;
     margin-top: 0;
+    text-align: center;
+    line-height: 35px;
 }
 .header__right {
     flex: 3;
     display: flex;
+    padding-top: 15px;
+    align-items: center;
 }
+
+.header__search-container {
+    position: relative;
+    margin: 0px 0px 0px 10px;
+}
+
 .header__searchbar {
     flex: 3;
-    padding: 10px;
-    margin-top: 5px;
-}
-.searchbar {
+    min-width: 50px;
+    height: 20px;
+    line-height: 20px;
 
-    height: 5px;
-    border-radius: 20px;
-    border-color: var(--color_2);
-    background-color: var(--color_3);
-}
-.header__searchbar :focus {
+    padding: 7px;
+    margin: 0px;
 
+    border-radius: 45px;
+    border: 2px solid var(--color_3);
+    background-color: var(--color_2);
+    transition: all 0.2s;
+    position: relative;
+    color: black;
+}
+
+.header__searchbar:focus {
     background-color: var(--color_2);
     outline: none;
 }
-.header__searchbar :hover {
-
+.header__searchbar:hover {
+    cursor: pointer;
     border-color: white;
 }
+
+.fake-placeholder {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    transition: all 0.2s ease;
+    color: gray;
+    font-size: 13px;
+    align-items: center;
+    line-height: 100%;
+}
+
+.header__search-container.active .fake-placeholder {
+    left: 9px;
+    transform: translate(0, -50%);
+}
+
 .header__notice {
     flex: 1;
     padding: 10px;
-    margin-top: 15px;
 }
 .header__loginout {
     flex: 1;
     padding: 10px;
-    margin-top: 15px
 }
 body {
     margin-top: 108px;

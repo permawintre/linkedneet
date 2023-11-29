@@ -1,8 +1,18 @@
-import React from 'react'
-import { Link } from "react-router-dom"
+import React,  { useState } from 'react'
+import { Link, useNavigate } from "react-router-dom"
 import { logOut } from "./firebase.js"
 
 export const Header = () => {
+    const [searchTerm, setSearchTerm] = useState('');
+    const navigate = useNavigate();
+    const [isFocused, setIsFocused] = useState(false);
+
+    const handleSearchSubmit = (event) => {
+        event.preventDefault();
+        // 검색 로직이나 페이지 이동 로직
+        // 예시: 검색어에 따라 다른 페이지로 이동
+        window.location = `/search?q=${encodeURIComponent(searchTerm)}`;
+    };
 
     return(
 
@@ -20,7 +30,19 @@ export const Header = () => {
                 </Link>
             </div>
             <div className="header__right">
-                <div className='header__searchbar'>searchbar</div>
+                <form onSubmit={handleSearchSubmit}>
+                    <div className={`header__search-container ${isFocused || searchTerm ? 'active' : ''}`}>
+                        <input 
+                            type="text" 
+                            className='header__searchbar' 
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onFocus={() => setIsFocused(true)}
+                            onBlur={() => setIsFocused(false)}
+                        />
+                        {searchTerm === '' && <span className='fake-placeholder'>검색</span>}
+                    </div>
+                </form>
                 <div className='header__notice'>공지</div>
                 <button className='header__loginout' onClick={ logOut }>login/out</button>
             </div>

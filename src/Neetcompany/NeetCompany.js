@@ -17,6 +17,7 @@ import {
 import { useEffect, useState, useRef } from 'react'
 import { Link, useNavigate } from "react-router-dom"
 import { dbService , auth } from '../firebase.js'
+import defaultProfileImg from '../images/default_profile_image.jpg'
 
 export const NeetCompany = () => {
     const [users, setUsers] = useState([]);

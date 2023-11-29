@@ -42,6 +42,7 @@ const ProfilePost = ({userData, myProfile}) => {
         };
         fetchPosts();
     }, [profileUid]);
+    console.log(profileUid);
 
     return (
         <div className="container">
@@ -66,7 +67,7 @@ const ProfilePost = ({userData, myProfile}) => {
                         //         {/* {post.images && post.images.length > 0 && <PostPics imgs={post.images} />} */}
                         //     // </div>
                         // ))
-                        <ShowPosts currentLocation={'profile'}/>
+                        <ShowPosts currentLocation={'profile'} userId = {profileUid}/>
                       )}
                 </div>
             </main>

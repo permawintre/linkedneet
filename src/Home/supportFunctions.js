@@ -9,7 +9,7 @@ import comments from '../images/comments.png'
 import React from 'react'
 import { dbService , auth } from '../firebase.js'
 import { Link } from "react-router-dom"
-
+import defaultProfileImg from '../images/default_profile_image.jpg'
 
 
 /**
@@ -249,7 +249,7 @@ export const Comments= ({ userId, userPic, userName, postedAt, contents})=> {
   return (
     <div className="postComment">
         <Link to={`/profiledetail?uid=${userId}`}>
-          <img src={userPic} alt="Profile" className="commentUserPic" />
+          <img src={userPic || defaultProfileImg} alt="Profile" className="commentUserPic" />
         </Link>
         <div className="commentDetails">
           <div className="commentHeader">

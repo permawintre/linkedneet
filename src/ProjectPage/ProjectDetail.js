@@ -5,7 +5,7 @@ import { doc, getDoc, where, getDocs, collection, query } from 'firebase/firesto
 import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { auth, dbService } from '../firebase.js'
-import { is } from "date-fns/locale";
+import { ProjectDetailComment } from './ProjectDetailComment';
 
 const defaultLeaderImg = 'https://s3.amazonaws.com/37assets/svn/765-default-avatar.png';
 
@@ -151,18 +151,15 @@ const ProjectBody = (project) => {
       );
 }
 
-const ProjectReview = (project) => {
+const ProjectReview = ({isReview, isMember, uid, projectId}) => {
     return (
         <div className={`${style.projectDetail} ${style.projectBody}`}>
           <div className={style.bodyTitle}>소모임 후기</div>
           <div className={style.bodyContent}>
-            {project.reviews.map((review, index) => (
-              <div className={style.review} key={index}>
-                <span className={style.reviewUser}>{review.nickname}</span>
-                <span className={style.reviewDate}>{formatDate(review.created_at)}</span>
-                <div className={style.reviewContent}>{review.content}</div>
-              </div>
-            ))}
+            { !isReview && !isMember ?
+              '작성된 후기가 없습니다' :
+              <ProjectDetailComment isReview={isReview} isMember={isMember} uid={uid} projectId={projectId}/>
+            }
           </div>
         </div>
       );
@@ -173,6 +170,7 @@ export const ProjectDetail = () => {
   const [project, setProject] = useState(null);
   const [uid, setUid] = useState("");
   const [isMember, setIsMember] = useState(false);
+  const [isReview, setIsReview] = useState(false);
 
   useEffect(() => {
     // Set uid if the user is authenticated
@@ -237,6 +235,17 @@ export const ProjectDetail = () => {
       } catch (error) {
         console.error('Error checking project membership: ', error);
       }
+
+      try {
+        const projectCommentsCollection = collection(dbService, 'projectComments');
+        const commentsQuery = query(projectCommentsCollection, where('projectId', '==', projectId));
+        const commentsQuerySnapshot = await getDocs(commentsQuery);
+
+        // Update isMember state based on whether the document exists
+        setIsReview(!commentsQuerySnapshot.empty);
+      } catch (error) {
+        console.error('Error checking project reviews: ', error);
+      }
     };
 
     fetchProjectAndCheckMembership();
@@ -298,16 +307,20 @@ export const ProjectDetail = () => {
             {((activeSection === 'projectMemberSection') || (activeSection === 'projectPreparationSection') || (activeSection === 'projectLocationSection')) &&
             <div className={`${style.projectDetail} ${style.projectBody}`}>
               <div id="projectMemberSection" className={style.bodyTitle}>이런 멤버를 원해요</div>
-              <div className={style.bodyContent}>{project.desiredCrew}</div>
+              <div className={style.bodyContent}>
+                { project.desiredCrew ? project.desiredCrew : "니트컴퍼니 회원이라면 누구나 환영해요!" }
+              </div>
               <div id="projectPreparationSection" className={style.bodyTitle}>준비물</div>
-              <div className={style.bodyContent}>{project.preparation}</div>
+              <div className={style.bodyContent}>
+                { project.preparation ? project.preparation : "별도의 준비물이 없습니다" }
+              </div>
               <div id="projectLocationSection" className={style.bodyTitle}>소모임 위치</div>
               <div className={style.bodyContent}>{project.location}</div>
             </div>
             }
         </div>
         <div id="projectReviewSection">
-            {activeSection === 'projectReviewSection' && ProjectReview(project)}
+            {activeSection === 'projectReviewSection' && ProjectReview({isReview, isMember, uid, projectId})}
         </div>
     </div>
     );

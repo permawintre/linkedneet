@@ -1,0 +1,177 @@
+.projectComment {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+}
+
+.projectComment img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+
+.projectComment form{
+    flex: 1;
+}
+
+.projectComment input {
+    width: 85%;
+    box-sizing: border-box;
+    margin-left: 1%;
+    margin-right: 1%;
+}
+
+.projectComment button {
+    border-radius: 20px;
+    border: none;
+    width: 10%;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 2%;
+    background-color: var(--color_4);
+    cursor: pointer;
+    letter-spacing: 1px;
+}
+
+.projectCommentToggle button {
+    width: 100%;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 0.25%;
+    background-color: gray;
+    cursor: pointer;
+    letter-spacing: 1px;
+}
+
+.message {
+    padding: 5px 20px;
+    border-radius: 25px;
+    border: 1px solid #D9D9D9;
+    background: #FFF;
+    display: flex;
+    flex-direction: row; /* 방향 변경 */
+    margin: 10px 0;
+}
+
+.messageBox {
+    display: flex;
+    flex-direction: column;
+    width: 100%; /* 남은 공간을 모두 차지 */
+    padding: 10px 0px;
+}
+
+.message img {
+    display: block;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-top: 12.5px;
+    margin-bottom: 12.5px;
+    margin-right: 10px; /* 이미지와 텍스트 사이 여백 추가 */
+}
+
+.message .messageHeader {
+    display: inline-block;
+}
+
+.message h3 {
+    display: inline-block;
+    color: #000;
+    margin-right: 5px;
+}
+
+.message .time {
+    position: relative;
+    color: var(--grey, #989898);
+    display: inline-block;
+    margin: 2.5px;
+    margin-right: 2.5px;
+    cursor: pointer;
+    }
+
+.message .time:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    font-size: 12.5px;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: black;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+    z-index: 1;
+}
+
+.message .text {
+    color: #000;
+    padding: 0px 0px;
+}
+
+.message .messageMenu {
+    position: relative;
+    display: block;
+    float: right;
+}
+
+.message .menuIcon {
+    cursor: pointer;
+}
+
+.message .menuOptions {
+    position: absolute;
+    top: 100%; /* 트리거 아이콘의 하단에 위치 */
+    right: 50%; /* 트리거 아이콘의 중앙 기준 오른쪽에서 50% 위치 */
+    transform: translateX(50%); /* X축을 기준으로 자신의 너비의 50%만큼 이동하여 중앙 정렬 */
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    z-index: 1;
+    white-space: nowrap; /* 옵션 텍스트가 줄바꿈 없이 한 줄로 표시되도록 설정 */
+}
+
+.message .menuOption {
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 14px; /* 폰트 크기를 줄임 */
+    width: 40px;
+    text-align: center;
+}
+
+.message .menuOption:hover {
+    background-color: #f0f0f0;
+}
+
+.message .messageEdit-box {
+    display: flex;
+    gap: 5px; /* 버튼 사이의 간격 */
+    align-items: center; /* 버튼과 입력 필드를 세로 중앙에 맞춤 */
+    justify-content: left; /* 요소들을 가로로 중앙에 맞춤 */
+    width: 100%;
+}
+
+.message .messageEditBox input {
+    background-color: white;
+    border: solid 2px rgb(187, 187, 187);
+    border-radius: 25px;
+    padding: 12px 15px;
+    margin: 8px 0;
+    width: 75%;
+}
+
+.message .messageEditBox button {
+    border-radius: 20px;
+    border: none;
+    background-color: var(--color_4);
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 14px 20px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: transform 80ms ease-in;
+}

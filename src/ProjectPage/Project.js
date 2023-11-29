@@ -297,9 +297,6 @@ export const Project = () => {
     fetchProjects();
   }, [uid]);
 
-    console.log(myProjects);
-    console.log(recommendProjects);
-
     return (
         <div className={style.body}>
             <MyProject uid={uid} myProjects={myProjects}/>

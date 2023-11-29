@@ -17,7 +17,7 @@ display: block;
 display: flex;
 padding-top: 3px;
 padding-bottom: 4px;
-width: 720px;
+width: 715px;
 height: 35px;
 justify-content: center;
 align-items: center;
@@ -49,7 +49,7 @@ white-space: nowrap; /*가로로 이어지게 설정*/
 display: flex;
 padding: 15px 0px 0px 0px;
 justify-content: left;
-width: 730px; /* 두 개의 카드가 들어갈 수 있는 너비 */
+width: 725px; /* 두 개의 카드가 들어갈 수 있는 너비 */
 gap: 20px; /* 프로필 사이의 간격 설정 */
 }
 
@@ -108,37 +108,49 @@ overflow: hidden; /* 컨테이너를 넘어가는 이미지 부분을 숨김 */
 
 
 .profile-info {
-font-family: IBM Plex Sans KR;
-font-size: 14px;
-font-weight: 500;
+  font-family: IBM Plex Sans KR;
+  font-size: 14px;
+  font-weight: 500;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-left: 30px;
+}
+
+.profile-group,
+.profile-friend,
+.profile-intro-title {
+  margin: 5px 0;
+  min-height: 20px;
 }
 
 .profile-name {
-position: absolute;
-left: 29px;
-margin: 5px 0;
-text-decoration: none;
+  height: 40px;
+  text-decoration: none;
 
-color: #000;
-font-size: 28px;
-font-weight: bold;
+  color: #000;
+  font-size: 28px;
+  font-weight: bold;
 }
 
 .profile-group {
-position: absolute;
-top: 50px;
-left: 29px;
-margin: 5px 0;
-
-color: var(--text-grey, #6C6C6C);
+  color: var(--text-grey, #6C6C6C);
 }
 
-
 .profile-friend {
-position: absolute;
-top: 90px;
-left: 29px;
-margin: 5px 0;
+  color: var(--grey, #989898);
+}
 
-color: var(--grey, #989898);
+.profile-intro-title {
+  width: 300px;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis; 
+  white-space: nowrap;
+
+  font-weight: bold;
+  text-align: left;
+
+  color: black;
 }

@@ -27,7 +27,7 @@ export const defaultData = {
   career: {
   },
 
-  friendInfo: '홍길동님과 알고 있습니다. (default text)',
+  // friendInfo: '홍길동님 외 3명이 알고 있습니다. (default text)',
 };
 
 // const defaultImage = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'

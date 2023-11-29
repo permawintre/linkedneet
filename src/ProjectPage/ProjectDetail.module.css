@@ -230,15 +230,15 @@
 .userProfile:nth-child(3n + 2) {
   margin-right: 20px;
 }
-.backgroundImg {
+.userProfile .backgroundImg {
     width: 210px;
     height: 107px;
     border-radius: 15px 15px 0px 0px;
-    background: var(--pure-white, #FFF);
+    background: var(--pure-white, #e7e7e7);
     object-fit: cover;
     overflow: hidden;
 }
-.profileImg {
+.userProfile .profileImg {
     position: absolute;
     top: 71px;
     left: 110px;
@@ -250,7 +250,7 @@
     object-fit: cover; /* 이미지가 비율을 유지하면서 컨테이너를 채우도록 설정 */
     overflow: hidden; /* 컨테이너를 넘어가는 이미지 부분을 숨김 */
 }
-.profileInfo {
+.userProfile .profileInfo {
     font-family: IBM Plex Sans KR;
     font-size: 14px;
     font-weight: 500;
@@ -260,19 +260,19 @@
     align-items: flex-start;
     margin-left: 15px;
 }
-.profileGroup,
-.profileFriend,
-.profileIntroTitle {
+.userProfile .profileGroup,
+.userProfile .profileFriend,
+.userProfile .profileIntroTitle {
     font-size: 12px;
 }
-.profileIntroTitle {
+.userProfile .profileIntroTitle {
     width: 180px;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
     margin-top: 3px;
 }
-.profileName {
+.userProfile .profileName {
     text-decoration: none;
     color: #000;
     font-size: 20px;
@@ -283,9 +283,9 @@
     white-space: nowrap;
     overflow: hidden; 
 }
-.profileGroup {
+.userProfile .profileGroup {
     color: var(--text-grey, #6C6C6C);
 }
-.profileFriend {
+.userProfile .profileFriend {
     color: var(--grey, #989898);
 }

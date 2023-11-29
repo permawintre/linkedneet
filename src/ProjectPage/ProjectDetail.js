@@ -153,7 +153,6 @@ const ProjectBody = (project) => {
 }
 
 const ProjectMember = ({memberInfos}) => {
-  console.log(memberInfos);
   return (
       <div className={`${style.projectDetail} ${style.projectBody}`}>
         <div className={`${style.bodyContent} ${style.memberBody}`}>
@@ -257,7 +256,6 @@ export const ProjectDetail = () => {
             const modifiedUserData = {
               ...userData,
               profile_image: userData.profile_image || defaultProfileImg,
-              background_image: userData.background_image || project.image.imageUrl,
               intro_title: userData.intro_title || '',
               id: userDocSnapshot.id
             };

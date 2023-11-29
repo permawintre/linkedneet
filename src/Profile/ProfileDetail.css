@@ -149,8 +149,8 @@ main {
 
 .intro-title {
     margin-left: 10px;
-    height: 40px;
-    overflow: auto;
+    margin-bottom: 10px;
+    height: auto;
     font-size: large;
     font-weight: bold;
 }

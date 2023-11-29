@@ -47,6 +47,7 @@ ul {
     flex: 3;
     display: flex;
     padding-top: 15px;
+    font-size: 20px;
 }
 .header__item {
     flex-grow: 1;

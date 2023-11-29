@@ -21,6 +21,8 @@ import { ProjectHome } from './ProjectPage/ProjectHome.js'
 
 import ProfileCareerDetail from './Profile/ProfileCareerDetail.js'
 
+import { EnrollManage } from './Manage/EnrollManage.js'
+
 function App() {
 
     const [init, setInit] = useState(true); 
@@ -71,6 +73,8 @@ function App() {
             <Route path="/profiledetail/career" element={<ProfileCareerDetail/>}></Route>
 
             <Route path="/profileheaderedit" element={loggedIn ? <ProfileHeaderEdit authObj = {authObj}/> : <RedirectToLogIn/>}></Route>
+
+            <Route path="/manage" element={<EnrollManage/>}></Route>
 
             <Route path="/google_signup" element={isLoggedIn ? <GoogleSignup/> : <RedirectToLogIn/>}></Route>
             <Route path="/signUp" element={<Signup/>}></Route>

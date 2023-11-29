@@ -916,7 +916,7 @@ function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLocation })
                                 }}>neetCompany
                                 </div>
 
-                                <div onClick={toggleProjectDropdown}>project</div>
+                                {userProjects.length!==0 ? <div onClick={toggleProjectDropdown}>project</div> : null}
                                 {showProjectDropdown && (
                                     <div className="projectDropdown">
                                         {userProjects.map((project, index) => (

@@ -1,5 +1,5 @@
 import React from "react"
-import { getDayMinuteCounter, PostContents, PostPics, LikeBtn, CommentBtn, PlusBtn, CommentsWindow, WriteCommentContainer, LoadingEffect } from './supportFunctions'
+import { getDayMinuteCounter, PostContents, PostPics, LikeBtn, CommentBtn, CommentsWindow, WriteCommentContainer, LoadingEffect } from './supportFunctions'
 import './Home.css'
 import { Link, useNavigate } from "react-router-dom"
 import { dbService , auth } from '../firebase.js'
@@ -26,6 +26,7 @@ import { v4 as uuidv4 } from 'uuid'; // 랜덤 식별자를 생성해주는 라�
 import { storage } from '../firebase.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
 
 import profile1Img from '../images/profile1Img.jpg'
@@ -1048,7 +1049,7 @@ export const Home = () => {
                     <img src={userInfo?.imgUrls || profile1Img} alt="background" className="homeProfile-background-img"/> 
                 </div>
                 <img src={userInfo?.profile_image} alt="profile" className="profile-img1" />
-                <div className="profile-info">
+                <div className="profile-info-home">
                     <h3>{userInfo?.nickname || 'undefined'}</h3>
                 </div>
                 <Link to={`/profiledetail?uid=${auth.currentUser.uid}`}>
@@ -1059,6 +1060,7 @@ export const Home = () => {
                 <ShowPosts currentLocation={'home'}/>
             </div>
             <aside className="right-sidebar">
+                <h2>새로운 사람을 알아가보세요!</h2>
                 <ul className="interestList">
                     {users.map(user => (
                         <li key={user.id} className="interestItem">
@@ -1066,7 +1068,7 @@ export const Home = () => {
                                 <img src={user.imgUrls || profile1Img} alt={user.nickname || 'User'}/>
                             </Link>
                             <span className="interestTitle">{user.nickname || 'Unknown User'}</span>
-                            <PlusBtn/>
+                            <FontAwesomeIcon icon={faArrowRight} className="fa-arrow-right"/>
                         </li>
                     ))}
                 </ul>

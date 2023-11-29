@@ -1,0 +1,72 @@
+.neetCompanyBody {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+.left-sidebar-neet, .right-sidebar-neet {
+    width: 250px; /* 또는 원하는 폭에 따라 조정 */
+    position: sticky;
+    top: 118px; /* 항상 상단에 고정 */
+    background-color: white;
+    border-radius: 20px;
+    box-sizing: border-box;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+.card-image {
+width: 100%;
+display: block; /* Remove space below the image */
+}
+
+.card-content {
+padding: 10px;
+font-family: 'Arial', sans-serif;
+}
+
+.card-title {
+font-size: 0.85em;
+color: gray;
+margin-bottom: 5px;
+}
+
+.card-number {
+font-size: 1.5em;
+font-weight: bold;
+margin-bottom: 5px;
+}
+
+.card-date {
+font-size: 0.75em;
+color: gray;
+margin-bottom: 10px;
+}
+
+.card-status {
+display: flex;
+align-items: center;
+margin-bottom: 10px;
+}
+
+.status-dot {
+height: 10px;
+width: 10px;
+background-color: #00ff00;
+border-radius: 50%;
+display: inline-block;
+margin-right: 5px;
+}
+
+.status-text {
+font-size: 0.85em;
+color: gray;
+}
+
+.card-members {
+font-size: 1.2em;
+font-weight: bold;
+background-color: #f0f0f0;
+text-align: center;
+border-radius: 20px;
+padding: 5px 0;
+}

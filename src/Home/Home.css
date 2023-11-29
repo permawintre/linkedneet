@@ -3,6 +3,7 @@
   
 .addmargin {
     margin: 20px 0;
+    padding-bottom: 300px;
 }
 
 .homePost {
@@ -696,18 +697,19 @@ hr {
     position: absolute;
   }
   
-  .profile-info { 
+  .profile-info-home { 
     width: 100%; 
     text-align: center; 
     margin-top: 10px; 
     position: relative;
-  }
+}
 
-  .profile-info h3 {
-    margin: 0;
+  .profile-info-home h3 {
+    margin: 0 auto;
     margin-top: 50px; 
     color: #000000;
     font-size: 1.2em; 
+    display: inline-block; 
 
   }
   
@@ -720,6 +722,9 @@ hr {
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     padding: 20px;
     box-sizing: border-box;
+}
+.right-sidebar h2 {
+    margin-bottom: 20px;
 }
 
 .interestList {
@@ -736,6 +741,7 @@ hr {
 
 .interestItem:hover {
     background-color: #ccc;
+    border-radius: 10px;
 }
 
 .interestItem:last-child {
@@ -755,10 +761,11 @@ hr {
     color: black;
 }
 
-.plusSign {
+.fa-arrow-right {
     font-weight: bold;
     font-size: 24px;
     cursor: pointer;
+    margin-right: 10px;
 }
 
 .plusSign.active {

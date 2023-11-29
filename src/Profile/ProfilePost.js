@@ -8,9 +8,10 @@ import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import './ProfilePost.css';
 import { ShowPosts } from '../Home/Home'
 
-const ProfilePost = ({userData, myProfile, profileUid}) => {
+const ProfilePost = ({userData, myProfile}) => {
     const [postList, setPostList] = useState([]);
-  
+    
+    const profileUid = userData.uid
    // Firebase에서 Post 불러오기 (Fetch)
    useEffect(() => {
         const fetchPosts = async () => {

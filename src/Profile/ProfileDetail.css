@@ -81,14 +81,14 @@ main {
 }
 
 .header-left .nickname {
-    margin-top: 0px;
+    margin: 0px 0px 0px 0px;
     font-weight: bold;
     font-size: 18pt;
     color: color_3;
 }
 
 .header-left .info {
-    margin: 0px 5px 0px 0px;
+    margin: 0px 0px 0px 0px;
     font-size: 11pt;
     color: rgb(158, 158, 158);
 }

@@ -270,6 +270,14 @@ export const GoogleSignup = () => {
             followers: [],
             followings: [],
 
+            // user approve state
+            /*
+             * Level 0 : Default State. 회원 가입 시 준회원 
+             * Level 1 : After approve. 관리자 승인 이후 정회원
+             * Level 2 : 관리자 레벨?
+             */
+            level: 0,
+
             // uid 
             uid: auth.currentUser.uid
         });

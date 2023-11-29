@@ -72,7 +72,9 @@ export const Signup = () => {
                 // following 
                 followers: [],
                 followings: [],
-
+                
+                level: 0,
+                
                 // uid 
                 uid: auth.currentUser.uid
             });

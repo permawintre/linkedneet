@@ -68,7 +68,6 @@ function App() {
 
     let loggedIn  = init && isLoggedIn;
     let approved = userLevel;
-    console.log(approved);
 
     const RedirectToLogIn = () => {
       navigate("/logIn");

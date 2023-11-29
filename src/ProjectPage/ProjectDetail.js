@@ -6,8 +6,7 @@ import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { auth, dbService } from '../firebase.js'
 import { ProjectDetailComment } from './ProjectDetailComment';
-
-const defaultLeaderImg = 'https://s3.amazonaws.com/37assets/svn/765-default-avatar.png';
+import defaultProfileImg from '../images/default_profile_image.jpg'
 
 const getTagColor = (status) => {
     switch (status) {
@@ -154,12 +153,22 @@ const ProjectBody = (project) => {
 }
 
 const ProjectMember = ({memberInfos}) => {
+  console.log(memberInfos);
   return (
       <div className={`${style.projectDetail} ${style.projectBody}`}>
-        <div className={style.bodyContent}>
+        <div className={`${style.bodyContent} ${style.memberBody}`}>
           {memberInfos.map((memberInfo, index) => (
-            <div key={index}>
-              {memberInfo.nickname}
+            <div className={style.userProfile} key={index}>
+              <Link to={`/profiledetail?uid=${memberInfo.id}`}>
+                <img className={style.backgroundImg} src={memberInfo.background_image}/>
+                <img className={style.profileImg} src={memberInfo.profile_image} alt={memberInfo.nickname} />
+              </Link>
+              <div className={style.profileInfo}>
+                <Link to={`/profiledetail?uid=${memberInfo.id}`} className={style.profileName}>{memberInfo.nickname}</Link>
+                <p className={style.profileGroup}>니트컴퍼니 {memberInfo.generation}기</p>
+                <p className={style.profileIntroTitle}>{memberInfo.intro_title}</p>
+              {/* <p className={style.profileFriend}>{friendInfo || ''}</p> friendInfo가 없을 경우 빈 문자열 */}
+              </div>
             </div>
           ))}
         </div>
@@ -215,7 +224,7 @@ export const ProjectDetail = () => {
             id: projectDoc.id,
             leaderName: leaderData.nickname,
             leaderComment: `니트컴퍼니 ${leaderData.generation}기. ${leaderData.intro_title}`,
-            leaderImage: leaderData.profile_img ? leaderData.profile_img : defaultLeaderImg
+            leaderImage: leaderData.profile_img ? leaderData.profile_img : defaultProfileImg
           };
 
           // Set project data and status
@@ -244,7 +253,15 @@ export const ProjectDetail = () => {
           const userDocSnapshot = await getDoc(userDocRef);
 
           if (userDocSnapshot.exists()) {
-            return userDocSnapshot.data();
+            const userData = userDocSnapshot.data();
+            const modifiedUserData = {
+              ...userData,
+              profile_image: userData.profile_image || defaultProfileImg,
+              background_image: userData.background_image || project.image.imageUrl,
+              intro_title: userData.intro_title || '',
+              id: userDocSnapshot.id
+            };
+            return modifiedUserData;
           }
         });
 

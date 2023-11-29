@@ -209,28 +209,83 @@
 .projectButton.active .text {
     font-weight: bold;
 }
-.review {
-    width: 670px;
-    padding: 5px;
-    background-color: rgb(241, 241, 241);
-    border-radius: 10px;
-    margin-bottom: 15px;
+/* Member */
+.memberBody {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    margin-bottom: -20px;
+    margin-left: 5px;
+}
+.userProfile {
+    position: relative;
+    width: 210px;
+    height: 210px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    border-radius: 15px;
+    background: var(--pure-white, #FFF);
+    margin-bottom: 20px;
+}
+.userProfile:nth-child(3n + 1),
+.userProfile:nth-child(3n + 2) {
+  margin-right: 20px;
+}
+.backgroundImg {
+    width: 210px;
+    height: 107px;
+    border-radius: 15px 15px 0px 0px;
+    background: var(--pure-white, #FFF);
+    object-fit: cover;
+    overflow: hidden;
+}
+.profileImg {
+    position: absolute;
+    top: 71px;
+    left: 110px;
+    width: 76px;
+    height: 76px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 50%;
+    background: var(--pure-white, #FFF);
+    object-fit: cover; /* 이미지가 비율을 유지하면서 컨테이너를 채우도록 설정 */
+    overflow: hidden; /* 컨테이너를 넘어가는 이미지 부분을 숨김 */
 }
-.review:last-child {
-    margin-bottom: 0;
-  }
-.review .review-user {
-    padding: 0 10px;
-    font-weight: bold;
+.profileInfo {
+    font-family: IBM Plex Sans KR;
+    font-size: 14px;
+    font-weight: 500;
+    width: 171px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-left: 15px;
 }
-.review .review-content {
-    padding: 0 10px;
-}
-.review .review-date {
+.profileGroup,
+.profileFriend,
+.profileIntroTitle {
     font-size: 12px;
-    color: gray;
 }
-.review .review-content {
-    font-size: 15px;
+.profileIntroTitle {
+    width: 180px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    margin-top: 3px;
+}
+.profileName {
+    text-decoration: none;
+    color: #000;
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 3px;
+    width: 90px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden; 
+}
+.profileGroup {
+    color: var(--text-grey, #6C6C6C);
+}
+.profileFriend {
+    color: var(--grey, #989898);
 }

@@ -164,13 +164,17 @@ const ProfileEditModal = ({EditModalClose}) => {
           <form onSubmit={onSubmit}>
             <hr className="body__partition"></hr>
             <div class="edit-modal-wrap">
-              <h1>프로필</h1>
+              <h1 style={{marginLeft: "2%"}}>프로필</h1>
               <hr style={{border: "solid 1px black"}}/>
               <div class="edit-profile-image">
                 <h3>프로필 사진</h3>
                 <div class="image-edit-button-wrapper">
                   <label for="file-search">
-                    <img class="profile-image" src={Image || userObj.profile_image} alt=""/>
+                    <img class="profile-image" src={Image || userObj.profile_image} 
+                      style={{color: "#5d5d5d",
+                              marginTop: "-45%",
+                              cursor: "pointer",
+                              border: "2px solid var(--color_2)"}} alt=""/>
                     <div class="image-edit-button">✏️ 변경하기</div>
                   </label>
                   
@@ -333,7 +337,11 @@ const ProfileIntroEditModal = ({EditModalClose}) => {
               <div class="edit-profile-intro-image">
                 <h4>멋진 모습을 보여주세요!</h4>
                 <label for="file-search">
-                  <img class="profile-intro-image" src={Image || userObj.intro_image} alt=""/>
+                  <img class="profile-intro-image" src={Image || userObj.intro_image} 
+                    style={{color: "#5d5d5d",
+                    marginTop: "5%",
+                    cursor: "pointer",
+                    border: "2px solid var(--color_2)"}} alt=""/>
                   <div class="image-edit-button">✏️ 변경하기</div>
                 </label>
                 <input id="file-search" type='file' 

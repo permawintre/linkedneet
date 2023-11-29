@@ -78,11 +78,10 @@ export const Signup = () => {
                 uid: auth.currentUser.uid
             });
             
-            
             // move to home if singup is successful
             document.location.href="/";
         })
-        .catch((error) => {
+        .catch((error) => { 
             switch (error.code) {
                 case "auth/user-not-found" || "auth/wrong-password":
                   alert("이메일 혹은 비밀번호가 일치하지 않습니다.");

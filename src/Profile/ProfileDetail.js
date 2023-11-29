@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Link, useLocation } from "react-router-dom"
 import { dbService, auth } from '../firebase';
-import { doc, getDoc, updateDoc, arrayUnion, collection, addDoc, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, query, where, getDocs, orderBy } from 'firebase/firestore';
 import { FaFacebookSquare, FaInstagramSquare} from 'react-icons/fa';
 import { IoGlobeOutline } from "react-icons/io5";
 import { MdPhoneIphone, MdEmail, MdCalendarMonth } from 'react-icons/md'
@@ -41,25 +41,24 @@ const ProfileHeader = ({userData, myProfile}) => {
   };
 
 
-  // Following Handle 
-  /* TODO!
-   * IsFollowed() 구현 => 이미 Follow 된 사람들에 한해서 Follow 비활성화
-   * 자기 페이지 Follow 비활성화
-   * Optimistic Following 구현 
-   */
   const isFollowed = () => {
     return userData.followers.includes(auth.currentUser.uid);
   };
-
+  
+  const [IsFollowed, setIsFollowed] = useState(userData.followers.includes(auth.currentUser.uid));
   const [followerlen, setFollowerLen] = useState(userData.followers.length);
   const followinglen = userData.followings.length;
 
+  const [followBtn, setFollowBtn] = useState("Follow");
   const handleFollow = async () => {
     try {
       const currentUserID = auth.currentUser.uid;
       const otherUserID = userData.uid; 
       
+      setFollowBtn("UnFollow");
       setFollowerLen(followerlen + 1);
+      setIsFollowed(true);
+      
       const otherUserRef = doc(dbService, "users", otherUserID);
       await updateDoc(otherUserRef, {
         followers: arrayUnion(currentUserID),
@@ -68,6 +67,31 @@ const ProfileHeader = ({userData, myProfile}) => {
       const userRef = doc(dbService, "users", currentUserID);
       await updateDoc(userRef, {
         followings: arrayUnion(otherUserID),
+      })
+
+    } catch(error) {
+      console.log(error);
+    }
+  }
+
+  const [UnFollowBtn, setUnFollowBtn] = useState("UnFollow");
+  const handleUnFollow = async() => {
+    try {
+      const currentUserID = auth.currentUser.uid;
+      const otherUserID = userData.uid; 
+      
+      setUnFollowBtn("Follow");
+      setFollowerLen(followerlen - 1);
+      setIsFollowed(false);
+
+      const otherUserRef = doc(dbService, "users", otherUserID);
+      await updateDoc(otherUserRef, {
+        followers: arrayRemove(currentUserID),
+      })
+      
+      const userRef = doc(dbService, "users", currentUserID);
+      await updateDoc(userRef, {
+        followings: arrayRemove(otherUserID),
       })
 
     } catch(error) {
@@ -94,8 +118,8 @@ const ProfileHeader = ({userData, myProfile}) => {
                 <div className="header-left3">
                   {myProfile ? (
                     <h3> </h3>
-                  ) : ( isFollowed() ? <button>Followed ✓</button> :
-                    <button onClick={handleFollow}>Follow</button>
+                  ) : ( IsFollowed ? <button onClick={handleUnFollow}>{UnFollowBtn}</button> :
+                    <button onClick={handleFollow}>{followBtn}</button>
                   )}
                 </div>
             </div>

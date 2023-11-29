@@ -5,60 +5,8 @@ import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { storage } from '../firebase.js';
 import { ref, uploadString, getDownloadURL } from 'firebase/storage';
-import arrow from '../images/arrow.png'
 import './ProfilePost.css';
-import {getDayMinuteCounter} from '../Home/supportFunctions'
-/**
- * 함수형 컴포넌트로, 이미지 배열 넣으면 좌우 슬라이드 가능한 component로 반환합니다(550px * 550px)
- * @param {Array} 사진으로 구성된 배열 input 
- * @returns className 'postPic'인 div로 둘러싸인 컴포넌트 반환
- */
-const PostPics = ({imgs}) => {
-
-    /* 리스너 설치하기 */
-    //console.log({imgs})
-    let [idx, setIdx] = useState(0); // 슬라이드 현재 번호
-    let [moveX, setMoveX] = useState(0); // 슬라이드 위치 값
-    const imgsLength = JSON.parse(JSON.stringify({imgs})).imgs.length
-  
-    function moveL() {
-      if(idx === 0) console.log('cannot move')
-      else {
-        setIdx(idx-1)
-        setMoveX(moveX+550)
-      }
-    }
-    function moveR() {
-      if(idx === imgsLength-1) console.log('cannot move')
-      else {
-        setIdx(idx+1)
-        setMoveX(moveX-550)
-      }
-    }
-  
-    return(
-      <div className='profile-postPic'>
-        <div className='imgContainer' style={{width: `${imgsLength*550}px`}}>
-          {/** map 활용해서 배열안에있던 이미지 하나씩 표시 */}
-          {imgs.map((img, idxs) => (<img src={img} alt="postPic" key={idxs} style={{transform : `translateX(${moveX}px)`}}/>))}
-        </div>
-        <div className='btnContainer'>
-          {/** 더이상 넘길 곳 없으면 버튼 사라지도록 삼항연산자로 처리 */}
-          {idx === 0?
-            <div className='placeHolder'/>
-            :
-            <div className='prev' onClick={moveL}><img src={arrow} alt="prev" /></div>
-          }
-          {idx === imgsLength-1?
-            <div className='placeHolder'/>
-            :
-            <div className='next' onClick={moveR}><img src={arrow} alt="next" /></div>
-          }
-          
-        </div>
-      </div>
-    )
-  }
+import { ShowPosts } from '../Home/Home'
 
 const ProfilePost = ({userData, myProfile, profileUid}) => {
     const [postList, setPostList] = useState([]);
@@ -100,24 +48,25 @@ const ProfilePost = ({userData, myProfile, profileUid}) => {
                 <h2>게시글</h2>
                 <div className="profile-post-list">
                     {postList.length === 0 ? (
-                            <div className="no-posts-message">
-                                게시글이 아직 없어요 T^T
-                            </div>
+                      <div className="no-posts-message">
+                          게시글이 아직 없어요 T^T
+                      </div>
                     ) : (
-                        postList.map(post => (
-                            <div className="profile-post" key={post.id}>
-                                <div className='post-header'>
-                                    <img src={post.userProfile} alt="User Profile" className="user-profile-img" />
-                                    <div className='post-info'>
-                                        <div className='profile-post-nickname'>{post.nickname}</div>
-                                        <div className='profile-post-posted-time' data-tooltip={(new Date(post.postedAt*1000)).toLocaleString()}>{formatDistanceToNow(new Date(post.postedAt*1000), { addSuffix: true, locale: ko })}</div>
-                                    </div>
-                                </div>
-                                <div className='text'>{post.contents}</div>
-                                {post.images && post.images.length > 0 && <PostPics imgs={post.images} />}
-                            </div>
-                        ))
-                    )}
+                        // postList.map(post => (
+                        //     // <div className="profile-post" key={post.id}>
+                        //         {/* <div className='post-header'>
+                        //             <img src={post.userProfile} alt="User Profile" className="user-profile-img" />
+                        //             <div className='post-info'>
+                        //                 <div className='profile-post-nickname'>{post.nickname}</div>
+                        //                 <div className='profile-post-posted-time' data-tooltip={(new Date(post.postedAt*1000)).toLocaleString()}>{formatDistanceToNow(new Date(post.postedAt*1000), { addSuffix: true, locale: ko })}</div>
+                        //             </div>
+                        //         </div> */}
+                        //         {/* <div className='text'>{post.contents}</div> */}
+                        //         {/* {post.images && post.images.length > 0 && <PostPics imgs={post.images} />} */}
+                        //     // </div>
+                        // ))
+                        <ShowPosts currentLocation={'profile'}/>
+                      )}
                 </div>
             </main>
         </div>

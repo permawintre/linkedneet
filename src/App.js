@@ -116,7 +116,6 @@ function App() {
             <Route path="*" element={<NotFound/>}></Route>
             <Route path="/main" element={<Main/>}></Route>
         </Routes>
-        <Footer/>
     </div>
 
   )

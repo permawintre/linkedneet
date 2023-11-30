@@ -62,51 +62,16 @@ const ProjectList = ({ isEmpty, projects }) => {
     });
     const projectCount = projects.length;
     let rowClass;
-    // if (projectCount === 0) {
-    //   rowClass = "zeroRow";
-    // } else if (projectCount <= 3) {
-    //   rowClass = "oneRow";
-    // } else {
-    //   rowClass = "twoRow";
-    // }
     rowClass = "oneRow";
     console.log(rowClass);
-
-    // For Navigation Button
-    const itemsPerRow = 2; // 한 줄 당 아이템 수
-    const totalRows = 1; // 총 줄 수
-    const itemsPerPage = itemsPerRow * totalRows; // 페이지 당 아이템 수
-    const [page, setPage] = useState(0); // 페이지 상태
-    const totalPages = Math.ceil(projects.length / itemsPerPage); // 전체 페이지 수
-    // 이전 페이지 보기
-    const showPreviousPage = () => {
-        setPage((prev) => (prev > 0 ? prev - 1 : prev));
-    };
-    // 다음 페이지 보기
-    const showNextPage = () => {
-        setPage((prev) => (prev < totalPages - 1 ? prev + 1 : prev));
-    };
-    // 현재 페이지에 해당하는 프로젝트 가져오기
-    const visibleProjects = projects.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
 
     // Return
     return (
         <div className={style.projects}>
-          <div className={`${style.projectsRecommand} ${style[rowClass]}`}>
-            {[...Array(totalRows)].map((_, rowIndex) => (
-              <div key={rowIndex} className={style.projectsRow}>
-                {visibleProjects
-                  .slice(rowIndex * itemsPerRow, (rowIndex + 1) * itemsPerRow)
-                  .map((project, index) => (
-                    <DetailedProject key={index} project={project} />
-                  ))}
-              </div>
-            ))}
-          </div>
-          <div className={style.navigation}>
-            <button onClick={showPreviousPage} disabled={page === 0}>{'<'}</button>
-            <span>{page + 1} / {totalPages}</span>
-            <button onClick={showNextPage} disabled={page === totalPages - 1}>{'>'}</button>
+          <div className={`${style.projectRow} ${style[rowClass]}`}>
+            {projects.map((project, index) => (
+                <DetailedProject key={index} project={project} />
+              ))}
           </div>
         </div>
       );

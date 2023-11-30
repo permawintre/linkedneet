@@ -98,15 +98,13 @@ function App() {
 
             <Route path="/profile" element={loggedIn ? (approved ? <Profile/> : <Approve />) : <RedirectToLogIn/>}></Route>
             <Route path="/profiledetail" element={loggedIn ? (approved ? <ProfileDetail/> : <Approve />) : <RedirectToLogIn/>}></Route>
-            <Route path="/profiledetail/career" element={<ProfileCareerDetail/>}></Route>
-
-            <Route path="/profileheaderedit" element={loggedIn ? <ProfileHeaderEdit authObj = {authObj}/> : <RedirectToLogIn/>}></Route>
-
-            <Route path="/manage" element={<EnrollManage/>}></Route>
+            <Route path="/profiledetail/career" element={loggedIn ? (approved ? <ProfileCareerDetail/> : <Approve />) : <RedirectToLogIn/>}></Route>
+            <Route path="/manage" element={loggedIn ? ((approved == 2) ? <EnrollManage/> : <Approve />) : <RedirectToLogIn/>}></Route>
 
 
-            <Route path="/search" element={loggedIn ? <Search/> : <RedirectToLogIn/>}></Route>
-            <Route path="/notice" element={loggedIn ? <Notice/> : <RedirectToLogIn/>}></Route>
+            <Route path="/search" element={loggedIn ?  (approved ?  <Search/> : <Approve/>) : <RedirectToLogIn/>}></Route>
+            <Route path="/notice" element={loggedIn ?  (approved ?  <Notice/> : <Approve/>) : <RedirectToLogIn/>}></Route>
+
 
 
             <Route path="/google_signup" element={isLoggedIn ? <GoogleSignup/> : <RedirectToLogIn/>}></Route>

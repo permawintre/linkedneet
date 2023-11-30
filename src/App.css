@@ -48,6 +48,7 @@ ul {
     padding-top: 15px;
     font-size: 20px;
     white-space: nowrap;
+
 }
 .header__item {
     flex-grow: 1;
@@ -125,7 +126,9 @@ ul {
 
 .header__notice {
     flex: 1;
+
     white-space: nowrap;
+
 }
 .header__loginout {
     flex: 1;

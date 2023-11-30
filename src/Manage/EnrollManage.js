@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react"
+
 import style from './EnrollManage.module.css'
+
 import { FcAlarmClock, FcCalendar, FcCheckmark, FcGlobe } from "react-icons/fc";
 import { doc, getDoc, addDoc, collection, updateDoc, query, where, getDocs, deleteDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -28,6 +30,7 @@ const dateFormatChange = (timestamp) => {
 };
 
 const ApplySection = ({ applicants, handleApprove, handleReject }) => {
+
   const [selectedApplicants, setSelectedApplicants] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
 
@@ -39,6 +42,7 @@ const ApplySection = ({ applicants, handleApprove, handleReject }) => {
       setSelectedApplicants([]);
     }
   }, [selectAll, applicants]);
+
 
   const handleCheckboxChange = (applicantId) => {
     const isSelected = selectedApplicants.includes(applicantId);
@@ -63,6 +67,7 @@ const ApplySection = ({ applicants, handleApprove, handleReject }) => {
         return null;
       });
 
+
       // Wait for all promises to complete
       await Promise.all(actionPromises);
 
@@ -77,10 +82,12 @@ const ApplySection = ({ applicants, handleApprove, handleReject }) => {
 
   return (
     <div className={`${style.projectDetail} ${style.projectBody}`}>
+
       <div className={style.bulkActionButton}>
         <button onClick={() => handleBulkAction('approve')}>승인하기</button>
         <button onClick={() => handleBulkAction('reject')}>거절하기</button>
       </div>
+
       <div className={style.selectAll} onClick={() => setSelectAll(!selectAll)}>
         {selectAll ? '✔️ 전체해제' : '✔️ 전체선택'}
       </div>
@@ -106,6 +113,7 @@ const ApplySection = ({ applicants, handleApprove, handleReject }) => {
     </div>
   );
 };
+
 
 const MemberSection = ({ members }) => {
   const [activeGeneration, setActiveGeneration] = useState(null);
@@ -185,6 +193,7 @@ export const EnrollManage = () => {
     setActiveSection(elementId);
   };
 
+
   useEffect(() => {
     const fetchApplicants = async () => {
       try {
@@ -198,6 +207,7 @@ export const EnrollManage = () => {
         console.error('지원자를 불러오는 동안 오류 발생:', error);
       }
     };
+
     const fetchMembers = async () => {
       try {
         const applyCollection = collection(dbService, 'users');
@@ -212,6 +222,7 @@ export const EnrollManage = () => {
     };
     fetchApplicants();
     fetchMembers();
+
   }, []);
 
   const handleApprove = async (applicantId) => {
@@ -237,6 +248,7 @@ export const EnrollManage = () => {
 
   return (
     <div className={style.body} style={{ overflowY: 'auto' }}>
+
       <div className={style.Buttons}>
         <span
           className={`${style.buttonItem} ${style[activeSection === 'applySection' ? 'active' : '']}`}

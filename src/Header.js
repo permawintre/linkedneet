@@ -2,7 +2,9 @@ import React,  { useState } from 'react'
 import { Link, useNavigate } from "react-router-dom"
 import { logOut } from "./firebase.js"
 
+
 export const Header = ({isLoggedIn, approved}) => {
+
     const [searchTerm, setSearchTerm] = useState('');
     const navigate = useNavigate();
     const [isFocused, setIsFocused] = useState(false);
@@ -22,7 +24,9 @@ export const Header = ({isLoggedIn, approved}) => {
                     <Link to="/" className="header__item link">홈</Link>
                     <Link to="/project" className="header__item link">소모임</Link>
                     <Link to="/neetCompany" className="header__item link">니트컴퍼니</Link>
+
                     <Link to="/profiledetail" className="header__item link">프로필</Link>
+
             </ul>
             <div className='header__mid'>
                 <Link to="/" className="link">
@@ -43,11 +47,13 @@ export const Header = ({isLoggedIn, approved}) => {
                         {searchTerm === '' && <span className='fake-placeholder'>검색</span>}
                     </div>
                 </form>
+
                 <Link to="/notice" className="header__notice link">공지</Link>
                 {approved === 2? (<Link to="/manage" className='header__notice link'>관리</Link>) : null}
                 <button className='header__loginout' onClick={ logOut }>
                     {isLoggedIn? 'logout' : 'login'}
                 </button>
+
             </div>
         </div>
         </div>

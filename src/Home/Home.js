@@ -30,6 +30,7 @@ import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
 
 import profile1Img from '../images/profile1Img.jpg'
+import { defaultData } from '../Profile/defaultData'
 
 const userName = "홍길동"
 const companyClass = 14
@@ -712,7 +713,7 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
 
     let [selectBar, setSelectBar] = useState(false)
 
-    const [userInfo, setUserInfo] = useState(null);
+    const [userInfo, setUserInfo] = useState({ ...defaultData });
     useEffect(() => { // 유저 정보 코드
         const fetchUserInfo = async () => {
             if (auth.currentUser) {
@@ -721,7 +722,7 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
                 const docSnap = await getDoc(userRef);
 
                 if (docSnap.exists()) {
-                    setUserInfo(docSnap.data());
+                    setUserInfo(prevData => ({ ...prevData, ...docSnap.data() }));
                 } else {
                     console.log("No such document!");
                 }
@@ -730,7 +731,6 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
 
         fetchUserInfo();
     }, []);
-
     
 
     useEffect( () => {
@@ -966,7 +966,7 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
 
 export const ShowPosts = (props) => {
 
-    const [userInfo, setUserInfo] = useState(null);
+    const [userInfo, setUserInfo] = useState({ ...defaultData });
     const [isWriteOpen, setIsWriteOpen] = useState(false);
 
     const currentLocation = props.currentLocation;
@@ -978,7 +978,7 @@ export const ShowPosts = (props) => {
                 const docSnap = await getDoc(userRef);
 
                 if (docSnap.exists()) {
-                    setUserInfo(docSnap.data());
+                    setUserInfo(prevData => ({ ...prevData, ...docSnap.data() }));
                 } else {
                     console.log("No such document!");
                 }
@@ -1001,7 +1001,7 @@ export const ShowPosts = (props) => {
 export const Home = () => {
 
     const [users, setUsers] = useState([]);
-    const [userInfo, setUserInfo] = useState(null);
+    const [userInfo, setUserInfo] = useState({ ...defaultData });
     const [isWriteOpen, setIsWriteOpen] = useState(false);
 
 
@@ -1020,7 +1020,6 @@ export const Home = () => {
 
             setUsers(selectedUsers); // 선택된 사용자들로 상태 업데이트
         };
-    
         fetchUsers();
     }, []);
 
@@ -1031,7 +1030,7 @@ export const Home = () => {
                 const docSnap = await getDoc(userRef);
 
                 if (docSnap.exists()) {
-                    setUserInfo(docSnap.data());
+                    setUserInfo(prevData => ({ ...prevData, ...docSnap.data() }));
                 } else {
                     console.log("No such document!");
                 }

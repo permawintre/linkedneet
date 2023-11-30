@@ -81,8 +81,9 @@ export const NeetCompany = () => {
       
     
     
-    
-    const [selectedDate, setSelectedDate] = useState(new Date());
+    const date = new Date();
+    date.setDate(date.getDate()-1)
+    const [selectedDate, setSelectedDate] = useState(date);
     
     const onChange = (newDate) => {
         setSelectedDate(newDate);

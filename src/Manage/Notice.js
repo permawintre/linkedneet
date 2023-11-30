@@ -1011,19 +1011,19 @@ export const Notice = () => {
                 <ShowPosts currentLocation={'home'}/>
             </div>
             <aside className="right-sidebar">
-                <h2>새로운 사람을 알아가보세요!</h2>
-                <ul className="interestList">
-                    {users.map(user => (
-                        <li key={user.id} className="interestItem">
-                            <Link to={`/profiledetail?uid=${user.id}`}>
-                                <img src={user.profile_image || defaultData.profile_image} alt={user.nickname || 'User'}/>
-                            </Link>
-                            <span className="interestTitle">{user.nickname || 'Unknown User'}</span>
-                            <FontAwesomeIcon icon={faArrowRight} className="fa-arrow-right"/>
-                        </li>
-                    ))}
-                </ul>
-            </aside>
+            <h2>새로운 사람을 알아가보세요!</h2>
+            <ul className="interestList">
+                {users.map(user => (
+                    <Link to={`/profiledetail?uid=${user.id}`}>
+                    <li key={user.id} className="interestItem">
+                        <img src={user.imgUrls || defaultData.profile_image} alt={user.nickname || 'User'}/>
+                        <div className="interestTitle">{user.nickname || 'Unknown User'}</div>
+                        <FontAwesomeIcon icon={faArrowRight} className="fa-arrow-right" color={'#000000'}/>
+                    </li>
+                    </Link>
+                ))}
+            </ul>
+        </aside>
 
         </div>
     )

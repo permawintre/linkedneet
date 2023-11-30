@@ -220,9 +220,14 @@ export function Post(props) {
                                     ▸project ▸{projectName}
                                 </div>
                             )}
-                            {props.postWhere != 'project' && (
+                            {props.postWhere === 'neetCompany' && (
                                 <div className="postWhere">
-                                    ▸{postWhere}
+                                    ▸neetCompany ▸{postUserInfo.generation}
+                                </div>
+                            )}
+                            {props.postWhere === 'profile' && (
+                                <div className="postWhere">
+                                    ▸profile 
                                 </div>
                             )}
                             </div>
@@ -281,6 +286,8 @@ export function Post(props) {
                     postWhere: postWhere,
                     whoLikes: whoLikes,
                     numOfLikes: numOfLikes,
+                    projectId: props.projectId
+                    
                 }}
                 showHeader={false}
             />
@@ -694,7 +701,7 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
     const [loading, setLoading] = useState(false)
 
     useEffect(() => {
-        if (existingPost) {
+        if (existingPost ) {
             setValues({
                 contents: existingPost.contents, 
                 imgUrls: existingPost.imgUrls,  
@@ -702,6 +709,8 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
                 postWhere: existingPost.postWhere,
                 whoLikes: existingPost.whoLikes,
                 numOfLikes: existingPost.numOfLikes,
+                neetGeneration: userInfo.generation,
+                projectId: existingPost.projectId,
                 modified: true,
             });
             setImgIds(existingPost.imgIds)
@@ -785,12 +794,15 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
             }
             
         }
+        const projectId = existingPost && existingPost.projectId
+                     ? existingPost.projectId
+                     : selectedProjectId || '';
         const postData = {
             ...values,
             'postedAt': existingPost ? existingPost.postedAt/1000 : moment().unix(),
             'userId': uid,
             'imgUrls': modifiedImgs(imgIds, imgDeleted, imgUrls),
-            'projectId': selectedProjectId,
+            'projectId': projectId,
             'neetGeneration': values.neetGeneration
         };
         console.log('Selected Neet Generation:', selectedNeetGeneration);
@@ -906,6 +918,46 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
           setUserProjects(projects);
         });
       }, []);
+    useEffect(() => {
+        const fetchProjectName = async (projectId) => {
+            const projectRef = doc(dbService, 'projects', projectId);
+            const projectSnap = await getDoc(projectRef);
+    
+            if (projectSnap.exists()) {
+                return projectSnap.data().name;
+            } else {
+                console.log("Project not found!");
+                return '';
+            }
+        };
+    
+        if (existingPost) {
+            const updateValues = async () => {
+                let projectName = '';
+    
+                if (existingPost.projectId) {
+                    projectName = await fetchProjectName(existingPost.projectId);
+                }
+    
+                setValues({
+                    contents: existingPost.contents,
+                    imgUrls: existingPost.imgUrls,
+                    postId: existingPost.postId,
+                    postWhere: existingPost.postWhere,
+                    whoLikes: existingPost.whoLikes,
+                    numOfLikes: existingPost.numOfLikes,
+                    neetGeneration: userInfo.generation,
+                    projectId: existingPost.projectId,
+                    projectName: projectName,
+                    modified: true,
+                });
+                setImgIds(existingPost.imgIds);
+            };
+    
+            updateValues();
+        }
+    }, [existingPost, isOpen]);
+    
 
     const [selectedProjectId, setSelectedProjectId] = useState(null);
     const selectedNeetGeneration = "0";  
@@ -927,7 +979,7 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
                     // 사용자 세대 정보를 values 상태에 저장
                     setValues(prevValues => ({
                         ...prevValues,
-                        neetGeneration: userData.generation, // 세대 정보 필드가 'generation'이라고 가정
+                        neetGeneration: userData.generation, 
                     }));
                 } else {
                     console.log("No such document!");
@@ -958,6 +1010,7 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
                                 <div>
                                     <div className="userName">{userInfo?.nickname || userName}</div>
                                     <div className="postWhere">게시 위치 ▸{values.postWhere}{values.postWhere === 'project' &&(<div>[{values.projectName}]</div>)}{values.postWhere === 'neetCompany' &&(<div>[{values.neetGeneration}]</div>)}</div>
+                                    {console.log(values)}
                                 </div>
                             </div>
                             {selectBar ? 

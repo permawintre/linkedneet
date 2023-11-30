@@ -96,7 +96,7 @@ function App() {
             <Route path="/projecthome/:projectId" element={loggedIn ? (approved ? <ProjectHome/>: <Approve />) : <RedirectToLogIn/>}></Route>
             
 
-            <Route path="/neetCompany/:neetGeneration" element={loggedIn ? (approved ? <NeetCompany/> : <Approve />) : <RedirectToLogIn/>}></Route>
+            <Route path="/neetCompany/:generation" element={loggedIn ? (approved ? <NeetCompany/> : <Approve />) : <RedirectToLogIn/>}></Route>
 
             <Route path="/profile" element={loggedIn ? (approved ? <Profile/> : <Approve />) : <RedirectToLogIn/>}></Route>
             <Route path="/profiledetail" element={loggedIn ? (approved ? <ProfileDetail/> : <Approve />) : <RedirectToLogIn/>}></Route>

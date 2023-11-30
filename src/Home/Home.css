@@ -219,6 +219,7 @@ hr {
 
 .commentDetails {
     flex-grow: 1;
+    position: relative;
 }
 
 .commentUsername {

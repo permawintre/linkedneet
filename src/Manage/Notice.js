@@ -614,14 +614,14 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
     }
     const writeTxt = () => {
 
-        if(currentLocation === 'home' || currentLocation === 'profile' ) return '당신의 일상을 공유해주세요!';
+        if(currentLocation === 'home' || currentLocation === 'profile' ) return '공지할 사항을 적어주세요.';
         if(currentLocation === 'neetCompany') return '오늘 진행한 업무를 공유해주세요!';
         if(currentLocation === 'project') return '활동을 팀원들과 공유해보세요!';
     }
     
     const modalTxt = () => {
 
-        if(currentLocation === 'home' || currentLocation === 'profile' ) return '나누고 싶은 생각이 있으세요?';
+        if(currentLocation === 'home' || currentLocation === 'profile' ) return '공지할 사항을 적어주세요.';
         if(currentLocation === 'neetCompany') return '오늘도 열심히 일한 당신! 수고했어요.';
         if(currentLocation === 'project') return '팀원들과 어떤 내용을 공유할까요?';
     }

@@ -1,13 +1,14 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Link, useLocation } from "react-router-dom"
 import { dbService, auth } from '../firebase';
-import { doc, getDoc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { FaFacebookSquare, FaInstagramSquare} from 'react-icons/fa';
 import { IoGlobeOutline } from "react-icons/io5";
 import { MdPhoneIphone, MdEmail, MdCalendarMonth } from 'react-icons/md'
 import { ProfileEditModal, ProfileIntroEditModal } from './ProfileEditModal';
 import { ProfileComment } from './ProfileComment';
 import { ProfilePost } from './ProfilePost';
+import { SearchProjects } from './ProfileProject';
 import { defaultData } from './defaultData'
 import './ProfilePost.css';
 import { Bars } from "react-loader-spinner";
@@ -270,6 +271,7 @@ const ProfileDetail = () => {
   const introRef = useRef(null);
   const careerRef = useRef(null);
   const postRef = useRef(null);
+  const projectRef = useRef(null);
   const commentRef = useRef(null);
 
   // For querystring 'uid'
@@ -365,11 +367,13 @@ useEffect(() => {
           <span onClick={() => scrollToRef(introRef)}>소개</span>
           <span onClick={() => scrollToRef(careerRef)}>경험</span>
           <span onClick={() => scrollToRef(postRef)}>게시글</span>
+          <span onClick={() => scrollToRef(projectRef)}>소모임</span>
           <span onClick={() => scrollToRef(commentRef)}>방명록</span>
         </div>
         <div ref={introRef}><ProfileIntro userData={profileUserData} myProfile={myProfile}/></div>
         <div ref={careerRef}><ProfileCareer userData={profileUserData} myProfile={myProfile}/></div>
         <div ref={postRef}><ProfilePost currentUserData={currentUserData} userData={profileUserData} myProfile={myProfile}/></div>
+        <div ref={projectRef}><SearchProjects searchterm={profileUserData.uid}></SearchProjects></div>
         <div ref={commentRef}><ProfileComment currentUserData={currentUserData} myProfile={myProfile} profileUid={uid}/></div>
     </div>
     </div>

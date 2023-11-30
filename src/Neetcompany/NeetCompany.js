@@ -31,7 +31,7 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css'; 
 import { useEffect, useState, useRef } from 'react'
 import defaultProfileImg from '../images/default_profile_image.jpg'
-
+import defaultBackground from '../images/default_background.jpg'
 const moims = ['모임 a', '모임 b', '모임 c']
 
 
@@ -104,11 +104,21 @@ export const NeetCompany = () => {
     };
 
     const selectedDateInfo = getSelectedDateInfo();
-    const attendanceDates = [
-        new Date(2023, 10, 10), 
-        new Date(2023, 10, 15), 
-        // 추가 날짜들
-      ];
+    const [attendanceDates, setAttendanceDates] = useState([]);
+    useEffect(() => {
+        if (uid && ncCheckTimes.length > 0) {
+            const tmp = ncCheckTimes;
+            setAttendanceDates(
+                tmp.map((timestamp) => {
+                    // Unix timestamp를 밀리초로 변환
+                    const timestampInMillis = timestamp * 1000;
+                    // Date 객체 생성
+                    const date = new Date(timestampInMillis);
+                    return date;
+                })
+            );
+        }
+    }, [uid, ncCheckTimes]);
     const tileClassName = ({ date, view }) => {
     // 월 뷰에서만 클래스 적용
     if (view === 'month') {
@@ -170,15 +180,20 @@ export const NeetCompany = () => {
         <div className="neetCompanyBody">
             <div className="left-sidebar-container">
                 <aside className="left-sidebar-neet">
-                    <img src="image_url_here" alt="Landscape" className="card-image"/>
+                    <img src={defaultBackground} alt="Landscape" className="card-image"/>
                     <div className="card-content">
                     <div className="change-generation" onClick={toggleGenerations}>◂다른 기수</div>
                     <div className="generation-number">{generation}기</div>
                     <div className="neet-status">
                         <span className="neet-status-dot"></span>
-                        <span className="neet-status-text">현재 출근한 멤버</span>
+                        <span className="neet-status-text">업무인증을 마친 멤버</span>
                     </div>
-                    <div className="card-members">21명</div>
+                    <div className="card-members">{whoChecked.length}</div>
+                    {checked ?
+                        <div className="card-members green">업무인증 완료!</div>
+                    :
+                        <div className="card-members red">업무인증 미완료</div>
+                    }
                     </div>
                 </aside>
                 
@@ -211,15 +226,6 @@ export const NeetCompany = () => {
                         <p>노트: {selectedDateInfo.notes}</p>
                     </div>
                 </aside>
-                <div className="homePostsMarginControl">
-                    <div>
-                        {checked ? "출근함" : "출근안함"}
-                    </div>
-                    <div>
-                        {'오늘 출근한 사람 수: '}{whoChecked.length}
-                    </div>
-                </div>
-                <RightSideBar/>
             </div>
 
         </div>

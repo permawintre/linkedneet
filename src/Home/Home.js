@@ -1045,7 +1045,7 @@ export const Home = () => {
         <div className='home'>
             <aside className="left-sidebar">
                 <div className="background-img-container">
-                    <img src={userInfo?.imgUrls || profile1Img} alt="background" className="homeProfile-background-img"/> 
+                    <img src={userInfo?.background_image || defaultData.background_image} alt="background" className="homeProfile-background-img"/> 
                 </div>
                 <img src={userInfo?.profile_image} alt="profile" className="profile-img1" />
                 <div className="profile-info-home">
@@ -1064,7 +1064,7 @@ export const Home = () => {
                     {users.map(user => (
                         <li key={user.id} className="interestItem">
                             <Link to={`/profiledetail?uid=${user.id}`}>
-                                <img src={user.imgUrls || profile1Img} alt={user.nickname || 'User'}/>
+                                <img src={user.profile_image || defaultData.profile_image} alt={user.nickname || 'User'}/>
                             </Link>
                             <span className="interestTitle">{user.nickname || 'Unknown User'}</span>
                             <FontAwesomeIcon icon={faArrowRight} className="fa-arrow-right"/>

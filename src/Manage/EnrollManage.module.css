@@ -1,0 +1,116 @@
+:root {
+    
+    --color_1: #FFA500;
+    --color_2: #DFE0DF;
+    --color_3: #1e1f38;
+    --color_4: #FF4B2B;
+
+}
+
+/* Apply Form */
+.projectBody {
+    width: 700px;
+    margin: 0 auto;
+    margin-top: 30px;
+    text-align: left;
+    padding: 10px;
+    background-color: white;
+    box-sizing: border-box;
+    padding-bottom: 20px;
+    border-radius: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.projectBody:last-child {
+    margin-bottom: 20px;
+}
+.projectBody .bodyTitle {
+    font-weight: bold;
+    font-size: 25px;
+    padding: 10px;
+}
+/* ApplyForm */
+.bodyBox {
+    display: flex;
+    flex-wrap: wrap;
+    justify-self: space-between;
+    justify-content: center;
+}
+.bodyBox .applicantBox {
+    width: calc(50% - 20px);
+    border: 1px dotted;
+    padding: 10px;
+    box-sizing: border-box;
+}
+.bodyBox .applicantBox:nth-child(2n+1) {
+    margin-right: 10px;
+}    
+.bodyBox .applicantBox .userInfo {
+    display: flex;
+}
+.bodyBox .applicantBox .applicantName,
+.bodyBox .applicantBox .applicantEmail {
+    display: inline-block;
+}
+.bodyBox .applicantBox .applicantName {
+    font-weight: bold;
+    font-size: 18px;
+    margin-right: 10px;
+}
+.bodyBox .applicantBox .applicantEmail {
+    padding-top: 6px;
+    font-size: 13px;
+    margin-right: 10px;
+}
+.bodyBox .applicantBox .applicantGeneration {
+    padding-top: 6px;
+    font-size: 13px;
+}
+.bodyBox .applicantBox .formItem {
+    margin: 10px auto;
+}
+.bodyBox .applicantBox .formTitle {
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 15px;
+}
+.bodyBox .applicantBox .formAnswer {
+    border: 2px solid lightgray;
+    border-radius: 5px;
+    padding: 7px 10px;
+    font-size: 15px;
+}
+.selectAll {
+    cursor: pointer;
+    margin-bottom: 10px;
+    margin-left: 15px;
+    font-size: 15px;
+}
+.bulkActionButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.bulkActionButton button {
+    margin: 5px;
+    cursor: pointer;
+    padding: 10px 40px;
+    font-size: 15px;
+    margin-bottom: 10px;
+}
+.applicantButton input {
+    margin-right: 4px;
+}
+.applicantButton {
+    font-size: 13px;
+}
+/* left sidebar */
+.leftSidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 200px;
+    padding: 20px;
+    background-color: #f0f0f0;
+    height: 100%; /* 사이드바가 차지하는 높이를 화면 높이로 설정 */
+    overflow-y: auto; /* 사이드바가 길어질 경우 스크롤바 추가 */
+  }

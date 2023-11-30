@@ -96,7 +96,7 @@ function App() {
 
             <Route path="/profileheaderedit" element={loggedIn ? <ProfileHeaderEdit authObj = {authObj}/> : <RedirectToLogIn/>}></Route>
 
-            <Route path="/manage" element={<EnrollManage/>}></Route>
+            <Route path="/manage" element={approved === 2 ? <EnrollManage/> : <Approve/>}></Route>
 
             <Route path="/google_signup" element={isLoggedIn ? <GoogleSignup/> : <RedirectToLogIn/>}></Route>
             <Route path="/approve" element={<Approve/>}></Route>

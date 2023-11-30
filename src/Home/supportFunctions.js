@@ -10,7 +10,7 @@ import React from 'react'
 import { dbService , auth } from '../firebase.js'
 import { Link } from "react-router-dom"
 
-
+import { defaultData } from '../Profile/defaultData'
 
 /**
  * 몇시간 전에 게시된건지 텍스트로 반환하는 함수입니다(moment.js 설치필요)
@@ -281,7 +281,7 @@ export const CommentsWindow = ({comments, numOfComments, updateComments}) => {
           //console.log("User data: ", userSnap.data());
           updatedComments.push({
             ...comment,
-            userPic: userSnap.data().profile_image,
+            userPic: userSnap.data().profile_image || defaultData.profile_image,
             userName: userSnap.data().nickname,
           });
         }

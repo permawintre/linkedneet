@@ -29,7 +29,8 @@ import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
 
-import defaultProfileImg from '../images/default_profile_image.jpg'
+import profile1Img from '../images/profile1Img.jpg'
+import { defaultData } from '../Profile/defaultData'
 
 const userName = "홍길동"
 const companyClass = 14
@@ -212,7 +213,7 @@ export function Post(props) {
             <div className='paddingDiv'>
                 <div className="postHeader">
                     <Link to={`/profiledetail?uid=${props.userId}`}>
-                        <div className='profileImg'><img src={postUserInfo.profileImage || defaultProfileImg} alt="profileImg"/></div>
+                        <div className='profileImg'><img src={postUserInfo.profileImage || profile1Img} alt="profileImg"/></div>
                     </Link>
                     <div className='postInfo'>
                         <Link to={`/profiledetail?uid=${props.userId}`}>
@@ -712,7 +713,7 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
 
     let [selectBar, setSelectBar] = useState(false)
 
-    const [userInfo, setUserInfo] = useState(null);
+    const [userInfo, setUserInfo] = useState({ ...defaultData });
     useEffect(() => { // 유저 정보 코드
         const fetchUserInfo = async () => {
             if (auth.currentUser) {
@@ -721,7 +722,7 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
                 const docSnap = await getDoc(userRef);
 
                 if (docSnap.exists()) {
-                    setUserInfo(docSnap.data());
+                    setUserInfo(prevData => ({ ...prevData, ...docSnap.data() }));
                 } else {
                     console.log("No such document!");
                 }
@@ -730,7 +731,6 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
 
         fetchUserInfo();
     }, []);
-
     
 
     useEffect( () => {
@@ -883,7 +883,7 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
         <div className='homePost write'>
             {showHeader && (
                 <div className='postHeader' onClick={ () => setIsOpen(true) }>
-                <div className='profileImg'><img src={userInfo?.profile_image || defaultProfileImg} alt="profileImg"/></div>
+                <div className='profileImg'><img src={userInfo?.profile_image || profile1Img} alt="profileImg"/></div>
                 <div className='popModal'>{writeTxt()}</div>
                 </div>
             )}
@@ -892,7 +892,7 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
                     <div className='modalWrite' onClick={ (e) => e.stopPropagation() }>
                         <div className='modalHeader'>
                             <div className='modalProfile' onClick={ () => setSelectBar(!selectBar) }>
-                                <div className='profileImg'><img src={userInfo?.profile_image || defaultProfileImg} alt="profileImg"/></div>
+                                <div className='profileImg'><img src={userInfo?.profile_image || profile1Img} alt="profileImg"/></div>
                                 <div>
                                     <div className="userName">{userInfo?.nickname || userName}</div>
                                     <div className="postWhere">게시 위치 ▸{values.postWhere}{values.postWhere === 'project' &&(<div>[{values.projectName}]</div>)}</div>
@@ -966,7 +966,7 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
 
 export const ShowPosts = (props) => {
 
-    const [userInfo, setUserInfo] = useState(null);
+    const [userInfo, setUserInfo] = useState({ ...defaultData });
     const [isWriteOpen, setIsWriteOpen] = useState(false);
 
     const currentLocation = props.currentLocation;
@@ -978,7 +978,7 @@ export const ShowPosts = (props) => {
                 const docSnap = await getDoc(userRef);
 
                 if (docSnap.exists()) {
-                    setUserInfo(docSnap.data());
+                    setUserInfo(prevData => ({ ...prevData, ...docSnap.data() }));
                 } else {
                     console.log("No such document!");
                 }
@@ -1001,7 +1001,7 @@ export const ShowPosts = (props) => {
 export const Home = () => {
 
     const [users, setUsers] = useState([]);
-    const [userInfo, setUserInfo] = useState(null);
+    const [userInfo, setUserInfo] = useState({ ...defaultData });
     const [isWriteOpen, setIsWriteOpen] = useState(false);
 
 
@@ -1020,7 +1020,6 @@ export const Home = () => {
 
             setUsers(selectedUsers); // 선택된 사용자들로 상태 업데이트
         };
-    
         fetchUsers();
     }, []);
 
@@ -1031,7 +1030,7 @@ export const Home = () => {
                 const docSnap = await getDoc(userRef);
 
                 if (docSnap.exists()) {
-                    setUserInfo(docSnap.data());
+                    setUserInfo(prevData => ({ ...prevData, ...docSnap.data() }));
                 } else {
                     console.log("No such document!");
                 }
@@ -1046,7 +1045,7 @@ export const Home = () => {
         <div className='home'>
             <aside className="left-sidebar">
                 <div className="background-img-container">
-                    <img src={userInfo?.imgUrls || defaultProfileImg} alt="background" className="homeProfile-background-img"/> 
+                    <img src={userInfo?.imgUrls || profile1Img} alt="background" className="homeProfile-background-img"/> 
                 </div>
                 <img src={userInfo?.profile_image} alt="profile" className="profile-img1" />
                 <div className="profile-info-home">
@@ -1065,7 +1064,7 @@ export const Home = () => {
                     {users.map(user => (
                         <li key={user.id} className="interestItem">
                             <Link to={`/profiledetail?uid=${user.id}`}>
-                                <img src={user.imgUrls || defaultProfileImg} alt={user.nickname || 'User'}/>
+                                <img src={user.imgUrls || profile1Img} alt={user.nickname || 'User'}/>
                             </Link>
                             <span className="interestTitle">{user.nickname || 'Unknown User'}</span>
                             <FontAwesomeIcon icon={faArrowRight} className="fa-arrow-right"/>

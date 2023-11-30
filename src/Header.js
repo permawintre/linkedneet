@@ -2,7 +2,7 @@ import React,  { useState } from 'react'
 import { Link, useNavigate } from "react-router-dom"
 import { logOut } from "./firebase.js"
 
-export const Header = () => {
+export const Header = ({isLoggedIn}) => {
     const [searchTerm, setSearchTerm] = useState('');
     const navigate = useNavigate();
     const [isFocused, setIsFocused] = useState(false);
@@ -44,7 +44,9 @@ export const Header = () => {
                     </div>
                 </form>
                 <div className='header__notice'>공지</div>
-                <button className='header__loginout' onClick={ logOut }>login/out</button>
+                <button className='header__loginout' onClick={ logOut }>
+                    {isLoggedIn? 'logout' : 'login'}
+                </button>
             </div>
         </div>
         </div>

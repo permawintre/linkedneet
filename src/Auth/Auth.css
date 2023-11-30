@@ -23,6 +23,7 @@ button {
 }
 button:hover{
   color:var(--color_2);
+  cursor: pointer;
 }
 
 button:active {

@@ -22,7 +22,7 @@ export const Header = () => {
                     <Link to="/" className="header__item link">홈</Link>
                     <Link to="/project" className="header__item link">소모임</Link>
                     <Link to="/neetCompany" className="header__item link">니트컴퍼니</Link>
-                    <a href="/profiledetail" className="header__item link">프로필</a>
+                    <Link to="/profiledetail" className="header__item link">프로필</Link>
             </ul>
             <div className='header__mid'>
                 <Link to="/" className="link">

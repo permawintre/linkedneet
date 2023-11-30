@@ -143,9 +143,6 @@ export function Post(props) {
         };
         fetchProjectName();
     }, [props.postWhere, props.postId]);
-    useEffect(() => {
-        console.log(`postWhere: ${props.postWhere}, projectName: ${props.projectId}`);
-    }, [props.projectId]);
 
 
     const postWriteEditBtnClick = ()=> {
@@ -742,7 +739,7 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
                 const docSnap = await getDoc(ncDocRef);
                 if (docSnap.exists()) {
                     setNcCheckTimes(docSnap.data().checkTimes)
-                    console.log("Document data:", docSnap.data().checkTimes);
+                    //console.log("Document data:", docSnap.data().checkTimes);
                 } else {
                     console.log("No such document!");
                 }

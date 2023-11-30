@@ -96,10 +96,15 @@ padding: 5px 0;
 margin: 5px 0;
 }
 .red {
-  background-color: red;
+  background-color: rgba(220, 73, 73, 0.3);
 }
 .green {
-  background-color: rgb(0, 200, 33);
+  background-color: rgba(0, 200, 33, 0.3);
+}
+
+.right-sidebar-container {
+  position: sticky;
+  top: 118px;
 }
 
 .right-sidebar-neet {
@@ -135,7 +140,7 @@ margin: 5px 0;
     margin-bottom: 10px;
   }
   .calendar-neet .attendance-date {
-    background-color: rgb(0, 200, 33); /* 민트색으로 표시 */
+    background-color: rgba(0, 200, 33, 0.3); /* 민트색으로 표시 */
     color: black; /* 글자색을 검정색으로 설정 */
   }
   .calendar-neet.react-calendar__navigation button {
@@ -246,4 +251,8 @@ margin: 5px 0;
 }
 .react-calendar {
   border: none !important;
+}
+
+.react-calendar__tile--active {
+  background-color: rgba(0, 60, 255, 0.7) !important;
 }

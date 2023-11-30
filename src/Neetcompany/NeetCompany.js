@@ -1,47 +1,33 @@
 import React from "react";
-import { getDayMinuteCounter, PostContents, PostPics, LikeBtn, CommentBtn, PlusBtn, CommentsWindow, WriteCommentContainer, addNewComment, LoadingEffect } from '../Home/supportFunctions'
 import "./NeetCompany.css"
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
-import styled from 'styled-components'
-import { v4 as uuidv4 } from 'uuid';
-import close from '../images/close.png';
-import { ShowPosts, RightSideBar } from "../Home/Home"
+import { ShowPosts } from "../Home/Home"
 import "./NeetCompany.css"
 import { dbService, auth } from "../firebase"
 import { Link, useParams, useNavigate } from "react-router-dom"
 import moment from 'moment';
 import {
     collection,
-    query,
-    orderBy,
-    limit,
     getDocs,
-    addDoc,
-    startAfter,
     doc,
     getDoc,
-    where,
-    updateDoc,
-    deleteDoc
 } from "firebase/firestore"
-import { storage } from '../firebase.js';
-import { ref, uploadString, getDownloadURL, deleteObject } from 'firebase/storage';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css'; 
-import { useEffect, useState, useRef } from 'react'
-import defaultProfileImg from '../images/default_profile_image.jpg'
+import { useEffect, useState } from 'react'
 import defaultBackground from '../images/default_background.jpg'
-const moims = ['모임 a', '모임 b', '모임 c']
 
 
 
 
-export const whoCheckedF = async (targetDate) => {
+export const whoCheckedF = async (unixtimestamp) => {
 
     let ans = [];
-    const dayStart = targetDate - targetDate%86400;
+    
+    const targetDate = unixtimestamp+32400;
+    const dayStart = targetDate - targetDate%86400 - 32400;
+
     const dayEnd = dayStart+86400;
+    console.log(dayStart, dayEnd)
     const check = (element) => {
         if(dayStart<=element && element<dayEnd) return true;
         else return false;
@@ -165,8 +151,9 @@ export const NeetCompany = () => {
 
         if(ncCheckTimes.length===0) return;
         let tmp = ncCheckTimes
-        const now = moment().unix();
-        const todayStart = now - now%86400;
+        const unixtimestamp = moment().unix();
+        const targetDate = unixtimestamp+32400;
+        const todayStart = targetDate - targetDate%86400 - 32400;
         const todayEnd = todayStart+86400;
         const check = (element) => {
             if(todayStart<=element && element<todayEnd) return true;

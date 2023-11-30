@@ -6,12 +6,27 @@
     --color_4: #FF4B2B;
 
 }
-
+/* Buttons */
+.Buttons {
+    width: 700px;
+    text-align: center;
+    margin: 30px auto 10px auto;
+}
+.buttonItem {
+    display: inline-block;
+    width: 200px;
+    margin: 0 2px;
+}
+.buttonItem .text {
+    cursor: pointer;
+}
+.buttonItem.active .text {
+    font-weight: bold;
+}
 /* Apply Form */
 .projectBody {
     width: 700px;
     margin: 0 auto;
-    margin-top: 30px;
     text-align: left;
     padding: 10px;
     background-color: white;
@@ -40,6 +55,7 @@
     border: 1px dotted;
     padding: 10px;
     box-sizing: border-box;
+    margin-bottom: 10px;
 }
 .bodyBox .applicantBox:nth-child(2n+1) {
     margin-right: 10px;
@@ -55,8 +71,20 @@
     font-weight: bold;
     font-size: 18px;
     margin-right: 10px;
+    text-align: center;
+}
+.bodyBox .applicantBox .applicantNickname {
+    padding-top: 6px;
+    font-size: 13px;
+    margin-right: 7px;
+    text-align: center
 }
 .bodyBox .applicantBox .applicantEmail {
+    padding-top: 6px;
+    font-size: 13px;
+    margin-right: 10px;
+}
+.bodyBox .applicantBox .applicantPhone {
     padding-top: 6px;
     font-size: 13px;
     margin-right: 10px;
@@ -103,14 +131,27 @@
 .applicantButton {
     font-size: 13px;
 }
-/* left sidebar */
-.leftSidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 200px;
-    padding: 20px;
-    background-color: #f0f0f0;
-    height: 100%; /* 사이드바가 차지하는 높이를 화면 높이로 설정 */
-    overflow-y: auto; /* 사이드바가 길어질 경우 스크롤바 추가 */
-  }
+/* member section */
+.generationBox {
+    display: block;
+    width: 100%;
+}
+.generationBox .applicantBox {
+    display: inline-block;
+    margin-bottom: 7px;
+    width: calc(50% - 10px);
+}
+.generationBox .applicantBox:nth-child(2n+1) {
+    margin-right: 15px;
+    margin-left: 5px;
+}
+.generationButtons {
+    width: 100%;
+    margin-bottom: 10px;
+}
+.generationButtons button {
+    width: 90px;
+    padding: 5px 0;
+    cursor: pointer;
+    margin: 2px 3px;
+}

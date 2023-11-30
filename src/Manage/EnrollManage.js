@@ -96,8 +96,8 @@ const ApplySection = ({ applicants, handleApprove, handleReject }) => {
               선택하기
             </div>
             <div className={style.userInfo}>
-              <div className={style.applicantName}>{applicant.nickname}</div>
-              <div className={style.applicantEmail}>{applicant.email}</div>
+              <div className={style.applicantName}>{applicant.name? applicant.name : '이름없음'}</div>
+              <div className={style.applicantNickname}>{applicant.nickname}</div>              <div className={style.applicantEmail}>{applicant.email}</div>
               <div className={style.applicantGeneration}>{applicant.generation}기</div>
             </div>
           </div>
@@ -107,9 +107,72 @@ const ApplySection = ({ applicants, handleApprove, handleReject }) => {
   );
 };
 
+const MemberSection = ({ members }) => {
+  const [activeGeneration, setActiveGeneration] = useState(null);
+
+  // Extract unique generation values and sort them in descending order
+  const uniqueGenerations = [...new Set(members.map((member) => member.generation))].sort(
+    (a, b) => b - a
+  );
+
+  const handleGenerationClick = (generation) => {
+    setActiveGeneration(generation);
+  };
+
+  const handleShowAll = () => {
+    setActiveGeneration(null); // Set activeGeneration to null to show all members
+  };
+
+  return (
+    <div className={`${style.projectDetail} ${style.projectBody}`}>
+      <div className={style.bodyBox}>
+        <div className={style.generationButtons}>
+          <button onClick={handleShowAll} className={!activeGeneration ? style.activeButton : ''}>
+            전체 멤버
+          </button>
+          {uniqueGenerations.map((generation) => (
+            <button
+              key={generation}
+              onClick={() => handleGenerationClick(generation)}
+              className={activeGeneration === generation ? style.activeButton : ''}
+            >
+              {`${generation}기`}
+            </button>
+          ))}
+        </div>
+
+        <div className={style.generationBox}>
+          {members
+            .filter((member) => (activeGeneration ? member.generation === activeGeneration : true))
+            .map((member) => (
+              <div className={style.applicantBox} key={member.id}>
+                <div className={style.userInfo}>
+                  <div>
+                    <div className={style.applicantName}>{member.name? member.name : '이름없음'}</div>
+                    <div className={style.applicantNickname}>{member.nickname}</div>
+                  </div>
+                  <div>
+                    <div className={style.applicantEmail}>⦁ email: {member.email}</div>
+                    <div className={style.applicantPhone}>⦁ tel: {member.tel}</div>
+                  </div>
+                </div>
+                {/* Add more member details as needed */}
+              </div>
+            ))}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export const EnrollManage = () => {
   const [applicants, setApplicants] = useState([]);
+  const [members, setMembers] = useState([]);
+  const [activeSection, setActiveSection] = useState('applySection');
+
+  const handleButtonClick = (elementId) => {
+    setActiveSection(elementId);
+  };
 
   useEffect(() => {
     const fetchApplicants = async () => {
@@ -124,7 +187,20 @@ export const EnrollManage = () => {
         console.error('지원자를 불러오는 동안 오류 발생:', error);
       }
     };
+    const fetchMembers = async () => {
+      try {
+        const applyCollection = collection(dbService, 'users');
+        const q = query(applyCollection, where('level', '==', 1));
+        const querySnapshot = await getDocs(q);
+
+        const applicantsData = querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
+        setMembers(applicantsData);
+      } catch (error) {
+        console.error('회원을 불러오는 동안 오류 발생:', error);
+      }
+    };
     fetchApplicants();
+    fetchMembers();
   }, []);
 
   const handleApprove = async (applicantId) => {
@@ -150,27 +226,46 @@ export const EnrollManage = () => {
 
   return (
     <div className={style.body} style={{ overflowY: 'auto' }}>
-      <div className={style.leftSidebar}>
-        <div className={style.sidebarBox}>
-          <div className={style.sidebarTitle}>가입자 관리</div>
-          {/* 여기에 가입자 관리에 대한 내용을 추가할 수 있습니다 */}
-        </div>
-        <div className={style.sidebarBox}>
-          <div className={style.sidebarTitle}>회원 관리</div>
-          {/* 여기에 회원 관리에 대한 내용을 추가할 수 있습니다 */}
-        </div>
+      <div className={style.Buttons}>
+        <span
+          className={`${style.buttonItem} ${style[activeSection === 'applySection' ? 'active' : '']}`}
+          onClick={() => handleButtonClick('applySection')}
+        >
+          <span className={style.text}>지원자 관리</span>
+        </span>
+        <span
+          className={`${style.buttonItem} ${style[activeSection === 'memberSection' ? 'active' : '']}`}
+          onClick={() => handleButtonClick('memberSection')}
+        >
+          <span className={style.text}>멤버 관리</span>
+        </span>
+      </div>
+      <div id="memberSection">
+        {activeSection === 'memberSection' && (
+        <>
+          {members.length === 0 ? (
+            <div className={`${style.projectDetail} ${style.projectBody}`}>
+              멤버가 없습니다
+            </div>
+          ) : (<MemberSection members={members}/>)}
+        </>
+        )}
       </div>
       <div id="applySection">
-        {applicants.length === 0 ? (
-            <div className={`${style.projectDetail} ${style.projectBody}`}>
-            지원자가 없습니다
-            </div>
-        ) : (
-            <ApplySection
-            applicants={applicants}
-            handleApprove={handleApprove}
-            handleReject={handleReject}
-            />
+        {activeSection === 'applySection' && (
+          <div>
+            {applicants.length === 0 ? (
+                <div className={`${style.projectDetail} ${style.projectBody}`}>
+                지원자가 없습니다
+                </div>
+            ) : (
+                <ApplySection
+                applicants={applicants}
+                handleApprove={handleApprove}
+                handleReject={handleReject}
+                />
+            )}
+          </div>
         )}
       </div>
     </div>

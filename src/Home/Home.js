@@ -996,15 +996,9 @@ export const ShowPosts = (props) => {
         </div>
     )
 }
-
-
-export const Home = () => {
+export const RightSideBar = () => {
 
     const [users, setUsers] = useState([]);
-    const [userInfo, setUserInfo] = useState(null);
-    const [isWriteOpen, setIsWriteOpen] = useState(false);
-
-
     useEffect(() => { //오른쪽 사이드 바 코드
         const fetchUsers = async () => {
             const usersCollectionRef = collection(dbService, 'users');
@@ -1023,6 +1017,30 @@ export const Home = () => {
     
         fetchUsers();
     }, []);
+
+    return (
+        <aside className="right-sidebar">
+            <h2>새로운 사람을 알아가보세요!</h2>
+            <ul className="interestList">
+                {users.map(user => (
+                    <Link to={`/profiledetail?uid=${user.id}`}>
+                    <li key={user.id} className="interestItem">
+                        <img src={user.imgUrls || defaultProfileImg} alt={user.nickname || 'User'}/>
+                        <div className="interestTitle">{user.nickname || 'Unknown User'}</div>
+                        <FontAwesomeIcon icon={faArrowRight} className="fa-arrow-right" color={'#000000'}/>
+                    </li>
+                    </Link>
+                ))}
+            </ul>
+        </aside>
+    )
+}
+
+export const Home = () => {
+
+    const [users, setUsers] = useState([]);
+    const [userInfo, setUserInfo] = useState(null);
+
 
     useEffect(() => { // 유저 정보 코드
         const fetchUserInfo = async () => {
@@ -1059,21 +1077,7 @@ export const Home = () => {
             <div className="homePostsMarginControl">
                 <ShowPosts currentLocation={'home'}/>
             </div>
-            <aside className="right-sidebar">
-                <h2>새로운 사람을 알아가보세요!</h2>
-                <ul className="interestList">
-                    {users.map(user => (
-                        <li key={user.id} className="interestItem">
-                            <Link to={`/profiledetail?uid=${user.id}`}>
-                                <img src={user.imgUrls || defaultProfileImg} alt={user.nickname || 'User'}/>
-                            </Link>
-                            <span className="interestTitle">{user.nickname || 'Unknown User'}</span>
-                            <FontAwesomeIcon icon={faArrowRight} className="fa-arrow-right"/>
-                        </li>
-                    ))}
-                </ul>
-            </aside>
-
+            <RightSideBar/>
         </div>
     )
 

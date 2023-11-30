@@ -1,36 +1,7 @@
-import { ShowPosts } from "../Home/Home"
+import { ShowPosts, RightSideBar } from "../Home/Home"
 import "./NeetCompany.css"
-import {
-    collection,
-    getDocs,
-} from "firebase/firestore"
-import { useEffect, useState } from 'react'
-import { Link } from "react-router-dom"
-import { dbService , auth } from '../firebase.js'
-import defaultProfileImg from '../images/default_profile_image.jpg'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
 export const NeetCompany = () => {
-    const [users, setUsers] = useState([]);
-    useEffect(() => { //오른쪽 사이드 바 코드
-        const fetchUsers = async () => {
-            const usersCollectionRef = collection(dbService, 'users');
-            const data = await getDocs(usersCollectionRef);
-            // 모든 사용자 정보를 배열로 변환
-            const allUsers = data.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-            // 현재 로그인한 사용자의 uid 확인
-            const currentUserId = auth.currentUser ? auth.currentUser.uid : null;
-            // 현재 로그인한 사용자를 제외한 사용자들 필터링
-            const otherUsers = allUsers.filter(user => user.id !== currentUserId);
-            // 랜덤하게 사용자 3명 선택
-            const selectedUsers = otherUsers.sort(() => 0.5 - Math.random()).slice(0, 3);
-
-            setUsers(selectedUsers); // 선택된 사용자들로 상태 업데이트
-        };
-    
-        fetchUsers();
-    }, []);
 
     return(
         <div className="neetCompanyBody">
@@ -51,20 +22,7 @@ export const NeetCompany = () => {
             <div className="homePostsMarginControl">
                 <ShowPosts currentLocation={'neetCompany'}/>
             </div>
-            <aside className="right-sidebar-neet">
-                <h2>새로운 사람을 알아가보세요!</h2>
-                <ul className="interestList">
-                    {users.map(user => (
-                        <li key={user.id} className="interestItem">
-                            <Link to={`/profiledetail?uid=${user.id}`}>
-                                <img src={user.imgUrls || defaultProfileImg} alt={user.nickname || 'User'}/>
-                            </Link>
-                            <span className="interestTitle">{user.nickname || 'Unknown User'}</span>
-                            <FontAwesomeIcon icon={faArrowRight} className="fa-arrow-right"/>
-                        </li>
-                    ))}
-                </ul>
-            </aside>
+            <RightSideBar/>
         </div>
     )
 }

@@ -720,7 +720,7 @@ hr {
     border: solid 1px #ccc;
     border-radius: 20px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    padding: 20px;
+    padding: 15px;
     box-sizing: border-box;
 }
 .right-sidebar h2 {
@@ -736,7 +736,7 @@ hr {
 .interestItem {
     display: flex;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 5px;
 }
 
 .interestItem:hover {
@@ -753,7 +753,7 @@ hr {
     width: 50px;
     height: 50px;
     object-fit: cover;
-    margin-right: 10px;
+    margin: 10px 10px 5px 10px;
 }
 
 .interestTitle {

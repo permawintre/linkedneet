@@ -3,7 +3,7 @@
     justify-content: center;
     align-items: flex-start;
 }
-.left-sidebar-neet, .right-sidebar-neet {
+.left-sidebar-neet {
     width: 250px; /* 또는 원하는 폭에 따라 조정 */
     position: sticky;
     top: 118px; /* 항상 상단에 고정 */
@@ -12,9 +12,6 @@
     box-sizing: border-box;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     overflow: hidden;
-}
-.right-sidebar-neet {
-    padding: 20px;
 }
 .card-image {
 width: 100%;

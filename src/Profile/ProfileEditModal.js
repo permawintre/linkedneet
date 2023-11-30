@@ -94,6 +94,34 @@ const ProfileEditModal = ({EditModalClose}) => {
         return EditModalClose?.(); // profileEditModalClose을 실행!
     };
     
+    // Profile 배경사진 
+    const [BGImage, setBGImage] = useState(userObj.background_image);
+    useEffect(() => {
+      setBGImage(userObj.background_image);
+    }, [userObj.background_image]);
+    const [BGImageChanged, setBGImageChanged] = useState(false);
+    const BGfileInput = useRef(null);
+    
+    const onBGProfileImgChange = (e) => {
+      if (e.target.files[0]){
+        setBGImage(e.target.files[0]);
+        setBGImageChanged(true);
+        setUserObj({  ...userObj, background_image: [e.target.files[0], e.target.files[0].name]});
+      }
+      // 업로드 취소할 시
+      else {
+        return
+      }
+      
+      //화면에 프로필 사진 표시
+      const reader = new FileReader();
+      reader.onload = () => {
+          if(reader.readyState === 2){
+              setBGImage(reader.result)
+          }
+      }
+      reader.readAsDataURL(e.target.files[0])
+    }
     // Profile 사진 
     const [Image, setImage] = useState(userObj.profile_image);
     useEffect(() => {
@@ -134,10 +162,23 @@ const ProfileEditModal = ({EditModalClose}) => {
             const imgName = userObj.profile_image[1]
             const imageRef = ref(storage, `${auth.currentUser.uid}/profile_images/${imgName}`);
             const imageUrlPromise = await uploadAndReturnUrl(imageRef, img);
+            
             await updateDoc(userDocRef, {
               profile_image: imageUrlPromise
             })
           }
+          if (BGImageChanged && (userObj.intro_image !== undefined || userObj.intro_image !== null)){
+            const storage = getStorage();
+            const bgimg = userObj.background_image[0]
+            const bgimgName = userObj.background_image[1]
+            const bgimageRef = ref(storage, `${auth.currentUser.uid}/background_images/${bgimgName}`);
+            const bgimageUrlPromise = await uploadAndReturnUrl(bgimageRef, bgimg);
+            
+            await updateDoc(userDocRef, {
+              background_image: bgimageUrlPromise
+            })
+          } 
+
           // update DB using user input 
           await updateDoc(userDocRef, {
               nickname: userObj.nickname,
@@ -186,7 +227,26 @@ const ProfileEditModal = ({EditModalClose}) => {
                       onChange={onProfileImgChange}
                       ref={fileInput}/>
                 </div>
+                <h3>배경 사진</h3>
+                <div class="bg-image-edit-button-wrapper">
+                  <label for="BGfile-search">
+                    <img class="profile-background-image-in-modal" src={BGImage || userObj.background_image} 
+                      style={{color: "#5d5d5d",
+                              marginTop: "-45%",
+                              cursor: "pointer",
+                              border: "2px solid var(--color_2)"}} alt=""/>
+                    <div class="image-edit-button">✏️ 변경하기</div>
+                  </label>
+                  <input id="BGfile-search" type='file' 
+                      style={{display: "none",
+                              cursor: "pointer"}}
+                      accept='image/jpg, image/png, image/jpeg' 
+                      name='background_image'
+                      onChange={onBGProfileImgChange}
+                      ref={BGfileInput}/>
+                </div>
               </div>
+              
               <div class="edit-contents">
                 <h3>닉네임</h3>
                   <input type="text" class="edit-section" name="nickname" placeholder="이름" value = {userObj.nickname || ""} onChange={onChange}></input> 

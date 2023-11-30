@@ -376,11 +376,11 @@ export const WriteCommentContainer = ({ userProfileImage, postId, userId, addNew
               <img src={userProfileImage} alt="프로필"/>
               <input
                   type="text"
-                  placeholder="댓글을 남겨 주세요"
+                  placeholder="댓글을 남겨 주세요!"
                   value={commentInput}
                   onChange={(e) => setCommentInput(e.target.value)}
               />
-              <button type="submit">보내기</button>
+              <button type="submit">전송</button>
           </form>
       </div>
   );

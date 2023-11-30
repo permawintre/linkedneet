@@ -208,11 +208,7 @@ export const NeetCompany = () => {
                 setEvents([]);
                 return;
             }
-            querySnapshot.forEach((doc) => {
-                console.log(doc.id, '=>', doc.data());
-                console.log(selectedDate.toISOString().split('T')[0]);
-                fetchedEvents.push(doc.data()); // 데이터를 배열에 추가
-            });
+            
             setEvents(fetchedEvents); 
     
         } catch (error) {

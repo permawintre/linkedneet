@@ -43,7 +43,7 @@ export const Header = ({isLoggedIn, approved}) => {
                         {searchTerm === '' && <span className='fake-placeholder'>검색</span>}
                     </div>
                 </form>
-                <div className='header__notice'>공지</div>
+                <Link to="/notice" className="header__notice link">공지</Link>
                 {approved === 2? (<Link to="/manage" className='header__notice link'>관리</Link>) : null}
                 <button className='header__loginout' onClick={ logOut }>
                     {isLoggedIn? 'logout' : 'login'}

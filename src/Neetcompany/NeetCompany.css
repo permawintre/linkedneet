@@ -13,7 +13,9 @@
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     overflow: hidden;
 }
-
+.right-sidebar-neet {
+    padding: 20px;
+}
 .card-image {
 width: 100%;
 display: block; /* Remove space below the image */

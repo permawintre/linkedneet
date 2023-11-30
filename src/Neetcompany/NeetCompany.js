@@ -2,25 +2,17 @@ import { ShowPosts } from "../Home/Home"
 import "./NeetCompany.css"
 import {
     collection,
-    query,
-    orderBy,
-    limit,
     getDocs,
-    addDoc,
-    startAfter,
-    doc,
-    getDoc,
-    where,
-    updateDoc,
-    deleteDoc
 } from "firebase/firestore"
-import { useEffect, useState, useRef } from 'react'
-import { Link, useNavigate } from "react-router-dom"
+import { useEffect, useState } from 'react'
+import { Link } from "react-router-dom"
 import { dbService , auth } from '../firebase.js'
+import defaultProfileImg from '../images/default_profile_image.jpg'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
 export const NeetCompany = () => {
     const [users, setUsers] = useState([]);
-    const [userInfo, setUserInfo] = useState(null);
     useEffect(() => { //오른쪽 사이드 바 코드
         const fetchUsers = async () => {
             const usersCollectionRef = collection(dbService, 'users');
@@ -65,10 +57,10 @@ export const NeetCompany = () => {
                     {users.map(user => (
                         <li key={user.id} className="interestItem">
                             <Link to={`/profiledetail?uid=${user.id}`}>
-                                <img src={user.imgUrls} alt={user.nickname || 'User'}/>
+                                <img src={user.imgUrls || defaultProfileImg} alt={user.nickname || 'User'}/>
                             </Link>
                             <span className="interestTitle">{user.nickname || 'Unknown User'}</span>
-                            <i className="fa fa-arrow-right" aria-hidden="true"></i>
+                            <FontAwesomeIcon icon={faArrowRight} className="fa-arrow-right"/>
                         </li>
                     ))}
                 </ul>

@@ -1,11 +1,15 @@
-import React,  { useState } from 'react'
+import React from 'react'
 import { Link, useNavigate } from "react-router-dom"
 import { logOut } from "./firebase.js"
+import { useEffect, useState, useRef } from 'react'
+import { doc,getDoc} from "firebase/firestore"
+import { dbService , auth } from './firebase.js'
 
 
 export const Header = ({isLoggedIn, approved}) => {
 
     const [searchTerm, setSearchTerm] = useState('');
+    const [userGeneration, setUserGeneration] = useState('');
     const navigate = useNavigate();
     const [isFocused, setIsFocused] = useState(false);
 
@@ -15,6 +19,26 @@ export const Header = ({isLoggedIn, approved}) => {
         // 예시: 검색어에 따라 다른 페이지로 이동
         window.location = `/search?q=${encodeURIComponent(searchTerm)}`;
     };
+    useEffect(() => {
+        const fetchUserGeneration = async () => {
+          if (auth.currentUser) {
+            const userRef = doc(dbService, 'users', auth.currentUser.uid);
+            try {
+              const docSnap = await getDoc(userRef);
+              if (docSnap.exists()) {
+                setUserGeneration(docSnap.data().generation);
+              } else {
+                console.log('No such document!');
+              }
+            } catch (error) {
+              console.error('Error fetching user data:', error);
+            }
+          }
+        };
+        console.log(userGeneration);
+    
+        fetchUserGeneration();
+      }, [auth.currentUser?.uid]);
 
     return(
 
@@ -23,7 +47,7 @@ export const Header = ({isLoggedIn, approved}) => {
             <ul className="header__left">
                     <Link to="/" className="header__item link">홈</Link>
                     <Link to="/project" className="header__item link">소모임</Link>
-                    <Link to="/neetCompany" className="header__item link">니트컴퍼니</Link>
+                    <Link to={`/neetCompany/${userGeneration}`} className="header__item link">니트컴퍼니</Link>
 
                     <Link to="/profiledetail" className="header__item link">프로필</Link>
 

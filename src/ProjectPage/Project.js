@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import style from './Project.module.css'
 import { Link } from 'react-router-dom';
-import { collection, query, orderBy, getDocs, where, getDoc, doc } from 'firebase/firestore';
+import { collection, query, getDocs, where } from 'firebase/firestore';
 import { dbService, auth } from '../firebase.js';
 import { Bars } from "react-loader-spinner";
 

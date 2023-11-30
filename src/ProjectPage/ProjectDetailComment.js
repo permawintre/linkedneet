@@ -1,6 +1,6 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { dbService, auth } from '../firebase';
-import { doc, getDoc, updateDoc, arrayUnion, collection, addDoc, query, where, getDocs, orderBy, deleteDoc } from 'firebase/firestore';
+import React, { useState, useEffect } from 'react';
+import { dbService } from '../firebase';
+import { doc, getDoc, updateDoc, collection, addDoc, query, where, getDocs, deleteDoc } from 'firebase/firestore';
 import { formatDistanceToNow } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import style from './ProjectDetailComment.module.css';

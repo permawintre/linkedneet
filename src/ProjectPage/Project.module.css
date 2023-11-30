@@ -27,11 +27,11 @@
     display: flex;
     flex-direction: column;
     overflow: auto;
+    padding-top: 20px;
 }
 
 .myProjects { 
     width: 940px;
-    padding: 10px;
     border-radius: 15px;
     margin-bottom: 10px;
 }
@@ -42,13 +42,15 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 10px;
     margin-bottom: 20px;
 }
 .projectsRow {
     position: relative;
     display: flex;
     align-items: center;
+}
+.myProjectsRow {
+    justify-content: center;
 }
 .projectsRecommand {
     position: relative;

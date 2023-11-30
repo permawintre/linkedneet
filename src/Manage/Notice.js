@@ -1,6 +1,6 @@
 import React from "react"
-import { getDayMinuteCounter, PostContents, PostPics, LikeBtn, CommentsWindow, WriteCommentContainer, LoadingEffect } from './supportFunctions'
-import './Home.css'
+import { getDayMinuteCounter, PostContents, PostPics, LikeBtn, CommentBtn, CommentsWindow, WriteCommentContainer, LoadingEffect } from './supportFunctions'
+import './Notice.css'
 import { Link, useNavigate } from "react-router-dom"
 import { dbService , auth } from '../firebase.js'
 import {
@@ -15,8 +15,7 @@ import {
     getDoc,
     where,
     updateDoc,
-    deleteDoc,
-    setDoc
+    deleteDoc
 } from "firebase/firestore"
 import { useEffect, useState, useRef } from 'react'
 import close from '../images/close.png'
@@ -303,33 +302,10 @@ const Posts=({ userInfo, currentLocation }) =>{
     const [nextPosts_loading, setNextPostsLoading] = useState(false);
 
     const setQuery = () => {
-        if(currentLocation === 'home'){
+        if(currentLocation === 'notice'){
             return query(
                 collection(dbService, 'posts'),
-                orderBy("postedAt", "desc"),
-                limit(5)
-            )
-        }
-        if(currentLocation === 'neetCompany'){
-            return query(
-                collection(dbService, 'posts'),
-                where("postWhere", "==", 'neetCompany'),
-                orderBy("postedAt", "desc"),
-                limit(5)
-            )
-        }
-        if(currentLocation === 'profile'){
-            return query(
-                collection(dbService, 'posts'),
-                where("postWhere", "==", "profile"),
-                orderBy("postedAt", "desc"),
-                limit(5)
-            )
-        }
-        if(currentLocation === 'project'){
-            return query(
-                collection(dbService, 'posts'),
-                where("postWhere", "==", "project"),
+                where("postWhere", "==", 'notice'),
                 orderBy("postedAt", "desc"),
                 limit(5)
             )
@@ -337,42 +313,14 @@ const Posts=({ userInfo, currentLocation }) =>{
     }
 
     const setQueryMore = (key) => {
-
-        
-        if(currentLocation === 'home'){
+        if(currentLocation === 'notice'){
             return query(
                 collection(dbService, 'posts'),
+                where("postWhere", "==", 'notice'),
                 orderBy("postedAt", "desc"),
                 startAfter(key),
                 limit(1)
             );
-        }
-        if(currentLocation === 'neetCompany'){
-            return query(
-                collection(dbService, 'posts'),
-                where("postWhere", "==", "neetCompany"),
-                orderBy("postedAt", "desc"),
-                startAfter(key),
-                limit(1)
-            )
-        }
-        if(currentLocation === 'profile'){
-            return query(
-                collection(dbService, 'posts'),
-                where("postWhere", "==", "profile"),
-                orderBy("postedAt", "desc"),
-                startAfter(key),
-                limit(1)
-            )
-        }
-        if(currentLocation === 'project'){
-            return query(
-                collection(dbService, 'posts'),
-                where("postWhere", "==", "project"),
-                orderBy("postedAt", "desc"),
-                startAfter(key),
-                limit(1)
-            )
         }
     }
 
@@ -658,7 +606,6 @@ function DndBox(props) {
 
 export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLocation }) {
 
-    
     const defaultPostWhere = () => {
 
         if(currentLocation === 'home' || currentLocation === 'profile' ) return 'profile';
@@ -733,25 +680,6 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
 
         fetchUserInfo();
     }, []);
-    const [ncCheckTimes, setNcCheckTimes] = useState([]);
-    useEffect(() => {
-        
-        const getNcCheckTimes = async () => {
-            if(uid) {
-                const ncDocRef = doc(dbService, "neetCompany", uid)
-                const docSnap = await getDoc(ncDocRef);
-                if (docSnap.exists()) {
-                    setNcCheckTimes(docSnap.data().checkTimes)
-                    console.log("Document data:", docSnap.data().checkTimes);
-                } else {
-                    console.log("No such document!");
-                }
-
-            }
-        }
-        getNcCheckTimes();
-    }, [uid])
-
     
 
     useEffect( () => {
@@ -835,18 +763,6 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
                 });
                 
         } else {
-            if(currentLocation === 'neetCompany'){
-
-                let tmp = ncCheckTimes
-                const now = moment().unix();
-                tmp.push(now)
-                const create = {
-                    'checkTimes': tmp
-                }
-                setDoc(doc(dbService, "neetCompany", uid), create)
-                
-
-            }
             addDoc(collection(dbService, "posts"), postData)
                 .then(() => {
                     handleUploadImages()
@@ -1021,17 +937,26 @@ export const ShowPosts = (props) => {
         fetchUserInfo();
     }, []);
 
-    return(
 
+    return(
+        // 관리자만 글 쓸수 있도록 user Level check
         <div className='postsContainer'>
-            <Write isOpen={isWriteOpen} setIsOpen={setIsWriteOpen} existingPost={false} showHeader={true} currentLocation={currentLocation}/>
+            {userInfo?.level === 2 && (
+                <Write isOpen={isWriteOpen} setIsOpen={setIsWriteOpen} existingPost={false} showHeader={true} currentLocation={currentLocation} />
+            )}
             <Posts userInfo={userInfo} currentLocation={currentLocation}/>
         </div>
     )
 }
-export const RightSideBar = () => {
+
+
+export const Notice = () => {
 
     const [users, setUsers] = useState([]);
+    const [userInfo, setUserInfo] = useState({ ...defaultData });
+    const [isWriteOpen, setIsWriteOpen] = useState(false);
+
+
     useEffect(() => { //오른쪽 사이드 바 코드
         const fetchUsers = async () => {
             const usersCollectionRef = collection(dbService, 'users');
@@ -1049,30 +974,6 @@ export const RightSideBar = () => {
         };
         fetchUsers();
     }, []);
-
-    return (
-        <aside className="right-sidebar">
-            <h2>새로운 사람을 알아가보세요!</h2>
-            <ul className="interestList">
-                {users.map(user => (
-                    <Link to={`/profiledetail?uid=${user.id}`}>
-                    <li key={user.id} className="interestItem">
-                        <img src={user.imgUrls || defaultProfileImg} alt={user.nickname || 'User'}/>
-                        <div className="interestTitle">{user.nickname || 'Unknown User'}</div>
-                        <FontAwesomeIcon icon={faArrowRight} className="fa-arrow-right" color={'#000000'}/>
-                    </li>
-                    </Link>
-                ))}
-            </ul>
-        </aside>
-    )
-}
-
-export const Home = () => {
-
-    const [users, setUsers] = useState([]);
-    const [userInfo, setUserInfo] = useState(null);
-
 
     useEffect(() => { // 유저 정보 코드
         const fetchUserInfo = async () => {
@@ -1109,7 +1010,21 @@ export const Home = () => {
             <div className="homePostsMarginControl">
                 <ShowPosts currentLocation={'home'}/>
             </div>
-            <RightSideBar/>
+            <aside className="right-sidebar">
+                <h2>새로운 사람을 알아가보세요!</h2>
+                <ul className="interestList">
+                    {users.map(user => (
+                        <li key={user.id} className="interestItem">
+                            <Link to={`/profiledetail?uid=${user.id}`}>
+                                <img src={user.profile_image || defaultData.profile_image} alt={user.nickname || 'User'}/>
+                            </Link>
+                            <span className="interestTitle">{user.nickname || 'Unknown User'}</span>
+                            <FontAwesomeIcon icon={faArrowRight} className="fa-arrow-right"/>
+                        </li>
+                    ))}
+                </ul>
+            </aside>
+
         </div>
     )
 

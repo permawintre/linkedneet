@@ -110,7 +110,6 @@ const ApplySection = ({ applicants, handleApprove, handleReject }) => {
 const MemberSection = ({ members }) => {
   const [activeGeneration, setActiveGeneration] = useState(null);
 
-  // Extract unique generation values and sort them in descending order
   const uniqueGenerations = [...new Set(members.map((member) => member.generation))].sort(
     (a, b) => b - a
   );
@@ -120,8 +119,12 @@ const MemberSection = ({ members }) => {
   };
 
   const handleShowAll = () => {
-    setActiveGeneration(null); // Set activeGeneration to null to show all members
+    setActiveGeneration(null);
   };
+
+  const filteredMembers = members.filter((member) =>
+    activeGeneration ? member.generation === activeGeneration : true
+  );
 
   return (
     <div className={`${style.projectDetail} ${style.projectBody}`}>
@@ -142,23 +145,31 @@ const MemberSection = ({ members }) => {
         </div>
 
         <div className={style.generationBox}>
-          {members
-            .filter((member) => (activeGeneration ? member.generation === activeGeneration : true))
-            .map((member) => (
-              <div className={style.applicantBox} key={member.id}>
-                <div className={style.userInfo}>
-                  <div>
-                    <div className={style.applicantName}>{member.name? member.name : '이름없음'}</div>
-                    <div className={style.applicantNickname}>{member.nickname}</div>
-                  </div>
-                  <div>
-                    <div className={style.applicantEmail}>⦁ email: {member.email}</div>
-                    <div className={style.applicantPhone}>⦁ tel: {member.tel}</div>
-                  </div>
+          <div className={style.generationCount}>
+            {activeGeneration ? (
+              <>
+                니트컴퍼니 {activeGeneration}기: 총 {filteredMembers.length}명
+              </>
+            ) : (
+              <>
+                니트컴퍼니 전체: 총 {members.length}명
+              </>
+            )}
+          </div>
+          {filteredMembers.map((member) => (
+            <div className={style.applicantBox} key={member.id}>
+              <div className={style.userInfo}>
+                <div>
+                  <div className={style.applicantName}>{member.name ? member.name : '이름없음'}</div>
+                  <div className={style.applicantNickname}>{member.nickname}</div>
                 </div>
-                {/* Add more member details as needed */}
+                <div>
+                  <div className={style.applicantEmail}>⦁ email: {member.email}</div>
+                  <div className={style.applicantPhone}>⦁ tel: {member.tel}</div>
+                </div>
               </div>
-            ))}
+            </div>
+          ))}
         </div>
       </div>
     </div>

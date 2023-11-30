@@ -105,8 +105,8 @@ const MyProject = ({ uid, myProjects }) => {
           <div className={`${style.projectsTitle} ${style.navigation}`}>
             <span className={style.projectsTitle}>나의 소모임</span>
           </div>
-          <div className={style.projectsRow}>
-            {paddedVisibleProjects.map((project, index) => (
+          <div className={`${style.projectsRow} ${style.myProjectsRow}`}>
+            {visibleProjects.map((project, index) => (
               project ? (
                 <UserProject key={index} uid={uid} project={project} />
               ) : (
@@ -126,7 +126,7 @@ const MyProject = ({ uid, myProjects }) => {
     );
   };
 
-const ProjectList = ({ projects }) => {
+const ProjectList = ({ isEmpty, projects }) => {
 
     projects.forEach((project) => {
       setProjectStatus(project);
@@ -196,7 +196,9 @@ const ProjectList = ({ projects }) => {
           <div className={style.projectListHeader}>
             <div className={style.projectsTitleHeader}>
               <span className={style.line}>-</span>
-              <span className={style.projectsTitle}>더 많은 소모임을 찾아보세요!</span>
+              <span className={style.projectsTitle}>
+              {isEmpty ? "원하는 소모임에 가입하세요!" :
+              "더 많은 소모임을 찾아보세요!"}</span>
               <span className={style.line}>-</span>
             </div>
             <div className={style.projectsFilter}>
@@ -237,12 +239,13 @@ const ProjectList = ({ projects }) => {
               </div>
             </div>
           </div>
+          
           <div className={`${style.projectsRecommand} ${style[rowClass]}`}>
             <div className={style.newProject}>
-              <div className={style.newProjectSmall}>원하는 소모임이 없다면?</div>
-              <Link to="/projectcreate" style={{ textDecoration: 'none' }}>
-                <div className={style.newProjectLarge}>소모임 만들기 ▶</div>
-              </Link>
+                <div className={style.newProjectSmall}>원하는 소모임이 없다면?</div>
+                <Link to="/projectcreate" style={{ textDecoration: 'none' }}>
+                  <div className={style.newProjectLarge}>소모임 만들기 ▶</div>
+                </Link>
             </div>
             {[...Array(totalRows)].map((_, rowIndex) => (
               <div key={rowIndex} className={style.projectsRow}>
@@ -312,10 +315,14 @@ export const Project = () => {
     fetchProjects();
   }, [uid]);
 
+  let projectEmpty = myProjects.length === 0
+
     return (
         <div className={style.body}>
+          {projectEmpty ? null :
             <MyProject uid={uid} myProjects={myProjects}/>
-            <ProjectList projects={recommendProjects}/>
+          }
+            <ProjectList isEmpty={projectEmpty} projects={recommendProjects}/>
         </div>
     );
 }

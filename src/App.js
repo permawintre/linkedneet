@@ -23,7 +23,7 @@ import { ProjectHome } from './ProjectPage/ProjectHome.js'
 import ProfileCareerDetail from './Profile/ProfileCareerDetail.js'
 
 import { EnrollManage } from './Manage/EnrollManage.js'
-
+import { Notice } from './Manage/Notice.js'
 import { Search } from './Search/Search.js'
 
 function App() {
@@ -80,7 +80,7 @@ function App() {
 
   return(
     <div className="background">
-        <Header isLoggedIn={isLoggedIn}/>
+        <Header isLoggedIn={isLoggedIn} approved={approved}/>
         <Routes>
             <Route path="/approve" element={ approved ? <Home /> : <Approve/>} />
             <Route path="/" element={loggedIn ? (approved ? <Home/> : <Approve />) : <RedirectToLogIn/>}></Route>
@@ -101,6 +101,7 @@ function App() {
             <Route path="/manage" element={<EnrollManage/>}></Route>
 
             <Route path="/search" element={loggedIn ? <Search/> : <RedirectToLogIn/>}></Route>
+            <Route path="/notice" element={loggedIn ? <Notice/> : <RedirectToLogIn/>}></Route>
 
             <Route path="/google_signup" element={isLoggedIn ? <GoogleSignup/> : <RedirectToLogIn/>}></Route>
             <Route path="/approve" element={<Approve/>}></Route>

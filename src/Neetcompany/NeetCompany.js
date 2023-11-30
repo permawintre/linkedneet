@@ -75,7 +75,7 @@ export const NeetCompany = () => {
         <div className="generation-list">
             {Array.from({ length: 16 }, (_, i) => `${i + 1}`).map(generationNumber => (
                 <Link key={generationNumber} to={`/neetCompany/${generationNumber}`}>
-                    <div>{generation}기</div>
+                   <div style={{ color: 'black' }}>{generationNumber}기</div>
                 </Link>
             ))}
         </div>

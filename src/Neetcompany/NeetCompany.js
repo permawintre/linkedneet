@@ -104,11 +104,21 @@ export const NeetCompany = () => {
     };
 
     const selectedDateInfo = getSelectedDateInfo();
-    const attendanceDates = [
-        new Date(2023, 10, 10), 
-        new Date(2023, 10, 15), 
-        // 추가 날짜들
-      ];
+    const [attendanceDates, setAttendanceDates] = useState([]);
+    useEffect(() => {
+        if (uid && ncCheckTimes.length > 0) {
+            const tmp = ncCheckTimes;
+            setAttendanceDates(
+                tmp.map((timestamp) => {
+                    // Unix timestamp를 밀리초로 변환
+                    const timestampInMillis = timestamp * 1000;
+                    // Date 객체 생성
+                    const date = new Date(timestampInMillis);
+                    return date;
+                })
+            );
+        }
+    }, [uid, ncCheckTimes]);
     const tileClassName = ({ date, view }) => {
     // 월 뷰에서만 클래스 적용
     if (view === 'month') {

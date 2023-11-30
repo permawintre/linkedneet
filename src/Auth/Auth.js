@@ -297,7 +297,8 @@ export const GoogleSignup = () => {
             generation: generation,
             facebook: "",
             instagram: "",
-            tel: "",
+            tel: tel,
+            name: name,
 
             // following 
             followers: [],

@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { Bars } from "react-loader-spinner";
 
 export const Approve = () => {
     const [isLoading, setIsLoading] = useState(true);
@@ -20,7 +21,14 @@ export const Approve = () => {
     return (
         <div>
             {isLoading ? (
-                <h1>Loading...</h1>
+                <div className="loadingContainer">
+                    <Bars
+                    type="ThreeDots"
+                    color="#00b22d"
+                    height={100}
+                    width={100}
+                    />
+                </div>
             ) : (
                 <h1>관리자의 승인이 필요합니다!</h1>
             )}

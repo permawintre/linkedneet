@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import { dbService, auth } from '../firebase';
 import { useLocation } from "react-router-dom"
 import { defaultData } from '../Profile/defaultData'
@@ -9,14 +9,13 @@ import { SearchProjects } from "./SearchProjects"
 import './Search.css'
 
 export const Search = () => {
-  // profiledetail에 접속해 있는 user의 정보(currentUserData)를 firebase에서 fetch
   const [currentUserData, setCurrentUserData] = useState({ ...defaultData });
   const [currentUserDataLoaded, setCurrentUserDataLoaded] = useState(false);
 
-  // For querystring 'uid'
+  // For querystring 'q'
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
-  const search_query = queryParams.get('q'); // uid가 없는 경우 현재 사용자의 uid 사용
+  const search_query = queryParams.get('q');
 
   useEffect( () => { // Current User Data Fetch
     const fetchCurrentUserData = async () => {
@@ -39,7 +38,6 @@ export const Search = () => {
     fetchCurrentUserData()
   }, []);
   
-  // firebase에서 currentUserData가 fetch되기 전까지 Loading... 띄우기
   if (!currentUserDataLoaded) {
     return <div>Loading...</div>;
   }

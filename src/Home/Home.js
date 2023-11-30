@@ -38,7 +38,7 @@ const moims = ['모임 a', '모임 b', '모임 c']
 
 
 export function Post(props) {
-    //console.log('사진여러장로딩문제', props.imgUrls)
+    const [myProjects, setMyProjects] = useState([]);
     const userId = props.userId;
     const postId = props.postId
     const postedAt = props.postedAt
@@ -205,6 +205,47 @@ export function Post(props) {
         return () => window.removeEventListener('mousedown', handleClick);
     }, [dropDownRef]);
 
+    useEffect(() => {
+        const fetchProjects = async () => {
+          // Fetch projectMember documents where userId matches uid
+          const projectMemberCollection = collection(dbService, 'projectMember');
+          const memberQuery = query(projectMemberCollection, where('userId', '==', userId));
+      
+          try {
+            const memberQuerySnapshot = await getDocs(memberQuery);
+      
+            const projectIds = memberQuerySnapshot.docs.map((doc) => doc.data().projectId);
+      
+            // Fetch all projects from the 'projects' collection
+            const projectsCollection = collection(dbService, 'projects');
+            const allProjectsSnapshot = await getDocs(projectsCollection);
+      
+            // Map all project data into an object for quick access
+            const allProjectsData = {};
+            allProjectsSnapshot.forEach((doc) => {
+              allProjectsData[doc.id] = { id: doc.id, ...doc.data() };
+            });
+      
+            // Separate projects into myProjects and recommendProjects
+            const myProjectsData = [];
+    
+            Object.keys(allProjectsData).forEach((projectId) => {
+              const projectData = allProjectsData[projectId];
+              if (projectIds.includes(projectId)) {
+                myProjectsData.push(projectData.name);
+                console.log(projectData.name)
+              }
+            });
+      
+            setMyProjects(myProjectsData);
+          } catch (error) {
+            console.error('Error fetching projects: ', error);
+          }
+        };
+      
+        fetchProjects();
+      }, []);
+
     return (
         <div className="homePost">
             <div className='paddingDiv'>
@@ -232,7 +273,7 @@ export function Post(props) {
                             )}
                             </div>
                             <div className='inGroup'>
-                                    {postUserInfo.generation+'기' || companyClass+'기'}{moims.map((moim, idx)=>(<span key={idx}>{', '}{moim}</span>))}
+                                    {postUserInfo.generation+'기'}{myProjects.length>3  ? <span>{`, ${myProjects[0]}, ${myProjects[1]} 외 ${myProjects.length-2}개`}</span>: myProjects.map((moim, idx)=>(<span key={idx}>{', '}{moim}</span>))}
                             </div>
                             <div className="postedWhen">{getDayMinuteCounter(postedAt)}{modified ? '·수정됨' : null}</div>
                         </Link>

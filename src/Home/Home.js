@@ -329,7 +329,7 @@ const Posts=({ userInfo, currentLocation, neetGeneration }) =>{
             console.log('gogo',neetGeneration);
             return query(
                 collection(dbService, 'posts'),
-                
+                where("postWhere", "==", 'neetCompany'),
                 where("neetGeneration", "==", neetGeneration),
                 orderBy("postedAt", "desc"),
                 limit(5)

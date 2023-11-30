@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import style from './Manage.module.css'
+import style from './EnrollManage.module.css'
 import { FcAlarmClock, FcCalendar, FcCheckmark, FcGlobe } from "react-icons/fc";
 import { doc, getDoc, addDoc, collection, updateDoc, query, where, getDocs, deleteDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -28,8 +28,17 @@ const dateFormatChange = (timestamp) => {
 };
 
 const ApplySection = ({ applicants, handleApprove, handleReject }) => {
-  console.log(applicants);
   const [selectedApplicants, setSelectedApplicants] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
+
+  useEffect(() => {
+    // 전체 선택 또는 해제가 변경될 때마다 모든 지원자를 선택 또는 해제합니다.
+    if (selectAll) {
+      setSelectedApplicants(applicants.map((applicant) => applicant.id));
+    } else {
+      setSelectedApplicants([]);
+    }
+  }, [selectAll, applicants]);
 
   const handleCheckboxChange = (applicantId) => {
     const isSelected = selectedApplicants.includes(applicantId);
@@ -53,11 +62,12 @@ const ApplySection = ({ applicants, handleApprove, handleReject }) => {
         }
         return null;
       });
-  
+
       // Wait for all promises to complete
       await Promise.all(actionPromises);
-  
+
       setSelectedApplicants([]);
+      setSelectAll(false); // 전체 선택 상태 초기화
       window.alert('처리되었습니다');
       window.location.reload();
     } catch (error) {
@@ -67,32 +77,31 @@ const ApplySection = ({ applicants, handleApprove, handleReject }) => {
 
   return (
     <div className={`${style.projectDetail} ${style.projectBody}`}>
-      <div className={style.bodyTitle}>지원자 목록</div>
-      <div className={style.bodyBox}>
-        {applicants.map((applicant) => (
-        <div className={style.applicantBox} key={applicant.id}>
-          <div className={style.applicantButton}>
-            <input
-              type="checkbox"
-              checked={selectedApplicants.includes(applicant.id)}
-              onChange={() => handleCheckboxChange(applicant.id)}
-            />
-            선택하기
-          </div>
-          <div className={style.userInfo}>
-            <div className={style.applicantName}>{applicant.nickname}</div>
-            <div className={style.applicantEmail}>{applicant.email}</div>
-            <div className={style.applicantEmail}>{applicant.generation}기</div>
-          </div>
-          {/* <div className={style.formItem}>
-            <div className={style.formTitle}>▶ 지원 동기</div>
-            <div className={style.formAnswer}>{applicant.applyReason}</div>
-          </div> */}
-        </div>))}
-      </div>
       <div className={style.bulkActionButton}>
         <button onClick={() => handleBulkAction('approve')}>승인하기</button>
         <button onClick={() => handleBulkAction('reject')}>거절하기</button>
+      </div>
+      <div className={style.selectAll} onClick={() => setSelectAll(!selectAll)}>
+        {selectAll ? '✔️ 전체해제' : '✔️ 전체선택'}
+      </div>
+      <div className={style.bodyBox}>
+        {applicants.map((applicant) => (
+          <div className={style.applicantBox} key={applicant.id}>
+            <div className={style.applicantButton}>
+              <input
+                type="checkbox"
+                checked={selectedApplicants.includes(applicant.id)}
+                onChange={() => handleCheckboxChange(applicant.id)}
+              />
+              선택하기
+            </div>
+            <div className={style.userInfo}>
+              <div className={style.applicantName}>{applicant.nickname}</div>
+              <div className={style.applicantEmail}>{applicant.email}</div>
+              <div className={style.applicantGeneration}>{applicant.generation}기</div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -141,6 +150,16 @@ export const EnrollManage = () => {
 
   return (
     <div className={style.body} style={{ overflowY: 'auto' }}>
+      <div className={style.leftSidebar}>
+        <div className={style.sidebarBox}>
+          <div className={style.sidebarTitle}>가입자 관리</div>
+          {/* 여기에 가입자 관리에 대한 내용을 추가할 수 있습니다 */}
+        </div>
+        <div className={style.sidebarBox}>
+          <div className={style.sidebarTitle}>회원 관리</div>
+          {/* 여기에 회원 관리에 대한 내용을 추가할 수 있습니다 */}
+        </div>
+      </div>
       <div id="applySection">
         {applicants.length === 0 ? (
             <div className={`${style.projectDetail} ${style.projectBody}`}>

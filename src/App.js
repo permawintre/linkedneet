@@ -22,6 +22,8 @@ import { ProjectHome } from './ProjectPage/ProjectHome.js'
 
 import ProfileCareerDetail from './Profile/ProfileCareerDetail.js'
 
+import { Main } from './Main.js'
+
 import { EnrollManage } from './Manage/EnrollManage.js'
 import { Notice } from './Manage/Notice.js'
 import { Search } from './Search/Search.js'
@@ -83,7 +85,7 @@ function App() {
         <Header isLoggedIn={isLoggedIn} approved={approved}/>
         <Routes>
             <Route path="/approve" element={ approved ? <Home /> : <Approve/>} />
-            <Route path="/" element={loggedIn ? (approved ? <Home/> : <Approve />) : <RedirectToLogIn/>}></Route>
+            <Route path="/" element={loggedIn ? (approved ? <Home/> : <Approve />) : <Main/>}></Route>
             <Route path="/project" element={loggedIn ? (approved ? <Project/> : <Approve />) : <RedirectToLogIn/>}></Route>
             <Route path="/projectdetail/:projectId" element={loggedIn ?  (approved ? <ProjectDetail/> : <Approve />) : <RedirectToLogIn/>}></Route>
             <Route path="/projectjoin/:projectId" element={loggedIn ? (approved ? <ProjectJoin/> : <Approve />) : <RedirectToLogIn/>}></Route>
@@ -108,6 +110,7 @@ function App() {
             <Route path="/signUp" element={<Signup/>}></Route>
             <Route path="/logIn" element={<Login/>}></Route>
             <Route path="*" element={<NotFound/>}></Route>
+            <Route path="/main" element={<Main/>}></Route>
         </Routes>
     </div>
 

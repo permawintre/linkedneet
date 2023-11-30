@@ -136,3 +136,12 @@ ul {
 body {
     margin-top: 108px;
 }
+.mainPage {
+    width: 100vw;
+    height: 100vh;
+    text-align: center;
+    background-image: url('./images/main.png');
+    background-size: cover;
+    background-attachment: fixed;
+    justify-content: center;
+}

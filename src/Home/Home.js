@@ -775,7 +775,10 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
             'userId': uid,
             'imgUrls': modifiedImgs(imgIds, imgDeleted, imgUrls),
             'projectId': selectedProjectId,
+            'neetGeneration': values.neetGeneration
         };
+        console.log('Selected Neet Generation:', selectedNeetGeneration);
+
     
         const handleUploadImages = async () => {
             for (let i = 0; i < contentImages.length; i++) {
@@ -828,6 +831,8 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
                 .catch(error => {
                     console.error("Error adding document: ", error);
                 });
+                console.log('Selected Neet Generation:', selectedNeetGeneration);
+
 
         }
     
@@ -875,9 +880,37 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
       }, []);
 
     const [selectedProjectId, setSelectedProjectId] = useState(null);
+    const selectedNeetGeneration = "0";  
     const selectProject = (projectId) => {
     setSelectedProjectId(projectId);
     };
+    
+    useEffect(() => { // 유저 정보 코드
+        const fetchUserInfo = async () => {
+            if (auth.currentUser) {
+                setUid(auth.currentUser.uid)
+                const userRef = doc(dbService, "users", auth.currentUser.uid);
+                const docSnap = await getDoc(userRef);
+    
+                if (docSnap.exists()) {
+                    const userData = docSnap.data();
+                    setUserInfo(userData);
+    
+                    // 사용자 세대 정보를 values 상태에 저장
+                    setValues(prevValues => ({
+                        ...prevValues,
+                        neetGeneration: userData.generation, // 세대 정보 필드가 'generation'이라고 가정
+                    }));
+                } else {
+                    console.log("No such document!");
+                }
+            }
+        };
+    
+        fetchUserInfo();
+    }, []);
+
+    
 
 
     return(
@@ -896,7 +929,7 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
                                 <div className='profileImg'><img src={userInfo?.profile_image || defaultProfileImg} alt="profileImg"/></div>
                                 <div>
                                     <div className="userName">{userInfo?.nickname || userName}</div>
-                                    <div className="postWhere">게시 위치 ▸{values.postWhere}{values.postWhere === 'project' &&(<div>[{values.projectName}]</div>)}</div>
+                                    <div className="postWhere">게시 위치 ▸{values.postWhere}{values.postWhere === 'project' &&(<div>[{values.projectName}]</div>)}{values.postWhere === 'neetCompany' &&(<div>[{values.neetGeneration}]</div>)}</div>
                                 </div>
                             </div>
                             {selectBar ? 

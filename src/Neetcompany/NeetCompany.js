@@ -12,9 +12,12 @@ import {
     getDoc,
     addDoc,
     query,
-    where
+    where,
+    deleteDoc
 } from "firebase/firestore"
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Calendar from 'react-calendar';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import 'react-calendar/dist/Calendar.css'; 
 import { useEffect, useState } from 'react'
 import defaultBackground from '../images/default_background.jpg'
@@ -195,13 +198,16 @@ export const NeetCompany = () => {
         try {
             const q = query(collection(dbService, "calendar"), where("date", "==", formattedDate));
             const querySnapshot = await getDocs(q);
+            const fetchedEvents = querySnapshot.docs.map(doc => ({
+                id: doc.id, // Firestore 문서의 ID를 저장
+                ...doc.data() // 문서의 나머지 데이터
+            }));
     
             if (querySnapshot.empty) {
                 console.log('No matching documents.');
                 setEvents([]);
                 return;
             }
-            const fetchedEvents = [];
             querySnapshot.forEach((doc) => {
                 console.log(doc.id, '=>', doc.data());
                 console.log(selectedDate.toISOString().split('T')[0]);
@@ -237,6 +243,22 @@ useEffect(() => {
   // 컴포넌트가 마운트되면 선택된 날짜를 하루 뒤로 설정
   setNextDay();
 }, []);
+
+const deleteEvent = async (eventId) => {
+    // Firestore에서 해당 일정 문서를 삭제
+    if (!eventId) {
+        console.error("Error: eventId is undefined.");
+        return;
+      }
+    try {
+      await deleteDoc(doc(dbService, "calendar", eventId));
+      // 성공적으로 삭제 후, UI 업데이트를 위해 상태 변경
+      setEvents(prevEvents => prevEvents.filter(event => event.id !== eventId));
+    } catch (error) {
+      console.error("Error removing document: ", error);
+    }
+  };
+  
 
 
 
@@ -286,7 +308,14 @@ useEffect(() => {
                         <ul>
                             
                         {events.map((event, index) => (
-                            <li key={index}>{event.content}</li> // 'content'는 Firestore에 저장된 필드 이름이어야 함
+                        <li key={index}>
+                            {event.content} 
+                            <FontAwesomeIcon 
+                            icon={faTrash} 
+                            onClick={() => deleteEvent(event.id)}
+                            style={{ cursor: 'pointer', color: 'gray' }} // 스타일 옵션
+                            />
+                        </li>
                         ))}
                         </ul>
                     </div>

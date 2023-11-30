@@ -117,8 +117,8 @@ export const NeetCompany = () => {
         date.getMonth() === attendanceDate.getMonth() &&
         date.getFullYear() === attendanceDate.getFullYear()
         );
-        console.log("타일 날짜:", date.toDateString());
-        attendanceDates.forEach(d => console.log("특별 날짜:", d.toDateString(), "비교 결과:", isAttendanceDate));
+        
+        
 
         if (isAttendanceDate) {
         return 'attendance-date'; // 특별한 날짜에 대한 클래스 이름

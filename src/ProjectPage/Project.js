@@ -24,50 +24,6 @@ const UserProject = ({ uid, project }) => {
       </div>
     );
   };
-const DetailedProject = ({ project }) => {
-    const getTagColor = (status) => {
-        switch (status) {
-            case '모집전': return 'tagBeforeRecruiting';
-            case '모집중': return 'tagRecruiting';
-            case '진행중': return 'tagInProgress';
-            case '진행완료': return 'tagCompleted';
-            case '진행전': return 'tagBeforeRunning';
-        }
-    }
-    return (
-    <div className={style.projectBox}>
-        <span className={`${style.tag} ${style[getTagColor(project.status)]}`}>{project.status}</span>
-        <img src={project.image.imageUrl} alt={project.name} />
-        <Link to={`/projectDetail/${project.id}`} style={{ textDecoration: 'none' }} className={style.name}>
-            {project.name}
-        </Link>
-        <div className={style.comment}>{project.shortDescription}</div>
-    </div>
-      );
-};
-const setProjectStatus = (project) => {
-  const currentDate = new Date();
-  const timestampInSeconds = Math.floor(currentDate.getTime() / 1000);
-
-  if (timestampInSeconds >= project.recruitStartDate.seconds && timestampInSeconds <= project.recruitEndDate.seconds) {
-    project.status = '모집중';
-  }
-  else if (timestampInSeconds >= project.runningStartDate.seconds && timestampInSeconds <= project.runningEndDate.seconds) {
-    project.status = '진행중';
-  }
-  else if (timestampInSeconds > project.runningEndDate.seconds) {
-    project.status = '진행완료';
-  }
-  else if (timestampInSeconds < project.recruitStartDate.seconds) {
-    project.status = '모집전';
-  }
-  else if (timestampInSeconds < project.runningStartDate) {
-    project.status = '진행전';
-  }
-  else {
-    project.status = '';
-  }
-}
 
 const MyProject = ({ uid, myProjects }) => {
     const myProjectsCount = myProjects.length;
@@ -126,8 +82,54 @@ const MyProject = ({ uid, myProjects }) => {
     );
   };
 
-const ProjectList = ({ isEmpty, projects }) => {
+export const ProjectList = ({ isEmpty, projects }) => {
 
+  const DetailedProject = ({ project }) => {
+    const getTagColor = (status) => {
+        switch (status) {
+            case '모집전': return 'tagBeforeRecruiting';
+            case '모집중': return 'tagRecruiting';
+            case '진행중': return 'tagInProgress';
+            case '진행완료': return 'tagCompleted';
+            case '진행전': return 'tagBeforeRunning';
+        }
+    }
+    return (
+    <div className={style.projectBox}>
+        <span className={`${style.tag} ${style[getTagColor(project.status)]}`}>{project.status}</span>
+        <img src={project.image.imageUrl} alt={project.name} />
+        <Link to={`/projectDetail/${project.id}`} style={{ textDecoration: 'none' }} className={style.name}>
+            {project.name}
+        </Link>
+        <div className={style.comment}>{project.shortDescription}</div>
+    </div>
+      );
+  };
+
+    const setProjectStatus = (project) => {
+      const currentDate = new Date();
+      const timestampInSeconds = Math.floor(currentDate.getTime() / 1000);
+    
+      if (timestampInSeconds >= project.recruitStartDate.seconds && timestampInSeconds <= project.recruitEndDate.seconds) {
+        project.status = '모집중';
+      }
+      else if (timestampInSeconds >= project.runningStartDate.seconds && timestampInSeconds <= project.runningEndDate.seconds) {
+        project.status = '진행중';
+      }
+      else if (timestampInSeconds > project.runningEndDate.seconds) {
+        project.status = '진행완료';
+      }
+      else if (timestampInSeconds < project.recruitStartDate.seconds) {
+        project.status = '모집전';
+      }
+      else if (timestampInSeconds < project.runningStartDate) {
+        project.status = '진행전';
+      }
+      else {
+        project.status = '';
+      }
+    }
+  
     projects.forEach((project) => {
       setProjectStatus(project);
     });

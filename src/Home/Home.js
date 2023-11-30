@@ -30,8 +30,6 @@ import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import defaultProfileImg from '../images/default_profile_image.jpg'
 
-
-import defaultProfileImg from '../images/default_profile_image.jpg'
 import { defaultData } from '../Profile/defaultData'
 
 const userName = "홍길동"

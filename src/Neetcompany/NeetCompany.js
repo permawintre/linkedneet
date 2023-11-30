@@ -1052,36 +1052,37 @@ export const NeetCompany = () => {
 
                 <ShowPosts currentLocation={'neetCompany'} neetGeneration={generation} />
             </div>
-            <aside className="right-sidebar-neet">
-                <div className="calendar-neet">
-                    <Calendar
-                        onChange={onChange}
-                        value={selectedDate}
-                        tileClassName={tileClassName}
-                        tileContent={({ date, view }) => view === 'month' && <span style={{ color: 'black' }}>{date.getDate()}</span>}
-                    />
+            <div className="right-sidebar-container">
+                <aside className="right-sidebar-neet">
+                    <div className="calendar-neet">
+                        <Calendar
+                            onChange={onChange}
+                            value={selectedDate}
+                            tileClassName={tileClassName}
+                            tileContent={({ date, view }) => view === 'month' && <span style={{ color: 'black' }}>{date.getDate()}</span>}
+                        />
+                    </div>
+                    <div className="calendar-info">
+                        <h3>{selectedDate.getDate()}일의 일정</h3>
+                        {selectedDateInfo.holidays && <p>공휴일: {selectedDateInfo.holidays}</p>}
+                        <ul>
+                            {selectedDateInfo.events.map((event, index) => (
+                                <li key={index}>{event}</li>
+                            ))}
+                        </ul>
+                        <p>노트: {selectedDateInfo.notes}</p>
+                    </div>
+                </aside>
+                <div className="homePostsMarginControl">
+                    <div>
+                        {checked ? "출근함" : "출근안함"}
+                    </div>
+                    <div>
+                        {'오늘 출근한 사람 수: '}{whoChecked.length}
+                    </div>
                 </div>
-                <div className="calendar-info">
-                    <h3>{selectedDate.getDate()}일의 일정</h3>
-                    {selectedDateInfo.holidays && <p>공휴일: {selectedDateInfo.holidays}</p>}
-                    <ul>
-                        {selectedDateInfo.events.map((event, index) => (
-                            <li key={index}>{event}</li>
-                        ))}
-                    </ul>
-                    <p>노트: {selectedDateInfo.notes}</p>
-                </div>
-            </aside>
-            <div className="homePostsMarginControl">
-                <div>
-                    {checked ? "출근함" : "출근안함"}
-                </div>
-                <div>
-                    {'오늘 출근한 사람 수: '}{whoChecked.length}
-                </div>
-                <ShowPosts currentLocation={'neetCompany'}/>
+                <RightSideBar/>
             </div>
-        <RightSideBar/>
 
         </div>
     )

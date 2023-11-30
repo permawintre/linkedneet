@@ -22,6 +22,7 @@ ul {
 }
 .background {
     background-color: var(--color_2);
+    min-height: calc(100vh - 108px);
 }
 .header {
     display: flex;

@@ -1,6 +1,6 @@
 import moment from 'moment'
 import { useState, useEffect } from 'react'
-import { doc, updateDoc,getDoc, addDoc, collection } from 'firebase/firestore'
+import { doc, updateDoc,getDoc, addDoc, collection,deleteDoc } from 'firebase/firestore'
 
 import arrow from '../images/arrow.png'
 import filledStar from '../images/filledStar.png'
@@ -9,6 +9,8 @@ import comments from '../images/comments.png'
 import React from 'react'
 import { dbService , auth } from '../firebase.js'
 import { Link } from "react-router-dom"
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 
 import defaultProfileImg from '../images/default_profile_image.jpg'
 
@@ -249,8 +251,28 @@ export const CommentBtn = () => {
   )
 }
 
-export const Comments= ({ userId, userPic, userName, postedAt, contents})=> {
+export const Comments= ({ commentId, userId, userPic, userName, postedAt, contents, deleteComment})=> {
   //console.log(postedAt);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const commentWriteBtnClick = () => {
+    setShowDropdown(!showDropdown);
+  };
+  
+
+  const handleDelete = async ()  => {
+    if (window.confirm("댓글을 삭제하시겠습니까?")) {
+      try {
+        // Firebase에서 해당 commentId를 가진 댓글을 삭제합니다.
+        await deleteDoc(doc(dbService, 'comments', commentId));
+        alert("댓글이 삭제되었습니다.");
+        deleteComment();
+      } catch (error) {
+        console.error("댓글 삭제 중 에러 발생:", error);
+        alert("댓글을 삭제하는 도중 문제가 발생했습니다.");
+      }
+    }
+  };
+
   return (
     <div className="postComment">
         <Link to={`/profiledetail?uid=${userId}`}>
@@ -264,12 +286,22 @@ export const Comments= ({ userId, userPic, userName, postedAt, contents})=> {
             <span className="commentPosetedAt">{getDayMinuteCounter(postedAt)}</span>
           </div>
           <p className="commentContents">{contents}</p>
+          {auth.currentUser.uid === userId && (
+            <div className="commentMenuIcon" onClick={commentWriteBtnClick}>
+              <FontAwesomeIcon icon={faEllipsisV} className="dropDownBtn"/>
+              {showDropdown && (
+                <div className="dropdownMenu">
+                  <div className="commentMenuItem" onClick={handleDelete}>삭제</div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
     </div>
   );  
 }
 
-export const CommentsWindow = ({comments, numOfComments, updateComments}) => {
+export const CommentsWindow = ({comments, numOfComments}) => {
   //console.log("Initial comments: ", comments);
   const [state,setState] = useState(true);
   const [commentsWithUserInfo, setCommentsWithUserInfo] = useState(comments);
@@ -286,6 +318,7 @@ export const CommentsWindow = ({comments, numOfComments, updateComments}) => {
           //console.log("User data: ", userSnap.data());
           updatedComments.push({
             ...comment,
+            commentId: comment.id,
             userPic: userSnap.data().profile_image || defaultData.profile_image,
             userName: userSnap.data().nickname,
           });
@@ -299,6 +332,14 @@ export const CommentsWindow = ({comments, numOfComments, updateComments}) => {
     fetchUserInfos();
   }, [comments]);
 
+  
+
+  const deleteComment = (commentId) => {
+    setCommentsWithUserInfo(currentComments =>
+      currentComments.filter(comment => comment.commentId !== commentId)
+    );
+  };
+
 
 
   const handler = () => {
@@ -311,11 +352,13 @@ export const CommentsWindow = ({comments, numOfComments, updateComments}) => {
       return(
         <Comments
           key={index}
+          commentId={comment.commentId}
           userPic={comment.userPic}
           userName={comment.userName}
           postedAt={comment.postedAt}
           contents={comment.contents}
           userId={comment.userId}
+          deleteComment={() => deleteComment(comment.commentId)}
         />
       );
     }) 

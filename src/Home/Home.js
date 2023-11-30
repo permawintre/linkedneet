@@ -1120,13 +1120,16 @@ export const ShowPosts = (props) => {
         fetchUserInfo();
     }, []);
 
-    return(
+    const shouldShowWrite = currentLocation !== 'neetCompany' || userInfo.generation === neetGeneration;
 
+    return(
         <div className='postsContainer'>
-            <Write isOpen={isWriteOpen} setIsOpen={setIsWriteOpen} existingPost={false} showHeader={true} currentLocation={currentLocation}/>
+            {shouldShowWrite && (
+                <Write isOpen={isWriteOpen} setIsOpen={setIsWriteOpen} existingPost={false} showHeader={true} currentLocation={currentLocation}/>
+            )}
             <Posts userInfo={userInfo} currentLocation={currentLocation} neetGeneration={neetGeneration}/>
         </div>
-    )
+    );
 }
 export const RightSideBar = () => {
 

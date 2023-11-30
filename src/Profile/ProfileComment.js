@@ -6,6 +6,9 @@ import { ko } from 'date-fns/locale';
 import './ProfileComment.css';
 import { BsThreeDots } from "react-icons/bs";
 
+import { defaultData } from '../Profile/defaultData';
+
+
 const ProfileComment = ({currentUserData, myProfile, profileUid}) => {
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
@@ -27,7 +30,7 @@ const ProfileComment = ({currentUserData, myProfile, profileUid}) => {
             const userDocRef = doc(dbService, "users", commentData.userId);
             const userDoc = await getDoc(userDocRef);
             if (userDoc.exists()) {
-              commentData.userProfile = userDoc.data().profile_image;
+              commentData.userProfile = userDoc.data().profile_image || defaultData.profile_image;
               commentData.nickname = userDoc.data().nickname;
             }
             // postedAt 필드가 Timestamp 객체인 경우 toDate()를 사용하여 Date 객체로 변환

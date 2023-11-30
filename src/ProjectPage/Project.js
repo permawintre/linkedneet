@@ -238,12 +238,6 @@ const ProjectList = ({ projects }) => {
             </div>
           </div>
           <div className={`${style.projectsRecommand} ${style[rowClass]}`}>
-            <div className={style.newProject}>
-              <div className={style.newProjectSmall}>원하는 소모임이 없다면?</div>
-              <Link to="/projectcreate" style={{ textDecoration: 'none' }}>
-                <div className={style.newProjectLarge}>소모임 만들기 ▶</div>
-              </Link>
-            </div>
             {[...Array(totalRows)].map((_, rowIndex) => (
               <div key={rowIndex} className={style.projectsRow}>
                 {visibleProjects
@@ -314,6 +308,12 @@ export const Project = () => {
 
     return (
         <div className={style.body}>
+            <div className={style.newProject}>
+              <div className={style.newProjectSmall}>원하는 소모임이 없다면?</div>
+              <Link to="/projectcreate" style={{ textDecoration: 'none' }}>
+                <div className={style.newProjectLarge}>소모임 만들기 ▶</div>
+              </Link>
+            </div>
             <MyProject uid={uid} myProjects={myProjects}/>
             <ProjectList projects={recommendProjects}/>
         </div>

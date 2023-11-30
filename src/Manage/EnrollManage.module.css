@@ -155,3 +155,7 @@
     cursor: pointer;
     margin: 2px 3px;
 }
+.generationCount {
+    margin-bottom: 5px;
+    text-align: center;
+}

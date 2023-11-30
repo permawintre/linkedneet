@@ -80,7 +80,7 @@ function App() {
 
   return(
     <div className="background">
-        <Header isLoggedIn={isLoggedIn}/>
+        <Header isLoggedIn={isLoggedIn} approved={approved}/>
         <Routes>
             <Route path="/approve" element={ approved ? <Home /> : <Approve/>} />
             <Route path="/" element={loggedIn ? (approved ? <Home/> : <Approve />) : <RedirectToLogIn/>}></Route>

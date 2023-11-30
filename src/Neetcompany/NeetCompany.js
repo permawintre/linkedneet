@@ -185,6 +185,7 @@ export const NeetCompany = () => {
                     where: "individual"
                 });
                 setEventText(''); // 입력 필드 초기화
+                setEvents(prev => [...prev, {content: eventText, userId: auth.currentUser.uid}])
             } catch (error) {
                 console.error("Error adding document: ", error);
             }

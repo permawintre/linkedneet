@@ -103,7 +103,6 @@ export const SearchProjects = ({ searchterm }) => {
     }, [searchterm]);
     
     const HitsComponent = () => {
-        alert(JSON.stringify(allProjectsSnapshot))
         const { hits } = useHits();
         const projectMembers = hits.map(hit => ({
             ...hit,

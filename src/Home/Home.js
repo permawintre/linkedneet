@@ -30,7 +30,7 @@ import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
 
-import profile1Img from '../images/profile1Img.jpg'
+import defaultProfileImg from '../images/default_profile_image.jpg'
 import { defaultData } from '../Profile/defaultData'
 
 const userName = "홍길동"
@@ -214,7 +214,7 @@ export function Post(props) {
             <div className='paddingDiv'>
                 <div className="postHeader">
                     <Link to={`/profiledetail?uid=${props.userId}`}>
-                        <div className='profileImg'><img src={postUserInfo.profileImage || profile1Img} alt="profileImg"/></div>
+                        <div className='profileImg'><img src={postUserInfo.profileImage || defaultProfileImg} alt="profileImg"/></div>
                     </Link>
                     <div className='postInfo'>
                         <Link to={`/profiledetail?uid=${props.userId}`}>
@@ -916,7 +916,7 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
         <div className='homePost write'>
             {showHeader && (
                 <div className='postHeader' onClick={ () => setIsOpen(true) }>
-                <div className='profileImg'><img src={userInfo?.profile_image || profile1Img} alt="profileImg"/></div>
+                <div className='profileImg'><img src={userInfo?.profile_image || defaultProfileImg} alt="profileImg"/></div>
                 <div className='popModal'>{writeTxt()}</div>
                 </div>
             )}
@@ -925,7 +925,7 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
                     <div className='modalWrite' onClick={ (e) => e.stopPropagation() }>
                         <div className='modalHeader'>
                             <div className='modalProfile' onClick={ () => setSelectBar(!selectBar) }>
-                                <div className='profileImg'><img src={userInfo?.profile_image || profile1Img} alt="profileImg"/></div>
+                                <div className='profileImg'><img src={userInfo?.profile_image || defaultProfileImg} alt="profileImg"/></div>
                                 <div>
                                     <div className="userName">{userInfo?.nickname || userName}</div>
                                     <div className="postWhere">게시 위치 ▸{values.postWhere}{values.postWhere === 'project' &&(<div>[{values.projectName}]</div>)}</div>

@@ -12,22 +12,29 @@ const searchClient = algoliasearch(
 const ProjectList = ({ isEmpty, projects }) => {
 
     const setProjectStatus = (project) => {
+      const millisecondsInADay = 24 * 60 * 60 * 1000; // 1일을 밀리초로 표현
+      const secondsInADay = 24 * 60 * 60;
       const currentDate = new Date();
-      const timestampInSeconds = Math.floor(currentDate.getTime());
+      const currentTimestampInDays = Math.floor(currentDate.getTime() / millisecondsInADay);
     
-      if (timestampInSeconds >= project.recruitStartDate && timestampInSeconds <= project.recruitEndDate) {
+      const recruitStartDateInDays = Math.floor(project.recruitStartDate.seconds / secondsInADay);
+      const recruitEndDateInDays = Math.floor(project.recruitEndDate.seconds / secondsInADay);
+      const runningStartDateInDays = Math.floor(project.runningStartDate.seconds / secondsInADay);
+      const runningEndDateInDays = Math.floor(project.runningEndDate.seconds / secondsInADay);
+    
+      if (currentTimestampInDays >= recruitStartDateInDays && currentTimestampInDays <= recruitEndDateInDays) {
         project.status = '모집중';
       }
-      else if (timestampInSeconds >= project.runningStartDate && timestampInSeconds <= project.runningEndDate) {
+      else if (currentTimestampInDays >= runningStartDateInDays && currentTimestampInDays <= runningEndDateInDays) {
         project.status = '진행중';
       }
-      else if (timestampInSeconds > project.runningEndDate) {
+      else if (currentTimestampInDays > runningEndDateInDays) {
         project.status = '진행완료';
       }
-      else if (timestampInSeconds < project.recruitStartDate) {
+      else if (currentTimestampInDays < recruitStartDateInDays) {
         project.status = '모집전';
       }
-      else if (timestampInSeconds < project.runningStartDate) {
+      else if (currentTimestampInDays < runningStartDateInDays) {
         project.status = '진행전';
       }
       else {

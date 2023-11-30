@@ -1,0 +1,30 @@
+.checksection_Outer {
+    display: flex;
+}
+.checksection{
+    padding: 20px 150px;
+    border-radius: 20px;
+    background-color: #ffffff;
+    margin: auto;
+}
+.checksection_Header{
+    display: flex;
+}
+.checksection_UnChecked, .checksection_Checked {
+    display: flex;
+}
+.checksection_Checked_nickname, .checksection_UnChecked_nickname {
+    margin-left: 50px;
+    width: 200px;
+}
+.checksection_partition{
+    text-align: center;
+    font-size: larger;
+    font-weight: bolder;
+}
+.checksection_CurrentDate{
+    text-align: center;
+    font-weight: bolder;
+    font-size: 30px;
+    margin: 0 20px;
+}

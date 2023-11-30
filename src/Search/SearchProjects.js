@@ -57,7 +57,7 @@ const ProjectList = ({ projects }) => {
         }
         return (
         <div className={style.projectBox}>
-            <span className={`${style.tag} ${style[getTagColor(project.status)]}`}>{project.status}</span>
+            <span className={`${style.tag}`}></span>
             <img src={project.image.imageUrl} alt={project.name} />
             <Link to={`/projectDetail/${project.id}`} style={{ textDecoration: 'none' }} className={style.name}>
                 {project.name}

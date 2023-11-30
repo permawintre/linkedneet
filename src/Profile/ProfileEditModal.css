@@ -259,5 +259,6 @@
 
     cursor: pointer;
     border: 2px solid var(--color_2);
+    object-fit: cover;
   }
 }

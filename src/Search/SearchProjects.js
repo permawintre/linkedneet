@@ -11,30 +11,33 @@ const searchClient = algoliasearch(
 
 const ProjectList = ({ projects }) => {
 
+    function formatDate(timestamp) {
+      return new Date(timestamp.seconds * 1000).toLocaleDateString('en-CA', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit'
+        })
+    }
     const setProjectStatus = (project) => {
-      const millisecondsInADay = 24 * 60 * 60 * 1000; // 1일을 밀리초로 표현
-      const secondsInADay = 24 * 60 * 60;
-      const currentDate = new Date();
-      const currentTimestampInDays = Math.floor(currentDate.getTime() / millisecondsInADay);
+      const currentDate = new Date().toLocaleDateString('en-CA', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      })
     
-      const recruitStartDateInDays = Math.floor(project.recruitStartDate.seconds / secondsInADay);
-      const recruitEndDateInDays = Math.floor(project.recruitEndDate.seconds / secondsInADay);
-      const runningStartDateInDays = Math.floor(project.runningStartDate.seconds / secondsInADay);
-      const runningEndDateInDays = Math.floor(project.runningEndDate.seconds / secondsInADay);
-    
-      if (currentTimestampInDays >= recruitStartDateInDays && currentTimestampInDays <= recruitEndDateInDays) {
+      if (currentDate >= formatDate(project.recruitStartDate) && currentDate <= formatDate(project.recruitEndDate)) {
         project.status = '모집중';
       }
-      else if (currentTimestampInDays >= runningStartDateInDays && currentTimestampInDays <= runningEndDateInDays) {
+      else if (currentDate >= formatDate(project.runningStartDate) && currentDate <= formatDate(project.runningEndDate)) {
         project.status = '진행중';
       }
-      else if (currentTimestampInDays > runningEndDateInDays) {
+      else if (currentDate > formatDate(project.runningEndDate)) {
         project.status = '진행완료';
       }
-      else if (currentTimestampInDays < recruitStartDateInDays) {
+      else if (currentDate < formatDate(project.recruitStartDate)) {
         project.status = '모집전';
       }
-      else if (currentTimestampInDays < runningStartDateInDays) {
+      else if (currentDate < formatDate(project.runningStartDate)) {
         project.status = '진행전';
       }
       else {

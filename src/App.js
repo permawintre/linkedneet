@@ -24,6 +24,8 @@ import ProfileCareerDetail from './Profile/ProfileCareerDetail.js'
 
 import { EnrollManage } from './Manage/EnrollManage.js'
 
+import { Search } from './Search/Search.js'
+
 function App() {
 
     const [init, setInit] = useState(true); 
@@ -78,7 +80,7 @@ function App() {
 
   return(
     <div className="background">
-        <Header/>
+        <Header isLoggedIn={isLoggedIn}/>
         <Routes>
             <Route path="/approve" element={ approved ? <Home /> : <Approve/>} />
             <Route path="/" element={loggedIn ? (approved ? <Home/> : <Approve />) : <RedirectToLogIn/>}></Route>
@@ -96,7 +98,9 @@ function App() {
 
             <Route path="/profileheaderedit" element={loggedIn ? <ProfileHeaderEdit authObj = {authObj}/> : <RedirectToLogIn/>}></Route>
 
-            <Route path="/manage" element={approved === 2 ? <EnrollManage/> : <Approve/>}></Route>
+            <Route path="/manage" element={<EnrollManage/>}></Route>
+
+            <Route path="/search" element={loggedIn ? <Search/> : <RedirectToLogIn/>}></Route>
 
             <Route path="/google_signup" element={isLoggedIn ? <GoogleSignup/> : <RedirectToLogIn/>}></Route>
             <Route path="/approve" element={<Approve/>}></Route>

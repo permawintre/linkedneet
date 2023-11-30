@@ -300,10 +300,21 @@ export function Post(props) {
 
 
 
-const Posts=({ userInfo, currentLocation }) =>{
+const Posts=({ userInfo, currentLocation, neetGeneration }) =>{
     const [posts, setPosts] = useState([]);
     const [lastKey, setLastKey] = useState(0);
     const [nextPosts_loading, setNextPostsLoading] = useState(false);
+    useEffect(() => {
+        initFetch()
+            .then((res) => {
+                setPosts(res.posts);
+                setLastKey(res.lastKey);
+                console.log(neetGeneration);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }, [neetGeneration]);
 
     const setQuery = () => {
         if(currentLocation === 'home'){
@@ -314,9 +325,12 @@ const Posts=({ userInfo, currentLocation }) =>{
             )
         }
         if(currentLocation === 'neetCompany'){
+            console.log('gogo');
+            console.log('gogo',neetGeneration);
             return query(
                 collection(dbService, 'posts'),
                 where("postWhere", "==", 'neetCompany'),
+                where("neetGeneration", "==", neetGeneration),
                 orderBy("postedAt", "desc"),
                 limit(5)
             )
@@ -354,6 +368,7 @@ const Posts=({ userInfo, currentLocation }) =>{
             return query(
                 collection(dbService, 'posts'),
                 where("postWhere", "==", "neetCompany"),
+                where("neetGeneration", "==", neetGeneration),
                 orderBy("postedAt", "desc"),
                 startAfter(key),
                 limit(5)
@@ -378,6 +393,7 @@ const Posts=({ userInfo, currentLocation }) =>{
             )
         }
     }
+    console.log("현재 세대: ", neetGeneration);
 
     const initFetch = async () => {
         
@@ -385,6 +401,7 @@ const Posts=({ userInfo, currentLocation }) =>{
             let posts = [];
             let lastKey = '';
             const q = setQuery();
+            console.log("생성된 쿼리: ", q);
             const data = await getDocs(q);
             data.forEach((doc) => {
                 posts.push({
@@ -396,6 +413,7 @@ const Posts=({ userInfo, currentLocation }) =>{
             return { posts, lastKey };
         } catch (e) {
             console.log(e);
+            return { posts: [], lastKey: 0 };
         }
     }
     const moreFetch = async (key) => {
@@ -428,7 +446,7 @@ const Posts=({ userInfo, currentLocation }) =>{
             });
     }, [])
     const fetchMorePosts = (key) => {
-        //console.log(key)
+        console.log(key)
         if (key > 0) {
           setNextPostsLoading(true);
           moreFetch(key)
@@ -1083,7 +1101,7 @@ export const ShowPosts = (props) => {
 
     const [userInfo, setUserInfo] = useState({ ...defaultData });
     const [isWriteOpen, setIsWriteOpen] = useState(false);
-    const {currentLocation, profileUserId} = props;
+    const { currentLocation, neetGeneration } = props;
 
     useEffect(() => { // 유저 정보 코드
         const fetchUserInfo = async () => {
@@ -1106,7 +1124,7 @@ export const ShowPosts = (props) => {
 
         <div className='postsContainer'>
             <Write isOpen={isWriteOpen} setIsOpen={setIsWriteOpen} existingPost={false} showHeader={true} currentLocation={currentLocation}/>
-            <Posts userInfo={userInfo} currentLocation={currentLocation}/>
+            <Posts userInfo={userInfo} currentLocation={currentLocation} neetGeneration={neetGeneration}/>
         </div>
     )
 }

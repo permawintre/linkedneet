@@ -3,6 +3,7 @@ import style from './Project.module.css'
 import { Link } from 'react-router-dom';
 import { collection, query, orderBy, getDocs, where, getDoc, doc } from 'firebase/firestore';
 import { dbService, auth } from '../firebase.js';
+import { Bars } from "react-loader-spinner";
 
 const UserProject = ({ uid, project }) => {
     return (
@@ -270,7 +271,8 @@ export const Project = () => {
   const uid = auth.currentUser.uid;
   const [myProjects, setMyProjects] = useState([]);
   const [recommendProjects, setRecommendProjects] = useState([]);
-  
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     const fetchProjects = async () => {
       // Fetch projectMember documents where userId matches uid
@@ -309,6 +311,8 @@ export const Project = () => {
         setRecommendProjects(recommendProjectsData);
       } catch (error) {
         console.error('Error fetching projects: ', error);
+      } finally {
+        setIsLoading(false);
       }
     };
   
@@ -317,6 +321,17 @@ export const Project = () => {
 
   let projectEmpty = myProjects.length === 0
 
+  if (isLoading) {
+    return (
+      <div className="loadingContainer">
+        <Bars
+          type="ThreeDots"
+          color="#00b22d"
+          height={100}
+          width={100}
+        />
+      </div>);
+  }
     return (
         <div className={style.body}>
           {projectEmpty ? null :

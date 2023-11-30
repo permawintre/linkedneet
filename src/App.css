@@ -22,8 +22,6 @@ ul {
 }
 .background {
     background-color: var(--color_2);
-    min-height: 100vh;
-    min-width: 100vw;
 }
 .header {
     display: flex;
@@ -50,6 +48,7 @@ ul {
     padding-top: 15px;
     font-size: 20px;
     white-space: nowrap;
+
 }
 .header__item {
     flex-grow: 1;
@@ -127,7 +126,9 @@ ul {
 
 .header__notice {
     flex: 1;
+
     white-space: nowrap;
+
 }
 .header__loginout {
     flex: 1;
@@ -144,4 +145,13 @@ body {
     background-size: cover;
     background-attachment: fixed;
     justify-content: center;
+}
+.Footer {
+    background-color: #1e1f38;
+    color: #DFE0DF;
+    padding: 20px;
+}
+.FooterLogo>.linkedneet_logo {
+    text-align: left;
+    margin-bottom: 20px;
 }

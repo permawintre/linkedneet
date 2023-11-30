@@ -2,17 +2,42 @@
     display: flex;
     justify-content: center;
     align-items: flex-start;
+    
 }
-.left-sidebar-neet {
+
+.left-sidebar-container {
+    position: sticky; /* sticky 요소의 부모로 relative 포지셔닝 설정 */
+    top: 118px; 
+    
+  }
+.left-sidebar-neet, .right-sidebar-neet {
+
     width: 250px; /* 또는 원하는 폭에 따라 조정 */
     position: sticky;
     top: 118px; /* 항상 상단에 고정 */
+    overflow: hidden;
+}
+.left-sidebar-neet{
     background-color: white;
     border-radius: 20px;
     box-sizing: border-box;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    overflow: hidden;
 }
+
+.generation-list {
+    position: absolute;
+    left: -130px; /* 왼쪽으로 이동하여 aside 요소 왼쪽에 위치 */
+    top: 0;
+    width: 100px; /* 필요한 너비로 설정 */
+    background: white; /* 배경색 설정 */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* 그림자 효과 */
+    border-radius: 20px;
+    padding: 10px;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+
 .card-image {
 width: 100%;
 display: block; /* Remove space below the image */
@@ -69,3 +94,131 @@ text-align: center;
 border-radius: 20px;
 padding: 5px 0;
 }
+
+.right-sidebar-neet {
+    width: 250px; /* 혹은 부모 컨테이너에 맞게 조정 */
+    
+    font-family: 'Arial', sans-serif;
+    margin-right: 10px;
+
+    
+}
+
+.calendar-neet {
+    margin-bottom: 10px; /* 달력과 정보 섹션 사이의 간격 */
+    background-color: white;
+    border-radius: 20px;
+    box-sizing: border-box;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    padding: 10px;
+    margin-right: 10px;
+    border: none;
+}
+.calendar-neet.react-calendar {
+    width: 100%;
+    max-width: 100%;
+    background-color: #fff;
+    font-family: Arial, sans-serif;
+    line-height: 1.125em;
+    border: white !important;
+  }
+  .calendar-neet.react-calendar__navigation {
+    display: flex;
+    height: 44px;
+    margin-bottom: 10px;
+  }
+  .calendar-neet .attendance-date {
+    background-color: mintcream; /* 민트색으로 표시 */
+    color: black; /* 글자색을 검정색으로 설정 */
+    border-radius: 50%; /* 원형으로 표시 */
+  }
+  .calendar-neet.react-calendar__navigation button {
+    min-width: 44px;
+    background: none;
+    border: none;
+    font-size: 16px;
+    color: black; 
+  }
+  .calendar-neet.react-calendar button {
+    min-width: 44px;
+    background: none;
+    border: none;
+    font-size: 16px;
+    color: black;
+  }
+.calendar-neet.react-calendar__navigation__label {
+    flex-grow: 1;
+    text-align: center;
+    font-weight: bold;
+  }
+  .calendar-neet.react-calendar__month-view__weekdays {
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: bold;
+    color: #555;
+  }
+  .calendar-neet.react-calendar__month-view__weekdays__weekday {
+    padding: 0.5em;
+    color: black;
+  }
+  .calendar-neet.react-calendar__month-view__days__day {
+    flex-grow: 0;
+    flex-shrink: 0;
+    /* 날짜의 기본 크기 설정 */
+    width: 14.28%; 
+    max-width: 14.28%; 
+    padding: 0.5em 0.5em;
+    text-align: center;
+  }
+  .calendar-neet.react-calendar__month-view__days__day--weekend {
+    color: #d10000;
+  }
+  .calendar-neet.react-calendar__tile {
+    all: initial;
+    color: black !important;
+    display: block;
+    border: none !important; 
+  }
+  .calendar-neet.react-calendar__tile--active {
+    background: #29e79e in !important;
+    
+    border-radius: 50%;
+  }
+  .calendar-neet .react-calendar__tile abbr {
+    display: none;
+  }
+  .calendar-neet .react-calendar__tile--now {
+    background: #e4e490;
+    color: black;
+    border-radius: 50%;
+  }
+  .calendar-info {
+    padding: 10px;
+    background-color: white;
+    border-radius: 20px;
+    box-sizing: border-box;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    margin-bottom: 10px;
+    margin-right: 10px;
+    
+}
+
+.calendar-info h3 {
+    margin: 0 10px 10px 10px;
+    font-size: 1rem;
+}
+
+.calendar-info ul {
+    list-style: none;
+    padding: 0;
+}
+
+.calendar-info li,
+.calendar-info p {
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+    color: #555;
+    margin-left: 10px;
+}
+
+

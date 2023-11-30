@@ -1,0 +1,101 @@
+/* css file for SearchProjects */
+:root {
+    
+    --color_1: #FFA500;
+    --color_2: #DFE0DF;
+    --color_3: #1e1f38;
+    --color_4: #FF4B2B;
+
+}
+
+.tagBeforeRecruiting,
+.tagBeforeRunning {
+    background-color: lightblue;
+}
+
+.tagRecruiting {
+    background-color: #edae49;
+}
+.tagInProgress {
+    background-color: #d1495b;
+}
+.tagCompleted {
+    background-color: #00798c;
+}
+
+.projects {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.projectRow {
+    position: relative;
+    width: 725px;
+    display: flex;
+    overflow-x: auto;
+    gap: 20px;
+    padding: 15px 0px 0px 0px;
+}
+.projectRow::-webkit-scrollbar {
+    height: 8px;
+  }
+.projectRow::-webkit-scrollbar-thumb {
+    background-color: #c0c0c0;
+    border-radius: 4px;
+}
+.projectRow::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+.projectBox {
+    flex: 0 0 auto;
+    width: 350px;
+    height: 250px;
+    /* margin: 5px; */
+    background-color: #f8f8f8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.projectBox img {
+    width: 100%;
+    height: 50%;
+    object-fit: cover;
+    border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+}
+
+.projectBox .name {
+    text-align: center;
+    box-sizing: border-box;
+    width: 100%;
+    height: 20%;
+    font-weight: bold;
+    position: absolute;
+    top: 50%;
+    overflow-wrap: break-word;
+    padding: 15px 5px 5px 5px;
+    font-size: 15px;
+    color: black;
+}
+.projectBox .comment {
+    box-sizing: border-box;
+    width: 100%;
+    height: 30%;
+    position: absolute;
+    top: 70%;
+    padding: 5px 15px;
+    font-size: 12px;
+}
+.projectBox .tag {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 3px 5px;
+    border-top-right-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}

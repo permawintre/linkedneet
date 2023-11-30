@@ -28,9 +28,8 @@ import { storage } from '../firebase.js';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import defaultProfileImg from '../images/default_profile_image.jpg'
 
-
-import profile1Img from '../images/profile1Img.jpg'
 import { defaultData } from '../Profile/defaultData'
 
 const userName = "홍길동"
@@ -143,9 +142,6 @@ export function Post(props) {
         };
         fetchProjectName();
     }, [props.postWhere, props.postId]);
-    useEffect(() => {
-        console.log(`postWhere: ${props.postWhere}, projectName: ${props.projectId}`);
-    }, [props.projectId]);
 
 
     const postWriteEditBtnClick = ()=> {
@@ -214,7 +210,7 @@ export function Post(props) {
             <div className='paddingDiv'>
                 <div className="postHeader">
                     <Link to={`/profiledetail?uid=${props.userId}`}>
-                        <div className='profileImg'><img src={postUserInfo.profileImage || profile1Img} alt="profileImg"/></div>
+                        <div className='profileImg'><img src={postUserInfo.profileImage || defaultProfileImg} alt="profileImg"/></div>
                     </Link>
                     <div className='postInfo'>
                         <Link to={`/profiledetail?uid=${props.userId}`}>
@@ -273,7 +269,7 @@ export function Post(props) {
             </div>
 */}
             <CommentsWindow comments={comments} numOfComments={comments.length}/>
-            <WriteCommentContainer userProfileImage = {props.userInfo?.profile_image} postId = {postId} userId ={auth.currentUser.uid} addNewComment={addNewComment} />
+            <WriteCommentContainer userProfileImage = {props.userInfo?.profile_image || defaultProfileImg} postId = {postId} userId ={auth.currentUser.uid} addNewComment={addNewComment} />
             <Write
                 isOpen={isWriteOpen}
                 setIsOpen={setIsWriteOpen}
@@ -344,7 +340,7 @@ const Posts=({ userInfo, currentLocation }) =>{
                 collection(dbService, 'posts'),
                 orderBy("postedAt", "desc"),
                 startAfter(key),
-                limit(1)
+                limit(5)
             );
         }
         if(currentLocation === 'neetCompany'){
@@ -353,7 +349,7 @@ const Posts=({ userInfo, currentLocation }) =>{
                 where("postWhere", "==", "neetCompany"),
                 orderBy("postedAt", "desc"),
                 startAfter(key),
-                limit(1)
+                limit(5)
             )
         }
         if(currentLocation === 'profile'){
@@ -362,7 +358,7 @@ const Posts=({ userInfo, currentLocation }) =>{
                 where("postWhere", "==", "profile"),
                 orderBy("postedAt", "desc"),
                 startAfter(key),
-                limit(1)
+                limit(5)
             )
         }
         if(currentLocation === 'project'){
@@ -371,7 +367,7 @@ const Posts=({ userInfo, currentLocation }) =>{
                 where("postWhere", "==", "project"),
                 orderBy("postedAt", "desc"),
                 startAfter(key),
-                limit(1)
+                limit(5)
             )
         }
     }
@@ -475,7 +471,7 @@ const Posts=({ userInfo, currentLocation }) =>{
       useEffect(() => {
         const handleScroll = () => {
           const { scrollTop, offsetHeight } = document.documentElement
-          if (window.innerHeight + scrollTop >= offsetHeight-1000) {
+          if (window.innerHeight + scrollTop >= offsetHeight-700) {
             setNextPostsLoading(true)
           }
         }
@@ -742,7 +738,7 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
                 const docSnap = await getDoc(ncDocRef);
                 if (docSnap.exists()) {
                     setNcCheckTimes(docSnap.data().checkTimes)
-                    console.log("Document data:", docSnap.data().checkTimes);
+                    //console.log("Document data:", docSnap.data().checkTimes);
                 } else {
                     console.log("No such document!");
                 }
@@ -795,7 +791,10 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
             'userId': uid,
             'imgUrls': modifiedImgs(imgIds, imgDeleted, imgUrls),
             'projectId': selectedProjectId,
+            'neetGeneration': values.neetGeneration
         };
+        console.log('Selected Neet Generation:', selectedNeetGeneration);
+
     
         const handleUploadImages = async () => {
             for (let i = 0; i < contentImages.length; i++) {
@@ -860,6 +859,8 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
                 .catch(error => {
                     console.error("Error adding document: ", error);
                 });
+                console.log('Selected Neet Generation:', selectedNeetGeneration);
+
 
         }
     
@@ -907,16 +908,44 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
       }, []);
 
     const [selectedProjectId, setSelectedProjectId] = useState(null);
+    const selectedNeetGeneration = "0";  
     const selectProject = (projectId) => {
     setSelectedProjectId(projectId);
     };
+    
+    useEffect(() => { // 유저 정보 코드
+        const fetchUserInfo = async () => {
+            if (auth.currentUser) {
+                setUid(auth.currentUser.uid)
+                const userRef = doc(dbService, "users", auth.currentUser.uid);
+                const docSnap = await getDoc(userRef);
+    
+                if (docSnap.exists()) {
+                    const userData = docSnap.data();
+                    setUserInfo(userData);
+    
+                    // 사용자 세대 정보를 values 상태에 저장
+                    setValues(prevValues => ({
+                        ...prevValues,
+                        neetGeneration: userData.generation, // 세대 정보 필드가 'generation'이라고 가정
+                    }));
+                } else {
+                    console.log("No such document!");
+                }
+            }
+        };
+    
+        fetchUserInfo();
+    }, []);
+
+    
 
 
     return(
         <div className='homePost write'>
             {showHeader && (
                 <div className='postHeader' onClick={ () => setIsOpen(true) }>
-                <div className='profileImg'><img src={userInfo?.profile_image || profile1Img} alt="profileImg"/></div>
+                <div className='profileImg'><img src={userInfo?.profile_image || defaultProfileImg} alt="profileImg"/></div>
                 <div className='popModal'>{writeTxt()}</div>
                 </div>
             )}
@@ -925,10 +954,10 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
                     <div className='modalWrite' onClick={ (e) => e.stopPropagation() }>
                         <div className='modalHeader'>
                             <div className='modalProfile' onClick={ () => setSelectBar(!selectBar) }>
-                                <div className='profileImg'><img src={userInfo?.profile_image || profile1Img} alt="profileImg"/></div>
+                                <div className='profileImg'><img src={userInfo?.profile_image || defaultProfileImg} alt="profileImg"/></div>
                                 <div>
                                     <div className="userName">{userInfo?.nickname || userName}</div>
-                                    <div className="postWhere">게시 위치 ▸{values.postWhere}{values.postWhere === 'project' &&(<div>[{values.projectName}]</div>)}</div>
+                                    <div className="postWhere">게시 위치 ▸{values.postWhere}{values.postWhere === 'project' &&(<div>[{values.projectName}]</div>)}{values.postWhere === 'neetCompany' &&(<div>[{values.neetGeneration}]</div>)}</div>
                                 </div>
                             </div>
                             {selectBar ? 
@@ -1001,8 +1030,7 @@ export const ShowPosts = (props) => {
 
     const [userInfo, setUserInfo] = useState({ ...defaultData });
     const [isWriteOpen, setIsWriteOpen] = useState(false);
-
-    const currentLocation = props.currentLocation;
+    const {currentLocation, profileUserId} = props;
 
     useEffect(() => { // 유저 정보 코드
         const fetchUserInfo = async () => {
@@ -1096,9 +1124,11 @@ export const Home = () => {
         <div className='home'>
             <aside className="left-sidebar">
                 <div className="background-img-container">
+
                     <img src={userInfo?.background_image || defaultData.background_image} alt="background" className="homeProfile-background-img"/> 
+
                 </div>
-                <img src={userInfo?.profile_image} alt="profile" className="profile-img1" />
+                <img src={userInfo?.profile_image || defaultProfileImg} alt="profile" className="profile-img1" />
                 <div className="profile-info-home">
                     <h3>{userInfo?.nickname || 'undefined'}</h3>
                 </div>
@@ -1109,7 +1139,10 @@ export const Home = () => {
             <div className="homePostsMarginControl">
                 <ShowPosts currentLocation={'home'}/>
             </div>
+
+
             <RightSideBar/>
+
         </div>
     )
 

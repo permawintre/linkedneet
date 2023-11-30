@@ -3,7 +3,7 @@ import { Routes, Route, useNavigate } from "react-router-dom"
 import './App.css'
 import { auth, dbService} from './firebase.js'
 import { doc, getDocs, collection, query, where, getDoc  } from "firebase/firestore"
-import { Header } from "./Header.js"
+import { Header, Footer } from "./Header.js"
 import { Home } from "./Home/Home.js"
 import { Signup, Login, GoogleSignup, Google } from "./Auth/Auth.js"
 import { NotFound } from "./etc/Notfound.js"
@@ -25,8 +25,10 @@ import ProfileCareerDetail from './Profile/ProfileCareerDetail.js'
 import { Main } from './Main.js'
 
 import { EnrollManage } from './Manage/EnrollManage.js'
+
 import { Notice } from './Manage/Notice.js'
 import { Search } from './Search/Search.js'
+
 
 function App() {
 
@@ -93,17 +95,19 @@ function App() {
             <Route path="/projectmanage/:projectId" element={loggedIn ? (approved ? <ProjectManage/>: <Approve />) : <RedirectToLogIn/>}></Route>
             <Route path="/projecthome/:projectId" element={loggedIn ? (approved ? <ProjectHome/>: <Approve />) : <RedirectToLogIn/>}></Route>
             
-            <Route path="/neetCompany" element={loggedIn ? (approved ? <NeetCompany/> : <Approve />) : <RedirectToLogIn/>}></Route>
+
+            <Route path="/neetCompany/:neetGeneration" element={loggedIn ? (approved ? <NeetCompany/> : <Approve />) : <RedirectToLogIn/>}></Route>
+
             <Route path="/profile" element={loggedIn ? (approved ? <Profile/> : <Approve />) : <RedirectToLogIn/>}></Route>
             <Route path="/profiledetail" element={loggedIn ? (approved ? <ProfileDetail/> : <Approve />) : <RedirectToLogIn/>}></Route>
-            <Route path="/profiledetail/career" element={<ProfileCareerDetail/>}></Route>
+            <Route path="/profiledetail/career" element={loggedIn ? (approved ? <ProfileCareerDetail/> : <Approve />) : <RedirectToLogIn/>}></Route>
+            <Route path="/manage" element={loggedIn ? ((approved == 2) ? <EnrollManage/> : <Approve />) : <RedirectToLogIn/>}></Route>
 
-            <Route path="/profileheaderedit" element={loggedIn ? <ProfileHeaderEdit authObj = {authObj}/> : <RedirectToLogIn/>}></Route>
 
-            <Route path="/manage" element={<EnrollManage/>}></Route>
+            <Route path="/search" element={loggedIn ?  (approved ?  <Search/> : <Approve/>) : <RedirectToLogIn/>}></Route>
+            <Route path="/notice" element={loggedIn ?  (approved ?  <Notice/> : <Approve/>) : <RedirectToLogIn/>}></Route>
 
-            <Route path="/search" element={loggedIn ? <Search/> : <RedirectToLogIn/>}></Route>
-            <Route path="/notice" element={loggedIn ? <Notice/> : <RedirectToLogIn/>}></Route>
+
 
             <Route path="/google_signup" element={isLoggedIn ? <GoogleSignup/> : <RedirectToLogIn/>}></Route>
             <Route path="/approve" element={<Approve/>}></Route>
@@ -112,6 +116,7 @@ function App() {
             <Route path="*" element={<NotFound/>}></Route>
             <Route path="/main" element={<Main/>}></Route>
         </Routes>
+        <Footer/>
     </div>
 
   )

@@ -4,14 +4,12 @@ import { dbService, auth } from '../firebase';
 import { doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { defaultData } from '../Profile/defaultData'
 import algoliasearch from "algoliasearch/lite";
-import { InstantSearch, SearchBox, useHits ,  Configure} from 'react-instantsearch-hooks-web';
+import { InstantSearch, SearchBox, useHits , Configure} from 'react-instantsearch-hooks-web';
 
 const searchClient = algoliasearch(
   process.env.REACT_APP_ALGOLIA_ID,
   process.env.REACT_APP_ALGOLIA_SEARCH_KEY
 );
-
-// import './Profile.css'
 
 // UserProfile 컴포넌트는 각 사용자의 ID를 받아 해당 사용자의 데이터를 Firebase에서 가져옴.
 const UserProfile = ({ uid, currentUserData }) => {
@@ -99,37 +97,10 @@ const UserProfile = ({ uid, currentUserData }) => {
   );
 };
 
-const renderUsers = (userList, currentUserData) => {  
-  // 유효한 userId만 필터링
-  const validUsers = userList.filter(uid => uid);
-  const slicedFollowers = validUsers.slice(0, 4)
-
-  if (validUsers.length === 0) {
-    return (
-      <h1 className="profiles-row-center">유저 검색 결과가 없어요... T^T</h1>
-    )
-  }
-
-  return  (
-    <div className="profiles-row">
-      { validUsers.map((uid, index) => (
-        <UserProfile key={uid} uid={uid} currentUserData={currentUserData} />
-      )) }
-    </div>
-  )
-};
-
 export const SearchUsers = ({ searchterm, currentUserData }) => {
-    const [userList, setUserList] = useState([]);
-
-    useEffect(() => {
-      // 검색 상태 초기화
-      setUserList([]);
-    }, [searchterm]);
 
     const HitsComponent = () => {
         const { hits } = useHits();
-
         if (hits.length === 0) {
             return <h1 className="profiles-row-center">유저 검색 결과가 없어요... T^T</h1>;
         }
@@ -142,9 +113,9 @@ export const SearchUsers = ({ searchterm, currentUserData }) => {
           </div>
         );
       };
+
     return (
       <InstantSearch searchClient={searchClient} indexName="users">
-        {/* 검색어가 nickname 필드에 포함되어 있는 문서만 필터링 */}
         <Configure query={searchterm} />
         <HitsComponent />
       </InstantSearch>

@@ -1,46 +1,24 @@
 import React, { useState, useEffect } from "react"
-import { Link, useLocation } from "react-router-dom"
-import { dbService, auth } from '../firebase';
-import { doc, getDoc, collection, getDocs, query, where } from 'firebase/firestore';
+import { Link } from "react-router-dom"
+import { dbService } from '../firebase';
+import { doc, getDoc } from 'firebase/firestore';
 import { defaultData } from '../Profile/defaultData'
 import algoliasearch from "algoliasearch/lite";
-import { InstantSearch, SearchBox, useHits , Configure} from 'react-instantsearch-hooks-web';
+import { InstantSearch, useHits , Configure} from 'react-instantsearch-hooks-web';
 
 const searchClient = algoliasearch(
   process.env.REACT_APP_ALGOLIA_ID,
   process.env.REACT_APP_ALGOLIA_SEARCH_KEY
 );
 
-// UserProfile 컴포넌트는 각 사용자의 ID를 받아 해당 사용자의 데이터를 Firebase에서 가져옴.
-const UserProfile = ({ uid, currentUserData }) => {
-  const [profileData, setProfileData] = useState(defaultData);
-  const [isLoading, setIsLoading] = useState(true);
+const UserProfile = ({ userData, currentUserData }) => {
   const [friendInfo, setFriendInfo] = useState('');
 
   useEffect(() => {
-    // Fetch user data from Firebase
-    const fetchUserData = async () => {
-      try {
-        const userDocRef = doc(dbService, 'users', uid);
-        const userDoc = await getDoc(userDocRef);
-
-        if (userDoc.exists()) {
-          const fetchedProfileData = userDoc.data();
-          setProfileData(prevData => ({ ...prevData, ...fetchedProfileData }));
-          // 프로필 사용자의 데이터가 로드되면 friendInfo 계산
-          calculateFriendInfo(fetchedProfileData.followers, currentUserData.followings);
-        } else {
-          console.log('User not found');
-        }
-      } catch (error) {
-        console.error('Error fetching user data:', error);
-      } finally {
-        setIsLoading(false); // Loading 끝
-      }
-    };
-
-    fetchUserData();
-  }, [uid]);
+    if (userData && currentUserData) {
+      calculateFriendInfo(userData.followers, currentUserData.followings);
+    }
+  }, [userData, currentUserData]);
   
   const calculateFriendInfo = (profileFollowers, currentUserFollowing) => {
     // 현재 사용자의 팔로잉 중 프로필의 팔로워에 포함된 사람들 찾기
@@ -74,22 +52,19 @@ const UserProfile = ({ uid, currentUserData }) => {
     fetchNames();
   };
 
-  // firebase에서 data fetch되기 전까지 Loading... 띄우기
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
-
-  const intro_title = profileData.intro_title;
+  const intro_title = userData.intro_title;
+  const profile_image = userData.profile_image || 'https://s3.amazonaws.com/37assets/svn/765-default-avatar.png';
+  const background_image = userData.background_image || 'https://images.pexels.com/photos/1731427/pexels-photo-1731427.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260';
 
   return (
     <div className="user-profile">
-        <Link to={`/profiledetail?uid=${uid}`}>
-          <img className="background-img" src={profileData.background_image}/>
-          <img className="profile-img" src={profileData.profile_image} alt={profileData.nickname} />
+        <Link to={`/profiledetail?uid=${userData.uid}`}>
+          <img className="background-img" src={background_image}/>
+          <img className="profile-img" src={profile_image} alt={userData.nickname} />
         </Link>
         <div className="profile-info">
-          <Link to={`/profiledetail?uid=${uid}`} className="profile-name">{profileData.nickname}</Link>
-          <p className="profile-group">니트컴퍼니 {profileData.generation}기</p>
+          <Link to={`/profiledetail?uid=${userData.uid}`} className="profile-name">{userData.nickname}</Link>
+          <p className="profile-group">니트컴퍼니 {userData.generation}기</p>
           <p className="profile-intro-title">{intro_title ? `"${intro_title}"` : ''}</p>
         <p className="profile-friend">{friendInfo || ''}</p> {/* friendInfo가 없을 경우 빈 문자열 */}
         </div>
@@ -108,7 +83,7 @@ export const SearchUsers = ({ searchterm, currentUserData }) => {
         return (
           <div className="profiles-row">
             {hits.map(hit => (
-              <UserProfile key={hit.objectID} uid={hit.objectID} currentUserData={currentUserData} />
+              <UserProfile key={hit.objectID} userData={hit} currentUserData={currentUserData} />
             ))}
           </div>
         );

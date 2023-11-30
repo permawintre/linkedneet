@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React from "react"
 import algoliasearch from "algoliasearch/lite";
 import style from './SearchProjects.module.css'
 import { Link } from 'react-router-dom';
@@ -9,7 +9,7 @@ const searchClient = algoliasearch(
   process.env.REACT_APP_ALGOLIA_SEARCH_KEY
 );
 
-const ProjectList = ({ isEmpty, projects }) => {
+const ProjectList = ({ projects }) => {
 
     const setProjectStatus = (project) => {
       const millisecondsInADay = 24 * 60 * 60 * 1000; // 1일을 밀리초로 표현
@@ -67,10 +67,7 @@ const ProjectList = ({ isEmpty, projects }) => {
     projects.forEach((project) => {
       setProjectStatus(project);
     });
-    const projectCount = projects.length;
-    let rowClass;
-    rowClass = "oneRow";
-    console.log(rowClass);
+    let rowClass = "oneRow";
 
     // Return
     return (
@@ -88,10 +85,10 @@ export const SearchProjects = ({ searchterm }) => {
 
     const HitsComponent = () => {
         const { hits } = useHits();
-        // hits 배열의 각 항목에 'id' 필드 추가
+
         const projects = hits.map(hit => ({
             ...hit,
-            id: hit.objectID  // Algolia의 objectID를 id 필드로 설정
+            id: hit.objectID
         }));
 
         console.log(hits[0])
@@ -100,7 +97,7 @@ export const SearchProjects = ({ searchterm }) => {
             return <h1 className="profiles-row-center">소모임 검색 결과가 없어요... T^T</h1>;
         }
         return (
-            <ProjectList isEmpty={false} projects={projects}/>
+            <ProjectList projects={projects}/>
         );
       };
 

@@ -35,6 +35,12 @@ import 'react-datepicker/dist/react-datepicker.css';
   </div> */
 
 function DateParser(yourDate) {
+  if (!yourDate) {
+    return null
+  } 
+  if (typeof(yourDate) == 'string') {
+    return yourDate
+  }
   const offset = yourDate.getTimezoneOffset()
   yourDate = new Date(yourDate.getTime() - (offset*60*1000))
   return yourDate.toISOString().split('T')[0]
@@ -513,15 +519,6 @@ const ProfileCareerEditModal = ({job, EditModalClose}) => {
     </div>
   );
 
-  const onToChange = (e) => {
-    const value = e.target.value;
-    setToDate(value)
-  };
-  const onFromChange = (e) => {
-    const value = e.target.value;
-    setFromDate(value)
-  };
-
   const onJobChange = (e) => {
     const value = e.target.value;
     setJob(value)
@@ -553,6 +550,7 @@ const ProfileCareerEditModal = ({job, EditModalClose}) => {
         // if successfully edit, then refresh < 새로고침 > 
         window.location.replace('/profiledetail')
     } catch (e) {
+        alert(e)
         console.log(e);
     }
       //setUserObj(null);
@@ -568,9 +566,9 @@ const ProfileCareerEditModal = ({job, EditModalClose}) => {
               <h4>경력</h4>
                 <input type="text" class="career-edit-section" name="job" placeholder="경력" value = {Job || ""} onChange={onJobChange}/>
             <h4>시작 기간</h4>
-              <DatePicker className="career-edit-section" dateFormat="yyyy/MM" selected = {new Date(FromDate) || ""} onChange={date => setFromDate(date)} shouldCloseOnSelect/> 
+              <DatePicker className="career-edit-section" dateFormat="yyyy/MM" selected = {FromDate ? new Date(FromDate) : null} onChange={date => setFromDate(date)} shouldCloseOnSelect/> 
             <h4>종료 기간</h4>
-              <DatePicker className="career-edit-section" dateFormat="yyyy/MM" selected = {new Date(ToDate) || ""} onChange={date => setToDate(date)} shouldCloseOnSelect/>
+              <DatePicker className="career-edit-section" dateFormat="yyyy/MM" selected = {ToDate ? new Date(ToDate) : null} onChange={date => setToDate(date)} shouldCloseOnSelect/>
             <h4 style={{margin: "2px"}}>세부사항</h4>
                 {detailList}
                 <input 
@@ -647,14 +645,6 @@ const ProfileCareerAddModal = ({AddModalClose}) => {
       <li class="career-detail-text">{detail.name}<button class="career-delete" onClick={() => handleDelete(detail.id)}/> </li>
     </div>
   );
-  const onToChange = (e) => {
-    const value = e.target.value;
-    setToDate(value)
-  };
-  const onFromChange = (e) => {
-    const value = e.target.value;
-    setFromDate(value)
-  };
   const onJobChange = (e) => {
     const value = e.target.value;
     setJob(value)
@@ -678,6 +668,13 @@ const ProfileCareerAddModal = ({AddModalClose}) => {
         // if successfully edit, then refresh < 새로고침 > 
         window.location.replace('/profiledetail')
     } catch (e) {
+        if (Job == ""){
+          alert("경력 이름을 반드시 입력해야 합니다.")
+        }
+        if (!FromDate){
+          alert("경력 시작 기간을 반드시 입력해야 합니다.")
+        }
+        alert(e)
         console.log(e);
     }
       //setUserObj(null);
@@ -692,9 +689,9 @@ const ProfileCareerAddModal = ({AddModalClose}) => {
             <h4>경력</h4>
               <input type="text" class="career-edit-section" name="job" placeholder="경력" value = {Job || ""} onChange={onJobChange}/>
             <h4>시작 기간</h4>
-              <DatePicker className="career-edit-section" dateFormat="yyyy/MM" selected = {new Date(FromDate) || ""} onChange={date => setFromDate(date)} shouldCloseOnSelect/> 
+              <DatePicker className="career-edit-section" dateFormat="yyyy/MM" selected = {FromDate ? new Date(FromDate) : null} onChange={date => setFromDate(date)} shouldCloseOnSelect/> 
             <h4>종료 기간</h4>
-              <DatePicker className="career-edit-section" dateFormat="yyyy/MM" selected = {new Date(ToDate) || ""} onChange={date => setToDate(date)} shouldCloseOnSelect/>
+              <DatePicker className="career-edit-section" dateFormat="yyyy/MM" selected = {ToDate ? new Date(ToDate) : null} onChange={date => setToDate(date)} shouldCloseOnSelect/>
             <h4 style={{margin: "2px"}}>세부사항</h4>
               {detailList}
               <input 

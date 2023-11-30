@@ -244,7 +244,7 @@ const ProfileCareer = ({userData, myProfile}) => {
             <div className="career-index"/>
             <div className="career-wrapper" key={index}>
               <div className="career-title-">
-                {job} ({userData.career[job]["from"].slice(0, 7)} ~ {userData.career[job]["to"].slice(0, 7)})
+                {job} ({userData.career[job]["from"].slice(0, 7)} ~ {userData.career[job]["to"]?.slice(0, 7)})
               </div>
               <div className="career-content">
                 {userData.career[job]["detail_list"].map((item, i) => (

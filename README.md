@@ -47,6 +47,7 @@ npm install
 3. Firebase 프로젝트 설정
 - firebase 콘솔에서 새 프로젝트를 생성하고 웹 앱을 추가한다.
 - firebase SDK 구성 객체를 설정하고, '.env' 파일을 프로젝트 루트에 추가한다.
+- 검색 엔진으로 사용하는 algolia의 application-id와 api-key도 '.env'에 추가한다. 
 ```
 REACT_APP_FIREBASE_API_KEY=your-api-key
 REACT_APP_FIREBASE_AUTH_DOMAIN=your-auth-domain
@@ -54,6 +55,8 @@ REACT_APP_FIREBASE_PROJECT_ID=your-project-id
 REACT_APP_FIREBASE_STORAGE_BUCKET=your-storage-bucket
 REACT_APP_FIREBASE_MESSAGING_SENDER_ID=your-messaging-sender-id
 REACT_APP_FIREBASE_APP_ID=your-app-id
+REACT_APP_ALGOLIA_ID=your-algolia-application-id
+REACT_APP_ALGOLIA_SEARCH_KEY=your-algolia-api-key
 ```
 4. Firebase CLI 설치
 ```

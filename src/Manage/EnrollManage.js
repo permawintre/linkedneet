@@ -1,33 +1,12 @@
 import React, { useState, useEffect } from "react"
 
 import style from './EnrollManage.module.css'
-
-import { FcAlarmClock, FcCalendar, FcCheckmark, FcGlobe } from "react-icons/fc";
-import { doc, getDoc, addDoc, collection, updateDoc, query, where, getDocs, deleteDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { useParams } from 'react-router-dom';
-import { Link } from 'react-router-dom';
-import { auth, dbService, storage } from '../firebase.js'
-import moment from 'moment'
-import { useNavigate } from 'react-router-dom';
-import DatePicker from 'react-datepicker';
+import './EnrollManage.css'
+import { doc, collection, updateDoc, query, where, getDocs, deleteDoc } from 'firebase/firestore';
+import { dbService } from '../firebase.js'
 import 'react-datepicker/dist/react-datepicker.css';
-import { Timestamp } from 'firebase/firestore';
-import { v4 as uuidv4 } from 'uuid';
-
-function formatDateKR(timestamp) {
-    return new Date(timestamp.seconds * 1000).toLocaleDateString('ko-KR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  }
-const dateFormatChange = (timestamp) => {
-  if (timestamp instanceof Timestamp) {
-    return new Date(timestamp.seconds * 1000);
-  }
-  return timestamp;
-};
+import { whoCheckedF } from "../Neetcompany/NeetCompany.js";
+import moment from 'moment'
 
 const ApplySection = ({ applicants, handleApprove, handleReject }) => {
 
@@ -184,6 +163,90 @@ const MemberSection = ({ members }) => {
   );
 };
 
+export const CheckSection = () => {
+
+  const [whoChecked, setWhoChecked] = useState([]);
+  const [currentDate, setCurrentDate] = useState(moment().unix());
+  
+  const [allUserData, setAllUserData] = useState();
+  const [checkedUserData, setCheckedUserData] = useState();
+  const [unCheckedUserData, setUnCheckedUserData] = useState();
+  
+  const getDate = () => {
+    let myDate = new Date(currentDate * 1000);
+    return(myDate.getFullYear()+"년 "+(myDate.getMonth()+1)+"월 "+myDate.getDate()+"일")
+  }
+
+  useEffect(() => {
+    const tmpfnc = async () => {
+        const newWhoChecked = await whoCheckedF(currentDate)
+        setWhoChecked(newWhoChecked)
+    }
+    tmpfnc();
+  }, [currentDate])
+
+  useEffect(() => {
+    const tmpfnc2 = async () => {
+      const querySnapshot = await getDocs(collection(dbService, "users"));
+      setAllUserData(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    };
+  
+    tmpfnc2();
+  }, []);
+  
+  useEffect(() => {
+    if (allUserData && whoChecked) {
+      setCheckedUserData(
+        allUserData.filter((doc) => whoChecked.includes(doc.id))
+      );
+      setUnCheckedUserData(
+        allUserData.filter((doc) => !whoChecked.includes(doc.id))
+      );
+    }
+  }, [allUserData, whoChecked]);
+
+
+  return(
+    <div className="checksection_Outer">
+    <div className="checksection">
+      <div className="checksection_Header">
+        <button onClick={() => setCurrentDate(currentDate-86400)}>{'이전'}</button>
+        <div className="checksection_CurrentDate">{getDate()}</div>
+        <button onClick={() => setCurrentDate(currentDate+86400)}>{'다음'}</button>
+      </div>
+      <div className="checksection_collection">
+        <div className="checksection_partition">업무인증 미완료: {unCheckedUserData && unCheckedUserData.length}</div>
+        <div className="checksection_UnChecked">
+          <div className="checksection_UnChecked_nickname">
+            {unCheckedUserData && unCheckedUserData.map((doc)=>{
+              return (<div>{doc.nickname}</div>)
+            })}
+          </div>
+          <div className="checksection_UnChecked_email">
+            {unCheckedUserData && unCheckedUserData.map((doc)=>{
+              return (<div>{doc.email}</div>)
+            })}
+          </div>
+        </div>
+        <div className="checksection_partition">업무인증 완료: {checkedUserData && checkedUserData.length}</div>
+        <div className="checksection_Checked">
+          <div className="checksection_Checked_nickname">
+            {checkedUserData && checkedUserData.map((doc)=>{
+              return (<div>{doc.nickname}</div>)
+            })}
+          </div>
+          <div className="checksection_Checked_email">
+            {checkedUserData && checkedUserData.map((doc)=>{
+              return (<div>{doc.email}</div>)
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  )
+}
+
 export const EnrollManage = () => {
   const [applicants, setApplicants] = useState([]);
   const [members, setMembers] = useState([]);
@@ -262,6 +325,12 @@ export const EnrollManage = () => {
         >
           <span className={style.text}>멤버 관리</span>
         </span>
+        <span
+          className={`${style.buttonItem} ${style[activeSection === 'checkSection' ? 'active' : '']}`}
+          onClick={() => handleButtonClick('checkSection')}
+        >
+          <span className={style.text}>출석 관리</span>
+        </span>
       </div>
       <div id="memberSection">
         {activeSection === 'memberSection' && (
@@ -290,6 +359,9 @@ export const EnrollManage = () => {
             )}
           </div>
         )}
+      </div>
+      <div id="checkSection">
+        {activeSection === 'checkSection' && <CheckSection/>}
       </div>
     </div>
   );

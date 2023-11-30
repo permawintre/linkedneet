@@ -1,14 +1,13 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Link, useLocation } from "react-router-dom"
 import { dbService, auth } from '../firebase';
-import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, arrayUnion, arrayRemove, collection, addDoc, query, where, getDocs, orderBy } from 'firebase/firestore';
 import { FaFacebookSquare, FaInstagramSquare} from 'react-icons/fa';
 import { IoGlobeOutline } from "react-icons/io5";
 import { MdPhoneIphone, MdEmail, MdCalendarMonth } from 'react-icons/md'
 import { ProfileEditModal, ProfileIntroEditModal } from './ProfileEditModal';
 import { ProfileComment } from './ProfileComment';
 import { ProfilePost } from './ProfilePost';
-import { SearchProjects } from './ProfileProject';
 import { defaultData } from './defaultData'
 import './ProfilePost.css';
 import { Bars } from "react-loader-spinner";
@@ -127,15 +126,21 @@ const ProfileHeader = ({userData, myProfile}) => {
             </div>
             <div className="header-right">
                 <div className="header-right1">
+                  {website_url ?
                     <a href={website_url} target="_blank" rel="noopener noreferrer">
                         <IoGlobeOutline size="30" style={{ color: 'black' }} title={website_url}/>
                     </a>
+                  : null }
+                  {facebook_url ?
                     <a href={facebook_url} target="_blank" rel="noopener noreferrer">
                         <FaFacebookSquare size="30" style={{ color: '#4267b2' }} title={facebook_url}/>
                     </a>
+                  : null }
+                  {insta_url ?
                     <a href={insta_url} target="_blank" rel="noopener noreferrer">
                         <FaInstagramSquare size="30" style={{ color: '#d62976' }} title={insta_url}/>
                     </a>
+                  : null }
                 </div>
                 <div className="header-right2">
                     <div className="email">
@@ -271,7 +276,6 @@ const ProfileDetail = () => {
   const introRef = useRef(null);
   const careerRef = useRef(null);
   const postRef = useRef(null);
-  const projectRef = useRef(null);
   const commentRef = useRef(null);
 
   // For querystring 'uid'
@@ -367,13 +371,11 @@ useEffect(() => {
           <span onClick={() => scrollToRef(introRef)}>소개</span>
           <span onClick={() => scrollToRef(careerRef)}>경험</span>
           <span onClick={() => scrollToRef(postRef)}>게시글</span>
-          <span onClick={() => scrollToRef(projectRef)}>소모임</span>
           <span onClick={() => scrollToRef(commentRef)}>방명록</span>
         </div>
         <div ref={introRef}><ProfileIntro userData={profileUserData} myProfile={myProfile}/></div>
         <div ref={careerRef}><ProfileCareer userData={profileUserData} myProfile={myProfile}/></div>
         <div ref={postRef}><ProfilePost currentUserData={currentUserData} userData={profileUserData} myProfile={myProfile}/></div>
-        <div ref={projectRef}><SearchProjects searchterm={profileUserData.uid}></SearchProjects></div>
         <div ref={commentRef}><ProfileComment currentUserData={currentUserData} myProfile={myProfile} profileUid={uid}/></div>
     </div>
     </div>

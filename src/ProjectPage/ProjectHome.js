@@ -1126,7 +1126,7 @@ export const ProjectHome = () => {
                         memberInfos.map(user => (
                             <li key={user.id} className={style.interestItem}>
                                 <Link to={`/profiledetail?uid=${user.id}`}>
-                                    <img src={user.imgUrls || profile1Img} alt={user.nickname || 'User'}/>
+                                    <img src={user.profile_image || profile1Img} alt={user.nickname || 'User'}/>
                                 </Link>
                                 <span className={style.interestTitle}>{user.nickname || 'Unknown User'}</span>
                                 <PlusBtn/>

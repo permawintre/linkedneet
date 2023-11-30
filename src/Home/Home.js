@@ -1,5 +1,5 @@
 import React from "react"
-import { getDayMinuteCounter, PostContents, PostPics, LikeBtn, CommentBtn, CommentsWindow, WriteCommentContainer, LoadingEffect } from './supportFunctions'
+import { getDayMinuteCounter, PostContents, PostPics, LikeBtn, CommentsWindow, WriteCommentContainer, LoadingEffect } from './supportFunctions'
 import './Home.css'
 import { Link, useNavigate } from "react-router-dom"
 import { dbService , auth } from '../firebase.js'
@@ -15,7 +15,8 @@ import {
     getDoc,
     where,
     updateDoc,
-    deleteDoc
+    deleteDoc,
+    setDoc
 } from "firebase/firestore"
 import { useEffect, useState, useRef } from 'react'
 import close from '../images/close.png'
@@ -656,6 +657,7 @@ function DndBox(props) {
 
 export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLocation }) {
 
+    
     const defaultPostWhere = () => {
 
         if(currentLocation === 'home' || currentLocation === 'profile' ) return 'profile';
@@ -730,6 +732,24 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
 
         fetchUserInfo();
     }, []);
+    const [ncCheckTimes, setNcCheckTimes] = useState([]);
+    useEffect(() => {
+        
+        const getNcCheckTimes = async () => {
+            if(uid) {
+                const ncDocRef = doc(dbService, "neetCompany", uid)
+                const docSnap = await getDoc(ncDocRef);
+                if (docSnap.exists()) {
+                    setNcCheckTimes(docSnap.data().checkTimes)
+                    console.log("Document data:", docSnap.data().checkTimes);
+                } else {
+                    console.log("No such document!");
+                }
+
+            }
+        }
+        getNcCheckTimes();
+    }, [uid])
 
     
 
@@ -814,6 +834,18 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
                 });
                 
         } else {
+            if(currentLocation === 'neetCompany'){
+
+                let tmp = ncCheckTimes
+                const now = moment().unix();
+                tmp.push(now)
+                const create = {
+                    'checkTimes': tmp
+                }
+                setDoc(doc(dbService, "neetCompany", uid), create)
+                
+
+            }
             addDoc(collection(dbService, "posts"), postData)
                 .then(() => {
                     handleUploadImages()

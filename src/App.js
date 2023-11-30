@@ -23,8 +23,10 @@ import { ProjectHome } from './ProjectPage/ProjectHome.js'
 import ProfileCareerDetail from './Profile/ProfileCareerDetail.js'
 
 import { EnrollManage } from './Manage/EnrollManage.js'
+
 import { Notice } from './Manage/Notice.js'
 import { Search } from './Search/Search.js'
+
 
 function App() {
 
@@ -91,14 +93,19 @@ function App() {
             <Route path="/projectmanage/:projectId" element={loggedIn ? (approved ? <ProjectManage/>: <Approve />) : <RedirectToLogIn/>}></Route>
             <Route path="/projecthome/:projectId" element={loggedIn ? (approved ? <ProjectHome/>: <Approve />) : <RedirectToLogIn/>}></Route>
             
-            <Route path="/neetCompany" element={loggedIn ? (approved ? <NeetCompany/> : <Approve />) : <RedirectToLogIn/>}></Route>
+
+            <Route path="/neetCompany/:neetGeneration" element={loggedIn ? (approved ? <NeetCompany/> : <Approve />) : <RedirectToLogIn/>}></Route>
+
             <Route path="/profile" element={loggedIn ? (approved ? <Profile/> : <Approve />) : <RedirectToLogIn/>}></Route>
             <Route path="/profiledetail" element={loggedIn ? (approved ? <ProfileDetail/> : <Approve />) : <RedirectToLogIn/>}></Route>
             <Route path="/profiledetail/career" element={loggedIn ? (approved ? <ProfileCareerDetail/> : <Approve />) : <RedirectToLogIn/>}></Route>
             <Route path="/manage" element={loggedIn ? ((approved == 2) ? <EnrollManage/> : <Approve />) : <RedirectToLogIn/>}></Route>
 
+
             <Route path="/search" element={loggedIn ?  (approved ?  <Search/> : <Approve/>) : <RedirectToLogIn/>}></Route>
             <Route path="/notice" element={loggedIn ?  (approved ?  <Notice/> : <Approve/>) : <RedirectToLogIn/>}></Route>
+
+
 
             <Route path="/google_signup" element={isLoggedIn ? <GoogleSignup/> : <RedirectToLogIn/>}></Route>
             <Route path="/approve" element={<Approve/>}></Route>

@@ -10,7 +10,12 @@ import React from 'react'
 import { dbService , auth } from '../firebase.js'
 import { Link } from "react-router-dom"
 
+import defaultProfileImg from '../images/default_profile_image.jpg'
+
+
+
 import { defaultData } from '../Profile/defaultData'
+
 
 /**
  * 몇시간 전에 게시된건지 텍스트로 반환하는 함수입니다(moment.js 설치필요)
@@ -249,7 +254,7 @@ export const Comments= ({ userId, userPic, userName, postedAt, contents})=> {
   return (
     <div className="postComment">
         <Link to={`/profiledetail?uid=${userId}`}>
-          <img src={userPic} alt="Profile" className="commentUserPic" />
+          <img src={userPic || defaultProfileImg} alt="Profile" className="commentUserPic" />
         </Link>
         <div className="commentDetails">
           <div className="commentHeader">

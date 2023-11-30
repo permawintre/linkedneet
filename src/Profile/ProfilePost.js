@@ -43,6 +43,7 @@ const Posts=({ userInfo, profileUid, onHasPostsChange }) =>{
                     ...doc.data(),
                     postId: doc.id
                 });
+
                 lastKey = doc.data().postedAt;
             })
             return { posts, lastKey };

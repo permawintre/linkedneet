@@ -24,6 +24,10 @@ import ProfileCareerDetail from './Profile/ProfileCareerDetail.js'
 
 import { EnrollManage } from './Manage/EnrollManage.js'
 
+import { Notice } from './Manage/Notice.js'
+import { Search } from './Search/Search.js'
+
+
 function App() {
 
     const [init, setInit] = useState(true); 
@@ -78,7 +82,7 @@ function App() {
 
   return(
     <div className="background">
-        <Header/>
+        <Header isLoggedIn={isLoggedIn} approved={approved}/>
         <Routes>
             <Route path="/approve" element={ approved ? <Home /> : <Approve/>} />
             <Route path="/" element={loggedIn ? (approved ? <Home/> : <Approve />) : <RedirectToLogIn/>}></Route>
@@ -89,7 +93,9 @@ function App() {
             <Route path="/projectmanage/:projectId" element={loggedIn ? (approved ? <ProjectManage/>: <Approve />) : <RedirectToLogIn/>}></Route>
             <Route path="/projecthome/:projectId" element={loggedIn ? (approved ? <ProjectHome/>: <Approve />) : <RedirectToLogIn/>}></Route>
             
-            <Route path="/neetCompany/:neetGeneration" element={loggedIn ? (approved ?<NeetCompany/>: <Approve />) : <RedirectToLogIn/>}></Route>
+
+            <Route path="/neetCompany" element={loggedIn ? (approved ? <NeetCompany/> : <Approve />) : <RedirectToLogIn/>}></Route>
+
             <Route path="/profile" element={loggedIn ? (approved ? <Profile/> : <Approve />) : <RedirectToLogIn/>}></Route>
             <Route path="/profiledetail" element={loggedIn ? (approved ? <ProfileDetail/> : <Approve />) : <RedirectToLogIn/>}></Route>
             <Route path="/profiledetail/career" element={<ProfileCareerDetail/>}></Route>
@@ -97,6 +103,11 @@ function App() {
             <Route path="/profileheaderedit" element={loggedIn ? <ProfileHeaderEdit authObj = {authObj}/> : <RedirectToLogIn/>}></Route>
 
             <Route path="/manage" element={<EnrollManage/>}></Route>
+
+
+            <Route path="/search" element={loggedIn ? <Search/> : <RedirectToLogIn/>}></Route>
+            <Route path="/notice" element={loggedIn ? <Notice/> : <RedirectToLogIn/>}></Route>
+
 
             <Route path="/google_signup" element={isLoggedIn ? <GoogleSignup/> : <RedirectToLogIn/>}></Route>
             <Route path="/approve" element={<Approve/>}></Route>

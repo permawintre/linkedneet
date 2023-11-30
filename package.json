@@ -13,11 +13,16 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "@types/algoliasearch": "^4.0.0",
+    "algoliasearch": "^4.20.0",
     "bootstrap": "^5.3.2",
+    "crypto-browserify": "^3.12.0",
     "date-fns": "^2.30.0",
     "dayjs": "^1.11.10",
     "firebase": "^10.4.0",
     "global": "^4.4.0",
+    "http": "^0.0.1-security",
+    "https-browserify": "^1.0.0",
     "moment": "^2.29.4",
     "react": "^18.2.0",
     "react-bootstrap": "^2.9.0",
@@ -25,11 +30,16 @@
     "react-datepicker": "^4.21.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.11.0",
+    "react-instantsearch": "^7.3.0",
+    "react-instantsearch-dom": "^6.40.4",
+    "react-instantsearch-hooks-web": "^6.47.3",
     "react-loader-spinner": "^5.4.5",
     "react-native-web": "^0.19.9",
     "react-router-dom": "^6.20.0",
     "react-scripts": "^5.0.1",
+    "stream-http": "^3.2.0",
     "styled-components": "^6.1.1",
+    "url": "^0.11.3",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -55,5 +65,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "nestjs-algolia": "^4.0.1"
   }
 }

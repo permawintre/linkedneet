@@ -1,0 +1,161 @@
+:root {
+    
+    --color_1: #FFA500;
+    --color_2: #DFE0DF;
+    --color_3: #1e1f38;
+    --color_4: #FF4B2B;
+
+}
+/* Buttons */
+.Buttons {
+    width: 700px;
+    text-align: center;
+    margin: 30px auto 10px auto;
+}
+.buttonItem {
+    display: inline-block;
+    width: 200px;
+    margin: 0 2px;
+}
+.buttonItem .text {
+    cursor: pointer;
+}
+.buttonItem.active .text {
+    font-weight: bold;
+}
+/* Apply Form */
+.projectBody {
+    width: 700px;
+    margin: 0 auto;
+    text-align: left;
+    padding: 10px;
+    background-color: white;
+    box-sizing: border-box;
+    padding-bottom: 20px;
+    border-radius: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.projectBody:last-child {
+    margin-bottom: 20px;
+}
+.projectBody .bodyTitle {
+    font-weight: bold;
+    font-size: 25px;
+    padding: 10px;
+}
+/* ApplyForm */
+.bodyBox {
+    display: flex;
+    flex-wrap: wrap;
+    justify-self: space-between;
+    justify-content: center;
+}
+.bodyBox .applicantBox {
+    width: calc(50% - 20px);
+    border: 1px dotted;
+    padding: 10px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+.bodyBox .applicantBox:nth-child(2n+1) {
+    margin-right: 10px;
+}    
+.bodyBox .applicantBox .userInfo {
+    display: flex;
+}
+.bodyBox .applicantBox .applicantName,
+.bodyBox .applicantBox .applicantEmail {
+    display: inline-block;
+}
+.bodyBox .applicantBox .applicantName {
+    font-weight: bold;
+    font-size: 18px;
+    margin-right: 10px;
+    text-align: center;
+}
+.bodyBox .applicantBox .applicantNickname {
+    padding-top: 6px;
+    font-size: 13px;
+    margin-right: 7px;
+    text-align: center
+}
+.bodyBox .applicantBox .applicantEmail {
+    padding-top: 6px;
+    font-size: 13px;
+    margin-right: 10px;
+}
+.bodyBox .applicantBox .applicantPhone {
+    padding-top: 6px;
+    font-size: 13px;
+    margin-right: 10px;
+}
+.bodyBox .applicantBox .applicantGeneration {
+    padding-top: 6px;
+    font-size: 13px;
+}
+.bodyBox .applicantBox .formItem {
+    margin: 10px auto;
+}
+.bodyBox .applicantBox .formTitle {
+    font-weight: bold;
+    margin-bottom: 5px;
+    font-size: 15px;
+}
+.bodyBox .applicantBox .formAnswer {
+    border: 2px solid lightgray;
+    border-radius: 5px;
+    padding: 7px 10px;
+    font-size: 15px;
+}
+.selectAll {
+    cursor: pointer;
+    margin-bottom: 10px;
+    margin-left: 15px;
+    font-size: 15px;
+}
+.bulkActionButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.bulkActionButton button {
+    margin: 5px;
+    cursor: pointer;
+    padding: 10px 40px;
+    font-size: 15px;
+    margin-bottom: 10px;
+}
+.applicantButton input {
+    margin-right: 4px;
+}
+.applicantButton {
+    font-size: 13px;
+}
+/* member section */
+.generationBox {
+    display: block;
+    width: 100%;
+}
+.generationBox .applicantBox {
+    display: inline-block;
+    margin-bottom: 7px;
+    width: calc(50% - 10px);
+}
+.generationBox .applicantBox:nth-child(2n+1) {
+    margin-right: 15px;
+    margin-left: 5px;
+}
+.generationButtons {
+    width: 100%;
+    margin-bottom: 10px;
+}
+.generationButtons button {
+    width: 90px;
+    padding: 5px 0;
+    cursor: pointer;
+    margin: 2px 3px;
+}
+.generationCount {
+    margin-bottom: 5px;
+    text-align: center;
+}

@@ -221,14 +221,27 @@
   }
 }
 
+.profile-background-image-in-modal {
+  width: 250px;
+  height: 125px;
+}
+
 .edit-profile-image {
   float: right;
+
+  position: absolute;
+  margin-left: 70%;
   margin-top: 1%;
   margin-right: 5%;
   display: inline;
+  margin-bottom: 10%;
 }
 .image-edit-button-wrapper{
   margin-top: 50%;
+}
+.bg-image-edit-button-wrapper{
+  margin-left: 0%;
+  margin-top: 45%;
 }
 
 .edit-profile-intro {

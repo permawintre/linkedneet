@@ -1,5 +1,5 @@
 import React from "react"
-import { getDayMinuteCounter, PostContents, PostPics, LikeBtn, CommentBtn, CommentsWindow, WriteCommentContainer, LoadingEffect } from './supportFunctions'
+import { getDayMinuteCounter, PostContents, PostPics, LikeBtn, CommentsWindow, WriteCommentContainer, LoadingEffect } from './supportFunctions'
 import './Home.css'
 import { Link, useNavigate } from "react-router-dom"
 import { dbService , auth } from '../firebase.js'
@@ -15,7 +15,8 @@ import {
     getDoc,
     where,
     updateDoc,
-    deleteDoc
+    deleteDoc,
+    setDoc
 } from "firebase/firestore"
 import { useEffect, useState, useRef } from 'react'
 import close from '../images/close.png'
@@ -31,6 +32,7 @@ import defaultProfileImg from '../images/default_profile_image.jpg'
 
 
 import profile1Img from '../images/profile1Img.jpg'
+import { defaultData } from '../Profile/defaultData'
 
 const userName = "홍길동"
 const companyClass = 14
@@ -657,6 +659,7 @@ function DndBox(props) {
 
 export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLocation }) {
 
+    
     const defaultPostWhere = () => {
 
         if(currentLocation === 'home' || currentLocation === 'profile' ) return 'profile';
@@ -713,7 +716,7 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
 
     let [selectBar, setSelectBar] = useState(false)
 
-    const [userInfo, setUserInfo] = useState(null);
+    const [userInfo, setUserInfo] = useState({ ...defaultData });
     useEffect(() => { // 유저 정보 코드
         const fetchUserInfo = async () => {
             if (auth.currentUser) {
@@ -722,7 +725,7 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
                 const docSnap = await getDoc(userRef);
 
                 if (docSnap.exists()) {
-                    setUserInfo(docSnap.data());
+                    setUserInfo(prevData => ({ ...prevData, ...docSnap.data() }));
                 } else {
                     console.log("No such document!");
                 }
@@ -731,6 +734,24 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
 
         fetchUserInfo();
     }, []);
+    const [ncCheckTimes, setNcCheckTimes] = useState([]);
+    useEffect(() => {
+        
+        const getNcCheckTimes = async () => {
+            if(uid) {
+                const ncDocRef = doc(dbService, "neetCompany", uid)
+                const docSnap = await getDoc(ncDocRef);
+                if (docSnap.exists()) {
+                    setNcCheckTimes(docSnap.data().checkTimes)
+                    console.log("Document data:", docSnap.data().checkTimes);
+                } else {
+                    console.log("No such document!");
+                }
+
+            }
+        }
+        getNcCheckTimes();
+    }, [uid])
 
     
 
@@ -818,6 +839,18 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
                 });
                 
         } else {
+            if(currentLocation === 'neetCompany'){
+
+                let tmp = ncCheckTimes
+                const now = moment().unix();
+                tmp.push(now)
+                const create = {
+                    'checkTimes': tmp
+                }
+                setDoc(doc(dbService, "neetCompany", uid), create)
+                
+
+            }
             addDoc(collection(dbService, "posts"), postData)
                 .then(() => {
                     handleUploadImages()
@@ -1000,7 +1033,7 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
 
 export const ShowPosts = (props) => {
 
-    const [userInfo, setUserInfo] = useState(null);
+    const [userInfo, setUserInfo] = useState({ ...defaultData });
     const [isWriteOpen, setIsWriteOpen] = useState(false);
     const {currentLocation, profileUserId} = props;
 
@@ -1011,7 +1044,7 @@ export const ShowPosts = (props) => {
                 const docSnap = await getDoc(userRef);
 
                 if (docSnap.exists()) {
-                    setUserInfo(docSnap.data());
+                    setUserInfo(prevData => ({ ...prevData, ...docSnap.data() }));
                 } else {
                     console.log("No such document!");
                 }
@@ -1029,15 +1062,9 @@ export const ShowPosts = (props) => {
         </div>
     )
 }
-
-
-export const Home = () => {
+export const RightSideBar = () => {
 
     const [users, setUsers] = useState([]);
-    const [userInfo, setUserInfo] = useState(null);
-    const [isWriteOpen, setIsWriteOpen] = useState(false);
-
-
     useEffect(() => { //오른쪽 사이드 바 코드
         const fetchUsers = async () => {
             const usersCollectionRef = collection(dbService, 'users');
@@ -1053,9 +1080,32 @@ export const Home = () => {
 
             setUsers(selectedUsers); // 선택된 사용자들로 상태 업데이트
         };
-    
         fetchUsers();
     }, []);
+
+    return (
+        <aside className="right-sidebar">
+            <h2>새로운 사람을 알아가보세요!</h2>
+            <ul className="interestList">
+                {users.map(user => (
+                    <Link to={`/profiledetail?uid=${user.id}`}>
+                    <li key={user.id} className="interestItem">
+                        <img src={user.imgUrls || defaultProfileImg} alt={user.nickname || 'User'}/>
+                        <div className="interestTitle">{user.nickname || 'Unknown User'}</div>
+                        <FontAwesomeIcon icon={faArrowRight} className="fa-arrow-right" color={'#000000'}/>
+                    </li>
+                    </Link>
+                ))}
+            </ul>
+        </aside>
+    )
+}
+
+export const Home = () => {
+
+    const [users, setUsers] = useState([]);
+    const [userInfo, setUserInfo] = useState(null);
+
 
     useEffect(() => { // 유저 정보 코드
         const fetchUserInfo = async () => {
@@ -1064,7 +1114,7 @@ export const Home = () => {
                 const docSnap = await getDoc(userRef);
 
                 if (docSnap.exists()) {
-                    setUserInfo(docSnap.data());
+                    setUserInfo(prevData => ({ ...prevData, ...docSnap.data() }));
                 } else {
                     console.log("No such document!");
                 }
@@ -1079,7 +1129,9 @@ export const Home = () => {
         <div className='home'>
             <aside className="left-sidebar">
                 <div className="background-img-container">
-                    <img src={userInfo?.imgUrls || defaultProfileImg} alt="background" className="homeProfile-background-img"/> 
+
+                    <img src={userInfo?.background_image || defaultData.background_image} alt="background" className="homeProfile-background-img"/> 
+
                 </div>
                 <img src={userInfo?.profile_image || defaultProfileImg} alt="profile" className="profile-img1" />
                 <div className="profile-info-home">
@@ -1092,20 +1144,9 @@ export const Home = () => {
             <div className="homePostsMarginControl">
                 <ShowPosts currentLocation={'home'}/>
             </div>
-            <aside className="right-sidebar">
-                <h2>새로운 사람을 알아가보세요!</h2>
-                <ul className="interestList">
-                    {users.map(user => (
-                        <li key={user.id} className="interestItem">
-                            <Link to={`/profiledetail?uid=${user.id}`}>
-                                <img src={user.imgUrls || defaultProfileImg} alt={user.nickname || 'User'}/>
-                            </Link>
-                            <span className="interestTitle">{user.nickname || 'Unknown User'}</span>
-                            <FontAwesomeIcon icon={faArrowRight} className="fa-arrow-right"/>
-                        </li>
-                    ))}
-                </ul>
-            </aside>
+
+
+            <RightSideBar/>
 
         </div>
     )

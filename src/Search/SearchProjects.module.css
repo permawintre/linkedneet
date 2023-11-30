@@ -48,13 +48,14 @@
     position: relative;
     display: flex;
     align-items: center;
+    gap: 10px;
 }
 .myProjectsRow {
     justify-content: center;
 }
 .projectsRecommand {
     position: relative;
-    width: 940px;
+    width: 725px;
 }
 .twoRow {
     height: 420px;
@@ -117,8 +118,8 @@
 }
 
 .projectBox {
-    width: 300px;
-    height: 200px;
+    width: 350px;
+    height: 250px;
     margin: 5px;
     background-color: #f8f8f8;
     display: flex;

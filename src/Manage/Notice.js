@@ -1,16 +1,8 @@
-import React from "react";
-import { getDayMinuteCounter, PostContents, PostPics, LikeBtn, CommentBtn, PlusBtn, CommentsWindow, WriteCommentContainer, addNewComment, LoadingEffect } from '../Home/supportFunctions'
-import "./NeetCompany.css"
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
-import styled from 'styled-components'
-import { v4 as uuidv4 } from 'uuid';
-import close from '../images/close.png';
-import { RightSideBar } from "../Home/Home"
-import "./NeetCompany.css"
-import { dbService, auth } from "../firebase"
-import { Link, useParams, useNavigate } from "react-router-dom"
-import moment from 'moment';
+import React from "react"
+import { getDayMinuteCounter, PostContents, PostPics, LikeBtn, CommentBtn, CommentsWindow, WriteCommentContainer, LoadingEffect } from './supportFunctions'
+import './Notice.css'
+import { Link, useNavigate } from "react-router-dom"
+import { dbService , auth } from '../firebase.js'
 import {
     collection,
     query,
@@ -25,16 +17,27 @@ import {
     updateDoc,
     deleteDoc
 } from "firebase/firestore"
-import { storage } from '../firebase.js';
-import { ref, uploadString, getDownloadURL, deleteObject } from 'firebase/storage';
-import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css'; 
 import { useEffect, useState, useRef } from 'react'
-import defaultProfileImg from '../images/default_profile_image.jpg'
+import close from '../images/close.png'
+import moment from 'moment'
+import styled from 'styled-components'
+import { ref, uploadString, getDownloadURL, deleteObject } from 'firebase/storage';
+import { v4 as uuidv4 } from 'uuid'; // 랜덤 식별자를 생성해주는 라이브러리
+import { storage } from '../firebase.js';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEllipsisV } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
+
+import profile1Img from '../images/profile1Img.jpg'
+import { defaultData } from '../Profile/defaultData'
+
+const userName = "홍길동"
+const companyClass = 14
 const moims = ['모임 a', '모임 b', '모임 c']
 
-function Post(props) {
+
+export function Post(props) {
     //console.log('사진여러장로딩문제', props.imgUrls)
     const userId = props.userId;
     const postId = props.postId
@@ -47,6 +50,7 @@ function Post(props) {
     const [postUserInfo, setPostUserInfo] = useState({ profileImage: '', nickname: '' });
     const postWhere = props.postWhere;
     const modified = props.modified;
+    const [projectName, setProjectName] = useState('');
 
     const [loading, setLoading] = useState(false)
 
@@ -119,8 +123,28 @@ function Post(props) {
         fetchComments();
     }, [postId]);
 
-    
+    useEffect(() => {
+        const fetchProjectName = async () => {
+            if (props.postWhere === 'project' && props.projectId) {
+                try {
+                    const projectRef = doc(dbService, 'projects', props.projectId);
+                    const projectSnap = await getDoc(projectRef);
 
+                    if (projectSnap.exists()) {
+                        setProjectName(projectSnap.data().name);
+                    } else {
+                        console.log("Project not found!");
+                    }
+                } catch (error) {
+                    console.error("Error fetching project data: ", error);
+                }
+            }
+        };
+        fetchProjectName();
+    }, [props.postWhere, props.postId]);
+    useEffect(() => {
+        console.log(`postWhere: ${props.postWhere}, projectName: ${props.projectId}`);
+    }, [props.projectId]);
 
 
     const postWriteEditBtnClick = ()=> {
@@ -189,14 +213,24 @@ function Post(props) {
             <div className='paddingDiv'>
                 <div className="postHeader">
                     <Link to={`/profiledetail?uid=${props.userId}`}>
-                        <div className='profileImg'><img src={postUserInfo.profileImage || defaultProfileImg} alt="profileImg"/></div>
+                        <div className='profileImg'><img src={postUserInfo.profileImage || profile1Img} alt="profileImg"/></div>
                     </Link>
                     <div className='postInfo'>
                         <Link to={`/profiledetail?uid=${props.userId}`}>
-                            <div className="userName">{postUserInfo.nickname || "undefined"}
+                            <div className="userName">{postUserInfo.nickname || userName}
+                            {props.postWhere === 'project' && (
+                                <div className="postWhere">
+                                    ▸project ▸{projectName}
+                                </div>
+                            )}
+                            {props.postWhere != 'project' && (
+                                <div className="postWhere">
+                                    ▸{postWhere}
+                                </div>
+                            )}
                             </div>
                             <div className='inGroup'>
-                                    {postUserInfo.generation+'기' || '?기'}{moims.map((moim, idx)=>(<span key={idx}>{', '}{moim}</span>))}
+                                    {postUserInfo.generation+'기' || companyClass+'기'}{moims.map((moim, idx)=>(<span key={idx}>{', '}{moim}</span>))}
                             </div>
                             <div className="postedWhen">{getDayMinuteCounter(postedAt)}{modified ? '·수정됨' : null}</div>
                         </Link>
@@ -252,7 +286,6 @@ function Post(props) {
                     numOfLikes: numOfLikes,
                 }}
                 showHeader={false}
-                currentLocation={'project'}
             />
             
             {loading ? <LoadingEffect/> : null}
@@ -263,69 +296,32 @@ function Post(props) {
 
 
 
-const Posts=({ userInfo, currentLocation, generation }) =>{
+const Posts=({ userInfo, currentLocation }) =>{
     const [posts, setPosts] = useState([]);
     const [lastKey, setLastKey] = useState(0);
     const [nextPosts_loading, setNextPostsLoading] = useState(false);
 
     const setQuery = () => {
-        if(currentLocation === 'home'){
+        if(currentLocation === 'notice'){
             return query(
                 collection(dbService, 'posts'),
+                where("postWhere", "==", 'notice'),
                 orderBy("postedAt", "desc"),
                 limit(5)
             )
         }
-        if(currentLocation === 'neetCompany'){
-            return query(
-                collection(dbService, 'posts'),
-                where("postWhere", "==", 'neetCompany'),
-                orderBy("postedAt", "desc"),
-                limit(5)
-            )
-        }
-        if(currentLocation === 'profile'){
-            return query(
-                collection(dbService, 'posts'),
-                where("postWhere", "==", "profile"),
-                orderBy("postedAt", "desc"),
-                limit(5)
-            )
-        }
-        
     }
 
     const setQueryMore = (key) => {
-
-        
-        if(currentLocation === 'home'){
+        if(currentLocation === 'notice'){
             return query(
                 collection(dbService, 'posts'),
+                where("postWhere", "==", 'notice'),
                 orderBy("postedAt", "desc"),
                 startAfter(key),
                 limit(1)
             );
         }
-        if(currentLocation === 'neetCompany'){
-            return query(
-                collection(dbService, 'posts'),
-                where("postWhere", "==", "neetCompany"),
-                orderBy("postedAt", "desc"),
-                where("neetGeneration", "==", generation),
-                startAfter(key),
-                limit(1)
-            )
-        }
-        if(currentLocation === 'profile'){
-            return query(
-                collection(dbService, 'posts'),
-                where("postWhere", "==", "profile"),
-                orderBy("postedAt", "desc"),
-                startAfter(key),
-                limit(1)
-            )
-        }
-        
     }
 
     const initFetch = async () => {
@@ -412,7 +408,7 @@ const Posts=({ userInfo, currentLocation, generation }) =>{
                     postWhere = {post.postWhere}
                     userInfo={userInfo}
                     modified = {post.modified}
-                    neetGeneration = {post.neetGeneration}
+                    projectId = {post.projectId}
                 />
                 <div className='postFooter'>
                 </div>
@@ -458,11 +454,10 @@ const Posts=({ userInfo, currentLocation, generation }) =>{
 }
 
 
-
 const StyledCpnt = styled.div`
     border: ${(props) => props.$isDragging ? '3px dotted #808080' : '3px solid #bbbbbb'}
 `
-function  DndBox(props) {
+function DndBox(props) {
 
     const [isDragging, setIsDragging] = useState(false);
     const [deleted, setDeleted] = useState(false);
@@ -609,7 +604,7 @@ function  DndBox(props) {
     )
 }
 
-function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLocation, selectedProjectId }) {
+export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLocation }) {
 
     const defaultPostWhere = () => {
 
@@ -667,7 +662,7 @@ function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLocation, s
 
     let [selectBar, setSelectBar] = useState(false)
 
-    const [userInfo, setUserInfo] = useState(null);
+    const [userInfo, setUserInfo] = useState({ ...defaultData });
     useEffect(() => { // 유저 정보 코드
         const fetchUserInfo = async () => {
             if (auth.currentUser) {
@@ -676,7 +671,7 @@ function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLocation, s
                 const docSnap = await getDoc(userRef);
 
                 if (docSnap.exists()) {
-                    setUserInfo(docSnap.data());
+                    setUserInfo(prevData => ({ ...prevData, ...docSnap.data() }));
                 } else {
                     console.log("No such document!");
                 }
@@ -685,7 +680,6 @@ function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLocation, s
 
         fetchUserInfo();
     }, []);
-
     
 
     useEffect( () => {
@@ -728,7 +722,7 @@ function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLocation, s
             'postedAt': existingPost ? existingPost.postedAt/1000 : moment().unix(),
             'userId': uid,
             'imgUrls': modifiedImgs(imgIds, imgDeleted, imgUrls),
-            'neetGeneration': values.neetGeneration,
+            'projectId': selectedProjectId,
         };
     
         const handleUploadImages = async () => {
@@ -790,13 +784,55 @@ function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLocation, s
         setContentImages([]);
     };
     
-    
+    const [showProjectDropdown, setShowProjectDropdown] = useState(false);
+
+    const toggleProjectDropdown = () => {
+    setShowProjectDropdown(!showProjectDropdown);
+    };
+
+    const fetchUserProjects = async () => {
+        const userProjects = [];
+        const userProjectTitles = [];
+      
+        const q = query(collection(dbService, 'projectMember'), where('userId', '==', auth.currentUser.uid));
+      
+        try {
+          const querySnapshot = await getDocs(q);
+          for (const docSnapshot of querySnapshot.docs) {
+                const projectId = docSnapshot.data().projectId;
+                const projectRef = doc(dbService, 'projects', projectId);
+                const projectSnap = await getDoc(projectRef);
+        
+                if (projectSnap.exists()) {
+                userProjectTitles.push(projectSnap.data().name);
+                userProjects.push({ id: projectId, name: projectSnap.data().name });
+                }
+            }
+        } catch (error) {
+          console.error("프로젝트 가져오기 중 에러 발생:", error);
+        }
+      
+        return userProjects;
+    }
+    const [userProjects, setUserProjects] = useState([]);
+    useEffect(() => {
+        // 컴포넌트가 마운트될 때 사용자가 속한 프로젝트 목록을 가져옵니다.
+        fetchUserProjects().then(projects => {
+          setUserProjects(projects);
+        });
+      }, []);
+
+    const [selectedProjectId, setSelectedProjectId] = useState(null);
+    const selectProject = (projectId) => {
+    setSelectedProjectId(projectId);
+    };
+
 
     return(
         <div className='homePost write'>
             {showHeader && (
                 <div className='postHeader' onClick={ () => setIsOpen(true) }>
-                <div className='profileImg'><img src={userInfo?.profile_image || defaultProfileImg} alt="profileImg"/></div>
+                <div className='profileImg'><img src={userInfo?.profile_image || profile1Img} alt="profileImg"/></div>
                 <div className='popModal'>{writeTxt()}</div>
                 </div>
             )}
@@ -805,12 +841,49 @@ function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLocation, s
                     <div className='modalWrite' onClick={ (e) => e.stopPropagation() }>
                         <div className='modalHeader'>
                             <div className='modalProfile' onClick={ () => setSelectBar(!selectBar) }>
-                                <div className='profileImg'><img src={userInfo?.profile_image || defaultProfileImg} alt="profileImg"/></div>
+                                <div className='profileImg'><img src={userInfo?.profile_image || profile1Img} alt="profileImg"/></div>
                                 <div>
-                                    <div className="userName">{userInfo?.nickname || 'undefined'}</div>
-                                    <div className="postWhere">게시 위치 ▸{values.postWhere}</div>
+                                    <div className="userName">{userInfo?.nickname || userName}</div>
+                                    <div className="postWhere">게시 위치 ▸{values.postWhere}{values.postWhere === 'project' &&(<div>[{values.projectName}]</div>)}</div>
                                 </div>
                             </div>
+                            {selectBar ? 
+                                <div className="selectBar">
+                                    <div onClick={ () => {setValues((prev) =>
+                                        ({...prev,
+                                        'postWhere': 'profile',})
+                                    );
+                                    setSelectBar(!selectBar)
+                                }}>profile
+                                </div>
+
+                                    <div onClick={ () => {setValues((prev) =>
+                                        ({...prev,
+                                        'postWhere': 'neetCompany',})
+                                    );
+                                    setSelectBar(!selectBar)
+                                }}>neetCompany
+                                </div>
+
+                                {userProjects.length!==0 ? <div onClick={toggleProjectDropdown}>project</div> : null}
+                                {showProjectDropdown && (
+                                    <div className="projectDropdown">
+                                        {userProjects.map((project, index) => (
+                                        <div key={index} onClick={() => {
+                                            setValues(prev => ({...prev, 'postWhere': 'project','projectName':project.name}));
+                                            selectProject(project.id);
+                                            setShowProjectDropdown(false); // 드롭다운 닫기
+                                        }}>
+                                            {project.name} {/* 프로젝트 제목 렌더링 */}
+                                        </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                </div>
+                                :
+                                null
+                            }
                             <img src={close} alt='x' className='close' onClick={ () => setIsOpen(false) }/>
                         </div>
                         
@@ -837,33 +910,15 @@ function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLocation, s
         </div>
     )
 }
-export const whoCheckedF = async (targetDate) => {
 
-    let ans = [];
-    const dayStart = targetDate - targetDate%86400;
-    const dayEnd = dayStart+86400;
-    const check = (element) => {
-        if(dayStart<=element && element<dayEnd) return true;
-        else return false;
-    }
-    const querySnapshot = await getDocs(collection(dbService, "neetCompany"));
-    querySnapshot.forEach((doc) => {
-        if(doc.data().checkTimes.findIndex(check)>=0){
-            ans.push(doc.id);
-        }
-    });
-    return ans;
-}
-const ShowPosts = (props) => {
 
-    const [userInfo, setUserInfo] = useState(null);
+
+export const ShowPosts = (props) => {
+
+    const [userInfo, setUserInfo] = useState({ ...defaultData });
     const [isWriteOpen, setIsWriteOpen] = useState(false);
-    const { generationNumber } = useParams();
-    console.log(generationNumber,"generationnum")
 
     const currentLocation = props.currentLocation;
-    const projectId = props.id;
-    const isMember = props.isMember;
 
     useEffect(() => { // 유저 정보 코드
         const fetchUserInfo = async () => {
@@ -872,7 +927,7 @@ const ShowPosts = (props) => {
                 const docSnap = await getDoc(userRef);
 
                 if (docSnap.exists()) {
-                    setUserInfo(docSnap.data());
+                    setUserInfo(prevData => ({ ...prevData, ...docSnap.data() }));
                 } else {
                     console.log("No such document!");
                 }
@@ -882,207 +937,95 @@ const ShowPosts = (props) => {
         fetchUserInfo();
     }, []);
 
-    return(
 
+    return(
+        // 관리자만 글 쓸수 있도록 user Level check
         <div className='postsContainer'>
-            { isMember ? (
-            <Write
-                isOpen={isWriteOpen}
-                setIsOpen={setIsWriteOpen}
-                existingPost={false}
-                showHeader={true}
-                currentLocation={currentLocation}
-                selectedProjectId={projectId}
-            />
-            ) : (null)}
-            <Posts userInfo={userInfo} currentLocation={currentLocation} generation={11}/>{/*수정*/}
+            {userInfo?.level === 2 && (
+                <Write isOpen={isWriteOpen} setIsOpen={setIsWriteOpen} existingPost={false} showHeader={true} currentLocation={currentLocation} />
+            )}
+            <Posts userInfo={userInfo} currentLocation={currentLocation}/>
         </div>
     )
 }
 
-export const NeetCompany = () => {
+
+export const Notice = () => {
+
     const [users, setUsers] = useState([]);
-    const [userInfo, setUserInfo] = useState(null);
-    const [generation, setGeneration] = useState(null);
-    const [showGenerations, setShowGenerations] = useState(false);
-    const toggleGenerations = () => setShowGenerations(!showGenerations);
-    const navigate = useNavigate();
-    const [uid, setUid] = useState(false);
-    const [checked, setChecked] = useState(false);
-    const [ncCheckTimes, setNcCheckTimes] = useState([]);
-    const [whoChecked, setWhoChecked] = useState([]);
-    useEffect(() => {
+    const [userInfo, setUserInfo] = useState({ ...defaultData });
+    const [isWriteOpen, setIsWriteOpen] = useState(false);
+
+
+    useEffect(() => { //오른쪽 사이드 바 코드
+        const fetchUsers = async () => {
+            const usersCollectionRef = collection(dbService, 'users');
+            const data = await getDocs(usersCollectionRef);
+            // 모든 사용자 정보를 배열로 변환
+            const allUsers = data.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+            // 현재 로그인한 사용자의 uid 확인
+            const currentUserId = auth.currentUser ? auth.currentUser.uid : null;
+            // 현재 로그인한 사용자를 제외한 사용자들 필터링
+            const otherUsers = allUsers.filter(user => user.id !== currentUserId);
+            // 랜덤하게 사용자 3명 선택
+            const selectedUsers = otherUsers.sort(() => 0.5 - Math.random()).slice(0, 3);
+
+            setUsers(selectedUsers); // 선택된 사용자들로 상태 업데이트
+        };
+        fetchUsers();
+    }, []);
+
+    useEffect(() => { // 유저 정보 코드
         const fetchUserInfo = async () => {
             if (auth.currentUser) {
                 const userRef = doc(dbService, "users", auth.currentUser.uid);
-                try {
-                    const docSnap = await getDoc(userRef);
-    
-                    if (docSnap.exists()) {
-                        const userData = docSnap.data();
-                        setGeneration(userData.generation); // 세대 정보를 상태에 설정
-                    } else {
-                        console.log("사용자 정보를 찾을 수 없음");
-                    }
-                } catch (error) {
-                    console.error("사용자 정보 가져오기 실패:", error);
-                }
-            }
-        };
-    
-        fetchUserInfo();
-    }, []);
-    const GenerationList = () => (
-        <div className="generation-list">
-            {Array.from({ length: 16 }, (_, i) => `${i + 1}`).map(generationNumber => (
-                <Link key={generationNumber} to={`/neetCompany/${generationNumber}`}>
-                    <div>{generationNumber}기</div>
-                </Link>
-            ))}
-        </div>
-    );
-    const handleSelectGeneration = (selectedGeneration) => {
-    const generationNumber = selectedGeneration.match(/\d+/)[0]; // 숫자 부분 추출
-    setGeneration(generationNumber); // 상태 업데이트
-    setShowGenerations(false); // 기수 선택 후 메뉴 닫기
-    console.log(`Selected: ${generationNumber}`);
-    navigate(`/generation/${selectedGeneration}`);
-    };
-      
-    
-    
-    
-    const [selectedDate, setSelectedDate] = useState(new Date());
-    
-    const onChange = (newDate) => {
-        setSelectedDate(newDate);
-      };
-    const getSelectedDateInfo = () => {
-        return {
-            events: ["팀 미팅", "프로젝트 마감일"],
-            notes: "오후 3시부터 원격 근무",
-            holidays: selectedDate.getDay() === 0 ? "신정" : null,
-        };
-    };
+                const docSnap = await getDoc(userRef);
 
-    const selectedDateInfo = getSelectedDateInfo();
-    const attendanceDates = [
-        new Date(2023, 10, 10), 
-        new Date(2023, 10, 15), 
-        // 추가 날짜들
-      ];
-    const tileClassName = ({ date, view }) => {
-    // 월 뷰에서만 클래스 적용
-    if (view === 'month') {
-        let isAttendanceDate = attendanceDates.some(attendanceDate => 
-        date.getDate() === attendanceDate.getDate() &&
-        date.getMonth() === attendanceDate.getMonth() &&
-        date.getFullYear() === attendanceDate.getFullYear()
-        );
-        console.log("타일 날짜:", date.toDateString());
-        attendanceDates.forEach(d => console.log("특별 날짜:", d.toDateString(), "비교 결과:", isAttendanceDate));
-
-        if (isAttendanceDate) {
-        return 'attendance-date'; // 특별한 날짜에 대한 클래스 이름
-        }
-    }
-    };
-    useEffect(() => {
-        setUid(auth.currentUser.uid)
-        const tmpfnc = async () => {
-            const newWhoChecked = await whoCheckedF(moment().unix())
-            setWhoChecked(newWhoChecked)
-        }
-        tmpfnc()
-    }, [])
-    useEffect(() => {
-        
-        const getNcCheckTimes = async () => {
-            if(uid) {
-                const ncDocRef = doc(dbService, "neetCompany", uid)
-                const docSnap = await getDoc(ncDocRef);
                 if (docSnap.exists()) {
-                    setNcCheckTimes(docSnap.data().checkTimes)
-                    console.log("Document data:", docSnap.data().checkTimes);
+                    setUserInfo(prevData => ({ ...prevData, ...docSnap.data() }));
                 } else {
                     console.log("No such document!");
                 }
-
-
             }
-        }
-        getNcCheckTimes();
-    }, [uid])
-    useEffect(() => {
+        };
 
-        if(ncCheckTimes.length===0) return;
-        let tmp = ncCheckTimes
-        const now = moment().unix();
-        const todayStart = now - now%86400;
-        const todayEnd = todayStart+86400;
-        const check = (element) => {
-            if(todayStart<=element && element<todayEnd) return true;
-            else return false;
-        }
-        if(tmp.findIndex(check)>=0) {
-            setChecked(true)
-        }
-    }, [ncCheckTimes])
+        fetchUserInfo();
+    }, []);
+
     return(
-        <div className="neetCompanyBody">
-            <div className="left-sidebar-container">
-                <aside className="left-sidebar-neet">
-                    <img src="image_url_here" alt="Landscape" className="card-image"/>
-                    <div className="card-content">
-                    <div className="change-generation" onClick={toggleGenerations}>◂다른 기수</div>
-                    <div className="generation-number">{generation}기</div>
-                    <div className="neet-status">
-                        <span className="neet-status-dot"></span>
-                        <span className="neet-status-text">현재 출근한 멤버</span>
-                    </div>
-                    <div className="card-members">21명</div>
-                    </div>
-                </aside>
-                
-                {showGenerations && (
-                    <GenerationList onSelect={handleSelectGeneration} />
-                )}
-            </div>
-            <div className="homePostsMarginControl">
-
-                <ShowPosts currentLocation={'neetCompany'} neetGeneration={generation} />
-            </div>
-            <aside className="right-sidebar-neet">
-                <div className="calendar-neet">
-                    <Calendar
-                        onChange={onChange}
-                        value={selectedDate}
-                        tileClassName={tileClassName}
-                        tileContent={({ date, view }) => view === 'month' && <span style={{ color: 'black' }}>{date.getDate()}</span>}
-                    />
+        
+        <div className='home'>
+            <aside className="left-sidebar">
+                <div className="background-img-container">
+                    <img src={userInfo?.background_image || defaultData.background_image} alt="background" className="homeProfile-background-img"/> 
                 </div>
-                <div className="calendar-info">
-                    <h3>{selectedDate.getDate()}일의 일정</h3>
-                    {selectedDateInfo.holidays && <p>공휴일: {selectedDateInfo.holidays}</p>}
-                    <ul>
-                        {selectedDateInfo.events.map((event, index) => (
-                            <li key={index}>{event}</li>
-                        ))}
-                    </ul>
-                    <p>노트: {selectedDateInfo.notes}</p>
+                <img src={userInfo?.profile_image} alt="profile" className="profile-img1" />
+                <div className="profile-info-home">
+                    <h3>{userInfo?.nickname || 'undefined'}</h3>
                 </div>
+                <Link to={`/profiledetail?uid=${auth.currentUser.uid}`}>
+                <button>내 프로필</button>
+                </Link>
             </aside>
             <div className="homePostsMarginControl">
-                <div>
-                    {checked ? "출근함" : "출근안함"}
-                </div>
-                <div>
-                    {'오늘 출근한 사람 수: '}{whoChecked.length}
-                </div>
-                <ShowPosts currentLocation={'neetCompany'}/>
+                <ShowPosts currentLocation={'home'}/>
             </div>
-        <RightSideBar/>
+            <aside className="right-sidebar">
+                <h2>새로운 사람을 알아가보세요!</h2>
+                <ul className="interestList">
+                    {users.map(user => (
+                        <li key={user.id} className="interestItem">
+                            <Link to={`/profiledetail?uid=${user.id}`}>
+                                <img src={user.profile_image || defaultData.profile_image} alt={user.nickname || 'User'}/>
+                            </Link>
+                            <span className="interestTitle">{user.nickname || 'Unknown User'}</span>
+                            <FontAwesomeIcon icon={faArrowRight} className="fa-arrow-right"/>
+                        </li>
+                    ))}
+                </ul>
+            </aside>
 
         </div>
     )
+
 }

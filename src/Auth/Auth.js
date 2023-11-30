@@ -11,6 +11,8 @@ export const Signup = () => {
     const [password, setPassword] = useState('');
     const [nickname, setNickname] = useState('');
     const [generation, setGeneration] = useState(''); // 기수
+    const [name, setName] = useState('');
+    const [tel, setTel] = useState('');
 
     // get an Email value from user.
     const onChangeEmail = (e) => {
@@ -36,6 +38,14 @@ export const Signup = () => {
         setGeneration(e.target.value);
     }
 
+    const onChangeTel = (e) => {
+        setTel(e.target.value);
+    }
+
+    const onChangeName = (e) => {
+        setName(e.target.value);
+    }
+    
     const onSubmit = async (event) => {
         event.preventDefault();
         // SignUp
@@ -62,12 +72,13 @@ export const Signup = () => {
 
             await setDoc(doc(userRef, auth.currentUser.uid), {
                 // user profile header
+                name: name,
                 nickname: nickname,
                 email: email,
                 generation: generation,
                 facebook: "",
                 instagram: "",
-                tel: "",
+                tel: tel,
 
                 // following 
                 followers: [],
@@ -110,6 +121,14 @@ export const Signup = () => {
             <form onSubmit={onSubmit} className="signup__body__inner">
                 <h2>이메일로 회원가입</h2>
                 <hr className="signup__body__partition"></hr>
+                <div className="signup__body__inputline">
+                    <p className="signup__body__inputline--description">이름</p>
+                    <input className="signup__body__inputline--input" name="name" type="text" value={name} placeholder="이름을 입력해 주세요" onChange={onChangeName} />
+                </div>
+                <div className="signup__body__inputline">
+                    <p className="signup__body__inputline--description">전화번호</p>
+                    <input className="signup__body__inputline--input" name="name" type="text" value={tel} placeholder="전화번호를 입력해 주세요" onChange={onChangeTel} />
+                </div>
                 <div className="signup__body__inputline">
                     <p className="signup__body__inputline--description">이메일 주소</p>
                     <input className="signup__body__inputline--input" name="email" type="text" value={email} placeholder="이메일 주소를 입력해 주세요" onChange={onChangeEmail} />
@@ -216,6 +235,8 @@ export const GoogleSignup = () => {
     const [password, setPassword] = useState('');
     const [nickname, setNickname] = useState('');
     const [generation, setGeneration] = useState(''); // 기수
+    const [name, setName] = useState('');
+    const [tel, setTel] = useState('');
 
     // get an Email value from user.
     const onChangeEmail = (e) => {
@@ -241,6 +262,16 @@ export const GoogleSignup = () => {
         setGeneration(e.target.value);
     }
     
+    
+    const onChangeTel = (e) => {
+        setTel(e.target.value);
+    }
+
+    const onChangeName = (e) => {
+        setName(e.target.value);
+    }
+    
+
     const onSubmit = async (event) => {
         event.preventDefault();
         // SignUp
@@ -294,10 +325,17 @@ export const GoogleSignup = () => {
                 <h2>기본 정보를 입력해주세요</h2>
                 <hr className="google_signup__body__partition"></hr>
                 <div className="google_signup__body__inputline">
+                    <p className="google_signup__body__inputline--description">이름</p>
+                    <input className="google_signup__body__inputline--input" name="name" type="text" value={name} placeholder="이름을 입력해 주세요" onChange={onChangeName} />
+                </div>
+                <div className="google_signup__body__inputline">
                     <p className="google_signup__body__inputline--description">이메일 주소</p>
                     <input className="google_signup__body__inputline--input" name="email" type="text" value={email} placeholder="이메일 주소를 입력해 주세요" onChange={onChangeEmail} />
                 </div>
-
+                <div className="google_signup__body__inputline">
+                    <p className="google_signup__body__inputline--description">전화번호</p>
+                    <input className="google_signup__body__inputline--input" name="name" type="text" value={tel} placeholder="전화번호를 입력해 주세요" onChange={onChangeTel} />
+                </div>
                 <div className="google_signup__body__inputline">
                     <p className="google_signup__body__inputline--description">닉네임</p>
                     <input className="google_signup__body__inputline--input" type="text" value={nickname} placeholder="닉네임을 입력해주세요" onChange={onChangeNickname} />

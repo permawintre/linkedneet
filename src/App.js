@@ -3,7 +3,7 @@ import { Routes, Route, useNavigate } from "react-router-dom"
 import './App.css'
 import { auth, dbService} from './firebase.js'
 import { doc, getDocs, collection, query, where, getDoc  } from "firebase/firestore"
-import { Header } from "./Header.js"
+import { Header, Footer } from "./Header.js"
 import { Home } from "./Home/Home.js"
 import { Signup, Login, GoogleSignup, Google } from "./Auth/Auth.js"
 import { NotFound } from "./etc/Notfound.js"
@@ -109,6 +109,7 @@ function App() {
             <Route path="/logIn" element={<Login/>}></Route>
             <Route path="*" element={<NotFound/>}></Route>
         </Routes>
+        <Footer/>
     </div>
 
   )

@@ -344,7 +344,7 @@ const Posts=({ userInfo, currentLocation }) =>{
                 collection(dbService, 'posts'),
                 orderBy("postedAt", "desc"),
                 startAfter(key),
-                limit(1)
+                limit(5)
             );
         }
         if(currentLocation === 'neetCompany'){
@@ -353,7 +353,7 @@ const Posts=({ userInfo, currentLocation }) =>{
                 where("postWhere", "==", "neetCompany"),
                 orderBy("postedAt", "desc"),
                 startAfter(key),
-                limit(1)
+                limit(5)
             )
         }
         if(currentLocation === 'profile'){
@@ -362,7 +362,7 @@ const Posts=({ userInfo, currentLocation }) =>{
                 where("postWhere", "==", "profile"),
                 orderBy("postedAt", "desc"),
                 startAfter(key),
-                limit(1)
+                limit(5)
             )
         }
         if(currentLocation === 'project'){
@@ -371,7 +371,7 @@ const Posts=({ userInfo, currentLocation }) =>{
                 where("postWhere", "==", "project"),
                 orderBy("postedAt", "desc"),
                 startAfter(key),
-                limit(1)
+                limit(5)
             )
         }
     }
@@ -475,7 +475,7 @@ const Posts=({ userInfo, currentLocation }) =>{
       useEffect(() => {
         const handleScroll = () => {
           const { scrollTop, offsetHeight } = document.documentElement
-          if (window.innerHeight + scrollTop >= offsetHeight-1000) {
+          if (window.innerHeight + scrollTop >= offsetHeight-700) {
             setNextPostsLoading(true)
           }
         }

@@ -55,7 +55,7 @@ input {
     display: flex;
     justify-content: center;
     box-shadow: 3px #000000;
-    padding: 150px;
+    padding: 50px;
 
     .signin__body__inner{
 
@@ -114,15 +114,15 @@ input {
   display: flex;
   justify-content: center;
   box-shadow: 3px #000000;
+  padding: 50px;
 
   .signup__body__inner{
 
       background-color: white;
       border-radius: 30px;
-      margin-top: 100px;
       padding: 30px;
       width: 500px;
-      height: 800px;
+      height: 730px;
       
       .signup__body__partition{
 

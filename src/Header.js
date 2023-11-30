@@ -53,3 +53,43 @@ export const Header = ({isLoggedIn, approved}) => {
         </div>
     )
 }
+export const Footer = () => {
+
+    return (
+    <div className='Footer'>
+        <Link to="/" className="link">
+            <div className='FooterLogo'>
+                <h1 className="linkedneet_logo">linked<span className="color1">neet</span></h1>
+            </div>
+        </Link>
+            <div className='color1'>
+                made by
+            </div>
+            <div>
+                {'김서경, 김호준(20), 김호준(21), 이다래, 이영도, 이영진'} 
+            </div>
+            <div className='color1'>
+                contact
+            </div>
+            <div>
+                seokyung1114@kaist.ac.kr
+            </div>
+            <div>
+                khf7000@kaist.ac.kr
+            </div>
+            <div>
+                juns0220@kaist.ac.kr
+            </div>
+            <div>
+                2darae@kaist.ac.kr
+            </div>
+            <div>
+                lyd0531@kaist.ac.kr
+            </div>
+            <div>
+                ligobservatory@kaist.ac.kr
+            </div>
+            
+    </div>
+    )
+}

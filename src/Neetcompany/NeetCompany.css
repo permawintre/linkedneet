@@ -272,7 +272,7 @@ margin: 5px 0;
   align-items: center;
 }
 .event-creation input {
-  flex-grow: 0.9; /* 입력 필드가 가능한 많은 공간 차지 */
+  width: 140px;
   padding: 8px; /* 패딩 */
   border: 1px solid #ccc; /* 경계선 */
   border-radius: 4px; /* 경계선 둥글게 */

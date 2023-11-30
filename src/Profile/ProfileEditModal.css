@@ -201,6 +201,7 @@
   position: absolute;
   top: 50%;
   left: 50%;
+  padding: 1%;
   transform: translate(-50%, -50%);
 
   h1 {
@@ -222,16 +223,12 @@
 
 .edit-profile-image {
   float: right;
-  margin: 30px;
+  margin-top: 1%;
+  margin-right: 5%;
   display: inline;
-  
-  img {
-    color: #5d5d5d;
-    margin-top: 2.5%;
-
-    cursor: pointer;
-    border: 2px solid var(--color_2);
-  }
+}
+.image-edit-button-wrapper{
+  margin-top: 50%;
 }
 
 .edit-profile-intro {

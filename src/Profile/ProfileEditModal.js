@@ -42,15 +42,8 @@ function DateParser(yourDate) {
 
 const ProfileEditModal = ({EditModalClose}) => {
       // user Table Attribute (need to add more)
-    const [userObj, setUserObj] = useState ({
-      nickname: "",
-      profile_image: "",
-      website: "",
-      instagram:"",
-      facebook:"",
-      tel:"",
-      email:"",
-    });
+    const [userObj, setUserObj] = useState({ ...defaultData });
+    const [userObjLoaded, setUserObjLoaded] = useState(false);
 
     useEffect(() => {
       const fetchUserData = async () => {
@@ -62,16 +55,14 @@ const ProfileEditModal = ({EditModalClose}) => {
             // If the document exists, setUserData with the document data
             if (userDoc.exists()) {
                 setUserObj(userObj => ({...userObj, ...userDoc.data()}));
-                await updateDoc(userDoc, {
-                  profile_image: getDownloadURL(ref(userDoc, `${auth.currentUser.uid}/profile_images/${userDoc.profile_image}`))
-                });
             } else {
                 console.log('User not found');
             }
-
           } catch (error) {
             console.error('Error fetching user data:', error);
-          } 
+          } finally {
+            setUserObjLoaded(true);
+          }
       };
       fetchUserData();
     }, []);
@@ -105,6 +96,9 @@ const ProfileEditModal = ({EditModalClose}) => {
     
     // Profile 사진 
     const [Image, setImage] = useState(userObj.profile_image);
+    useEffect(() => {
+      setImage(userObj.profile_image);
+    }, [userObj.profile_image]);
     const [ImageChanged, setImageChanged] = useState(false);
     const fileInput = useRef(null);
     
@@ -170,13 +164,17 @@ const ProfileEditModal = ({EditModalClose}) => {
           <form onSubmit={onSubmit}>
             <hr className="body__partition"></hr>
             <div class="edit-modal-wrap">
-              <h1>프로필</h1>
+              <h1 style={{marginLeft: "2%"}}>프로필</h1>
               <hr style={{border: "solid 1px black"}}/>
               <div class="edit-profile-image">
                 <h3>프로필 사진</h3>
                 <div class="image-edit-button-wrapper">
                   <label for="file-search">
-                    <img class="profile-image" src={Image || userObj.profile_image} alt=""/>
+                    <img class="profile-image" src={Image || userObj.profile_image} 
+                      style={{color: "#5d5d5d",
+                              marginTop: "-45%",
+                              cursor: "pointer",
+                              border: "2px solid var(--color_2)"}} alt=""/>
                     <div class="image-edit-button">✏️ 변경하기</div>
                   </label>
                   
@@ -215,11 +213,7 @@ const ProfileEditModal = ({EditModalClose}) => {
 };
 
 const ProfileIntroEditModal = ({EditModalClose}) => {
-  const [userObj, setUserObj] = useState ({
-    intro_image: "",
-    intro_content: "",
-    intro_title: ""
-  });
+  const [userObj, setUserObj] = useState({ ...defaultData });
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -230,9 +224,6 @@ const ProfileIntroEditModal = ({EditModalClose}) => {
           // If the document exists, setUserData with the document data
           if (userDoc.exists()) {
               setUserObj(userObj => ({...userObj, ...userDoc.data()}));
-              await updateDoc(userDoc, {
-                intro_image: getDownloadURL(ref(userDoc, `${auth.currentUser.uid}/profile_intro_images/${userDoc.intro_image}`))
-              });
           } else {
               console.log('User not found');
           }
@@ -273,6 +264,9 @@ const ProfileIntroEditModal = ({EditModalClose}) => {
   
   // Profile 사진 
   const [Image, setImage] = useState(userObj.intro_image);
+  useEffect(() => {
+    setImage(userObj.intro_image);
+  }, [userObj.intro_image]);
   const [ImageChanged, setImageChanged] = useState(false);
   const fileInput = useRef(null);
 
@@ -343,7 +337,11 @@ const ProfileIntroEditModal = ({EditModalClose}) => {
               <div class="edit-profile-intro-image">
                 <h4>멋진 모습을 보여주세요!</h4>
                 <label for="file-search">
-                  <img class="profile-intro-image" src={Image || userObj.intro_image} alt=""/>
+                  <img class="profile-intro-image" src={Image || userObj.intro_image} 
+                    style={{color: "#5d5d5d",
+                    marginTop: "5%",
+                    cursor: "pointer",
+                    border: "2px solid var(--color_2)"}} alt=""/>
                   <div class="image-edit-button">✏️ 변경하기</div>
                 </label>
                 <input id="file-search" type='file' 

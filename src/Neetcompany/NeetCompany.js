@@ -40,6 +40,55 @@ export const NeetCompany = () => {
     
         fetchUsers();
     }, []);
+    const [calendar, setCalendar] = useState({
+        month: "January 2022",
+        days: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+        // ... 달력의 날짜 데이터 등 ...
+    });
+    const [currentMonth, setCurrentMonth] = useState(new Date());
+    const generateCalendarDays = (date) => {
+        const startDay = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+        const daysInMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+
+        const daysArray = [];
+        for (let i = 0; i < startDay; i++) {
+            // 이전 달의 날짜를 추가할 수 있습니다.
+            daysArray.push(<td key={`prev${i}`} className="calendar-day other-month"></td>);
+        }
+
+        for (let i = 1; i <= daysInMonth; i++) {
+            daysArray.push(
+                <td key={i} className="calendar-day">
+                    {i}
+                    {/* 여기에 출석 상태를 나타내는 로직을 추가할 수 있습니다. */}
+                </td>
+            );
+        }
+
+        // 총 칸수를 35(5주)나 42(6주)로 맞추기 위해 다음 달의 날짜를 추가할 수 있습니다.
+        const totalSlots = startDay + daysInMonth;
+        const nextMonthDays = totalSlots > 35 ? 42 - totalSlots : 35 - totalSlots;
+        for (let i = 1; i <= nextMonthDays; i++) {
+            // 다음 달의 날짜를 추가할 수 있습니다.
+            daysArray.push(<td key={`next${i}`} className="calendar-day other-month"></td>);
+        }
+
+        return daysArray;
+    };
+    const calendarDays = generateCalendarDays(currentMonth);
+    const [selectedDate, setSelectedDate] = useState(new Date());
+    const getSelectedDateInfo = () => {
+        // API 호출 또는 상태에서 정보를 가져오는 로직
+        // 예시로 하드코딩된 데이터를 사용합니다.
+        return {
+            events: ["팀 미팅", "프로젝트 마감일"],
+            notes: "오후 3시부터 원격 근무",
+            holidays: "신정",
+        };
+    };
+    const selectedDateInfo = getSelectedDateInfo();
+
+
 
     return(
         <div className="neetCompanyBody">
@@ -61,18 +110,37 @@ export const NeetCompany = () => {
                 <ShowPosts currentLocation={'neetCompany'}/>
             </div>
             <aside className="right-sidebar-neet">
-                <h2>새로운 사람을 알아가보세요!</h2>
-                <ul className="interestList">
-                    {users.map(user => (
-                        <li key={user.id} className="interestItem">
-                            <Link to={`/profiledetail?uid=${user.id}`}>
-                                <img src={user.imgUrls} alt={user.nickname || 'User'}/>
-                            </Link>
-                            <span className="interestTitle">{user.nickname || 'Unknown User'}</span>
-                            <i className="fa fa-arrow-right" aria-hidden="true"></i>
-                        </li>
-                    ))}
-                </ul>
+                <div className="calendar">
+                    <header className="calendar-header">
+                        <span>{calendar.month}</span>
+                        <div className="navigation">
+                            <button>&lt;</button>
+                            <button>&gt;</button>
+                        </div>
+                    </header>
+                    <table className="calendar-days">
+                        <thead>
+                            <tr>
+                                {calendar.days.map(day => (
+                                    <th key={day}>{day}</th>
+                                ))}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {calendarDays}
+                        </tbody>
+                    </table>
+                    <div className="calendar-info">
+                        <h3>{selectedDate.toLocaleDateString()}의 일정</h3>
+                        {selectedDateInfo.holidays && <p>공휴일: {selectedDateInfo.holidays}</p>}
+                        <ul>
+                            {selectedDateInfo.events.map((event, index) => (
+                                <li key={index}>{event}</li>
+                            ))}
+                        </ul>
+                        <p>노트: {selectedDateInfo.notes}</p>
+                    </div>
+                </div>
             </aside>
         </div>
     )

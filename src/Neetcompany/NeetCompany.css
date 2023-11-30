@@ -260,3 +260,39 @@ margin: 5px 0;
 .react-calendar__tile--active {
   background-color: rgba(0, 60, 255, 0.7) !important;
 }
+.event-creation{
+  background-color: white;
+  border-radius: 20px;
+  box-sizing: border-box;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  margin-bottom: 10px;
+  margin-right: 10px;
+  padding: 10px;
+  display: flex; /* Flexbox 레이아웃 사용 */
+  align-items: center;
+}
+.event-creation input {
+  flex-grow: 0.9; /* 입력 필드가 가능한 많은 공간 차지 */
+  padding: 8px; /* 패딩 */
+  border: 1px solid #ccc; /* 경계선 */
+  border-radius: 4px; /* 경계선 둥글게 */
+  display: flex; /* Flexbox 레이아웃 사용 */
+  align-items: center; /* 요소들을 수직 중앙에 정렬 */
+  gap: 10px;
+  margin-right: 10px;
+}
+
+.event-creation .submit-event {
+  padding: 4px 10px; /* 패딩 */
+  background-color: #007bff; /* 배경 색상 */
+  color: white; /* 글자 색상 */
+  text-align: center; /* 텍스트 중앙 정렬 */
+  border: none; /* 경계선 없음 */
+  border-radius: 4px; /* 경계선 둥글게 */
+  cursor: pointer; /* 마우스 오버시 커서 변경 */
+  white-space: nowrap;
+  margin-right: 20px;
+}
+.event-creation .submit-event:hover {
+  background-color: #0056b3; /* 호버 시 배경 색상 변경 */
+}

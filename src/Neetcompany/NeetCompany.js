@@ -10,6 +10,9 @@ import {
     getDocs,
     doc,
     getDoc,
+    addDoc,
+    query,
+    where
 } from "firebase/firestore"
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css'; 
@@ -163,6 +166,81 @@ export const NeetCompany = () => {
             setChecked(true)
         }
     }, [ncCheckTimes])
+
+    const [eventText, setEventText] = useState('');
+
+    const handleEventSubmit = async () => {
+        console.log(dbService);
+        const eventText = document.querySelector('.event-creation input').value;
+        if (eventText) {
+            try {
+                await addDoc(collection(dbService, "calendar"), {
+                    content: eventText,
+                    date: selectedDate.toISOString().split('T')[0],
+                    userId: auth.currentUser.uid,
+                    where: "individual"
+                });
+                setEventText(''); // 입력 필드 초기화
+            } catch (error) {
+                console.error("Error adding document: ", error);
+            }
+        }
+      };
+
+    const [events, setEvents] = useState([]);
+    // 선택된 날짜에 맞는 일정을 가져오는 함수
+    const fetchEvents = async () => {
+        const formattedDate = selectedDate.toISOString().split('T')[0];
+        console.log(`Searching for events on date: ${selectedDate}`);
+        try {
+            const q = query(collection(dbService, "calendar"), where("date", "==", formattedDate));
+            const querySnapshot = await getDocs(q);
+    
+            if (querySnapshot.empty) {
+                console.log('No matching documents.');
+                setEvents([]);
+                return;
+            }
+            const fetchedEvents = [];
+            querySnapshot.forEach((doc) => {
+                console.log(doc.id, '=>', doc.data());
+                console.log(selectedDate.toISOString().split('T')[0]);
+                fetchedEvents.push(doc.data()); // 데이터를 배열에 추가
+            });
+            setEvents(fetchedEvents); 
+    
+        } catch (error) {
+            console.error("Error fetching events: ", error);
+        }
+    };
+
+    useEffect(() => {
+        if(selectedDate) {
+            fetchEvents();
+        }
+        console.log('selectedDate changed, called fetchEvents');
+    }, [selectedDate]);
+    useEffect(() => {
+        console.log('Events state updated:', events);
+    }, [events]);
+
+// 선택된 날짜를 하루 뒤로 설정하는 함수
+const setNextDay = () => {
+  setSelectedDate(prevDate => {
+    const nextDay = new Date(prevDate);
+    nextDay.setDate(prevDate.getDate() + 1);
+    return nextDay;
+  });
+};
+
+useEffect(() => {
+  // 컴포넌트가 마운트되면 선택된 날짜를 하루 뒤로 설정
+  setNextDay();
+}, []);
+
+
+
+
     return(
         <div className="neetCompanyBody">
             <div className="left-sidebar-container">
@@ -206,11 +284,20 @@ export const NeetCompany = () => {
                         <h3>{selectedDate.getDate()}일의 일정</h3>
                         {selectedDateInfo.holidays && <p>공휴일: {selectedDateInfo.holidays}</p>}
                         <ul>
-                            {selectedDateInfo.events.map((event, index) => (
-                                <li key={index}>{event}</li>
-                            ))}
+                            
+                        {events.map((event, index) => (
+                            <li key={index}>{event.content}</li> // 'content'는 Firestore에 저장된 필드 이름이어야 함
+                        ))}
                         </ul>
-                        <p>노트: {selectedDateInfo.notes}</p>
+                    </div>
+                    <div className="event-creation">
+                        <input 
+                            type="text" 
+                            placeholder="일정 추가..." 
+                            value={eventText}
+                            onChange={(e) => setEventText(e.target.value)} // 입력 필드 값 관리
+                        />
+                        <div className="submit-event" onClick={handleEventSubmit}>등록</div>
                     </div>
                 </aside>
             </div>

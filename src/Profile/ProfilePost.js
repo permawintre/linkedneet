@@ -67,7 +67,7 @@ const ProfilePost = ({userData, myProfile}) => {
                         //         {/* {post.images && post.images.length > 0 && <PostPics imgs={post.images} />} */}
                         //     // </div>
                         // ))
-                        <ShowPosts currentLocation={'profile'} userId = {profileUid}/>
+                        <ShowPosts currentLocation={'profile'}/>
                       )}
                 </div>
             </main>

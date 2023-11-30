@@ -296,38 +296,43 @@ function Post(props) {
 
 
 
-const Posts=({ currentLocation, userId }) =>{
+const Posts=({ userInfo, currentLocation }) =>{
     const [posts, setPosts] = useState([]);
     const [lastKey, setLastKey] = useState(0);
     const [nextPosts_loading, setNextPostsLoading] = useState(false);
 
     const setQuery = () => {
-        let baseQuery = query(
-            collection(dbService, 'posts'),
-            orderBy("postedAt", "desc"),
-            limit(5)
-        );
-    
-        if (currentLocation === 'home' || currentLocation === 'neetCompany' || currentLocation === 'project') {
-            baseQuery = query(
+        if(currentLocation === 'home'){
+            return query(
                 collection(dbService, 'posts'),
-                where("postWhere", "==", currentLocation),
                 orderBy("postedAt", "desc"),
                 limit(5)
-            );
-            console.log("query");
+            )
         }
-    
-        // userId가 제공된 경우, 사용자의 게시물로 필터링
-        if (userId) {
-            baseQuery = query(
-                baseQuery,
-                where("userId", "==", userId)
-            );
-            console.log(userId);
+        if(currentLocation === 'neetCompany'){
+            return query(
+                collection(dbService, 'posts'),
+                where("postWhere", "==", 'neetCompany'),
+                orderBy("postedAt", "desc"),
+                limit(5)
+            )
         }
-    
-        return baseQuery;
+        if(currentLocation === 'profile'){
+            return query(
+                collection(dbService, 'posts'),
+                where("postWhere", "==", "profile"),
+                orderBy("postedAt", "desc"),
+                limit(5)
+            )
+        }
+        if(currentLocation === 'project'){
+            return query(
+                collection(dbService, 'posts'),
+                where("postWhere", "==", "project"),
+                orderBy("postedAt", "desc"),
+                limit(5)
+            )
+        }
     }
 
     const setQueryMore = (key) => {
@@ -452,6 +457,7 @@ const Posts=({ currentLocation, userId }) =>{
                     postId = {post.postId}
                     userId= {post.userId}
                     postWhere = {post.postWhere}
+                    userInfo={userInfo}
                     modified = {post.modified}
                     projectId = {post.projectId}
                 />
@@ -986,7 +992,7 @@ export const ShowPosts = (props) => {
 
         <div className='postsContainer'>
             <Write isOpen={isWriteOpen} setIsOpen={setIsWriteOpen} existingPost={false} showHeader={true} currentLocation={currentLocation}/>
-            <Posts userInfo={userInfo} currentLocation={currentLocation} userId = {profileUserId}/>
+            <Posts userInfo={userInfo} currentLocation={currentLocation}/>
         </div>
     )
 }

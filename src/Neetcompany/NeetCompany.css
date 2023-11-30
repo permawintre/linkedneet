@@ -93,6 +93,13 @@ background-color: #f0f0f0;
 text-align: center;
 border-radius: 20px;
 padding: 5px 0;
+margin: 5px 0;
+}
+.red {
+  background-color: red;
+}
+.green {
+  background-color: rgb(0, 200, 33);
 }
 
 .right-sidebar-neet {

@@ -47,7 +47,11 @@ export const Header = ({isLoggedIn, approved}) => {
             <ul className="header__left">
                     <Link to="/" className="header__item link">홈</Link>
                     <Link to="/project" className="header__item link">소모임</Link>
-                    <Link to={`/neetCompany/${userGeneration}`} className="header__item link">니트컴퍼니</Link>
+                    {userGeneration==='0' ? 
+                        <Link to={`/neetCompany/12`} className="header__item link">니트컴퍼니</Link>
+                    :
+                        <Link to={`/neetCompany/${userGeneration}`} className="header__item link">니트컴퍼니</Link>
+                    }
 
                     <Link to="/profiledetail" className="header__item link">프로필</Link>
 

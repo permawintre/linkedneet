@@ -273,7 +273,7 @@ export function Post(props) {
                             )}
                             </div>
                             <div className='inGroup'>
-                                    {postUserInfo.generation+'기'}{myProjects.length>3 ? <span>{`, ${myProjects[0]}, ${myProjects[1]} 외 ${myProjects.length-2}개`}</span>: myProjects.map((moim, idx)=>(<span key={idx}>{', '}{moim}</span>))}
+                                    {postUserInfo.generation==='0' ? 'admin' : postUserInfo.generation+'기'}{myProjects.length>3 ? <span>{`, ${myProjects[0]}, ${myProjects[1]} 외 ${myProjects.length-2}개`}</span>: myProjects.map((moim, idx)=>(<span key={idx}>{', '}{moim}</span>))}
                             </div>
                             <div className="postedWhen">{getDayMinuteCounter(postedAt)}{modified ? '·수정됨' : null}</div>
                         </Link>

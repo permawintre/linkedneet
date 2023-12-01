@@ -30,11 +30,9 @@ import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
 
 import profile1Img from '../images/profile1Img.jpg'
+import defaultprofileImg from '../images/default_profile_image.jpg'
 import { defaultData } from '../Profile/defaultData'
 
-const userName = "홍길동"
-const companyClass = 14
-const moims = ['모임 a', '모임 b', '모임 c']
 
 
 export function Post(props) {
@@ -213,11 +211,11 @@ export function Post(props) {
             <div className='paddingDiv'>
                 <div className="postHeader">
                     <Link to={`/profiledetail?uid=${props.userId}`}>
-                        <div className='profileImg'><img src={postUserInfo.profileImage || profile1Img} alt="profileImg"/></div>
+                        <div className='profileImg'><img src={postUserInfo.profileImage || defaultprofileImg} alt="profileImg"/></div>
                     </Link>
                     <div className='postInfo'>
                         <Link to={`/profiledetail?uid=${props.userId}`}>
-                            <div className="userName">{postUserInfo.nickname || userName}
+                            <div className="userName">{postUserInfo.nickname || 'undefined'}
                             {props.postWhere === 'project' && (
                                 <div className="postWhere">
                                     ▸project ▸{projectName}
@@ -230,7 +228,7 @@ export function Post(props) {
                             )}
                             </div>
                             <div className='inGroup'>
-                                    {postUserInfo.generation+'기' || companyClass+'기'}{moims.map((moim, idx)=>(<span key={idx}>{', '}{moim}</span>))}
+                                    admin
                             </div>
                             <div className="postedWhen">{getDayMinuteCounter(postedAt)}{modified ? '·수정됨' : null}</div>
                         </Link>
@@ -611,12 +609,14 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
         if(currentLocation === 'home' || currentLocation === 'profile' ) return 'profile';
         if(currentLocation === 'neetCompany') return 'neetCompany';
         if(currentLocation === 'project') return 'project';
+        if(currentLocation === 'notice') return 'notice';
     }
     const writeTxt = () => {
 
         if(currentLocation === 'home' || currentLocation === 'profile' ) return '공지할 사항을 적어주세요.';
         if(currentLocation === 'neetCompany') return '오늘 진행한 업무를 공유해주세요!';
         if(currentLocation === 'project') return '활동을 팀원들과 공유해보세요!';
+        if(currentLocation === 'notice') return '공지사항을 작성해주세요';
     }
     
     const modalTxt = () => {
@@ -624,6 +624,7 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
         if(currentLocation === 'home' || currentLocation === 'profile' ) return '공지할 사항을 적어주세요.';
         if(currentLocation === 'neetCompany') return '오늘도 열심히 일한 당신! 수고했어요.';
         if(currentLocation === 'project') return '팀원들과 어떤 내용을 공유할까요?';
+        if(currentLocation === 'notice') return '어떤 내용을 알릴까요?';
     }
     
     const defaultValues = {
@@ -843,47 +844,10 @@ export function Write({ isOpen, setIsOpen, existingPost, showHeader, currentLoca
                             <div className='modalProfile' onClick={ () => setSelectBar(!selectBar) }>
                                 <div className='profileImg'><img src={userInfo?.profile_image || profile1Img} alt="profileImg"/></div>
                                 <div>
-                                    <div className="userName">{userInfo?.nickname || userName}</div>
-                                    <div className="postWhere">게시 위치 ▸{values.postWhere}{values.postWhere === 'project' &&(<div>[{values.projectName}]</div>)}</div>
+                                    <div className="userName">{userInfo?.nickname || 'undefined'}</div>
+                                    <div className="postWhere">게시 위치 ▸notice</div>
                                 </div>
                             </div>
-                            {selectBar ? 
-                                <div className="selectBar">
-                                    <div onClick={ () => {setValues((prev) =>
-                                        ({...prev,
-                                        'postWhere': 'profile',})
-                                    );
-                                    setSelectBar(!selectBar)
-                                }}>profile
-                                </div>
-
-                                    <div onClick={ () => {setValues((prev) =>
-                                        ({...prev,
-                                        'postWhere': 'neetCompany',})
-                                    );
-                                    setSelectBar(!selectBar)
-                                }}>neetCompany
-                                </div>
-
-                                {userProjects.length!==0 ? <div onClick={toggleProjectDropdown}>project</div> : null}
-                                {showProjectDropdown && (
-                                    <div className="projectDropdown">
-                                        {userProjects.map((project, index) => (
-                                        <div key={index} onClick={() => {
-                                            setValues(prev => ({...prev, 'postWhere': 'project','projectName':project.name}));
-                                            selectProject(project.id);
-                                            setShowProjectDropdown(false); // 드롭다운 닫기
-                                        }}>
-                                            {project.name} {/* 프로젝트 제목 렌더링 */}
-                                        </div>
-                                        ))}
-                                    </div>
-                                )}
-
-                                </div>
-                                :
-                                null
-                            }
                             <img src={close} alt='x' className='close' onClick={ () => setIsOpen(false) }/>
                         </div>
                         
@@ -918,7 +882,7 @@ export const ShowPosts = (props) => {
     const [userInfo, setUserInfo] = useState({ ...defaultData });
     const [isWriteOpen, setIsWriteOpen] = useState(false);
 
-    const currentLocation = props.currentLocation;
+    const currentLocation = 'notice';
 
     useEffect(() => { // 유저 정보 코드
         const fetchUserInfo = async () => {
@@ -942,7 +906,7 @@ export const ShowPosts = (props) => {
         // 관리자만 글 쓸수 있도록 user Level check
         <div className='postsContainer'>
             {userInfo?.level === 2 && (
-                <Write isOpen={isWriteOpen} setIsOpen={setIsWriteOpen} existingPost={false} showHeader={true} currentLocation={currentLocation} />
+                <Write isOpen={isWriteOpen} setIsOpen={setIsWriteOpen} existingPost={false} showHeader={true} currentLocation={'notice'} />
             )}
             <Posts userInfo={userInfo} currentLocation={currentLocation}/>
         </div>
@@ -1008,7 +972,7 @@ export const Notice = () => {
                 </Link>
             </aside>
             <div className="homePostsMarginControl">
-                <ShowPosts currentLocation={'home'}/>
+                <ShowPosts currentLocation={'notice'}/>
             </div>
             <aside className="right-sidebar">
             <h2>새로운 사람을 알아가보세요!</h2>

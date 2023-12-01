@@ -11,9 +11,31 @@ import { ProfilePost } from './ProfilePost';
 import { defaultData } from './defaultData'
 import './ProfilePost.css';
 import { Bars } from "react-loader-spinner";
+import style from '../ProjectPage/Project.module.css'
 
 const DefaultProfileImg = 'https://s3.amazonaws.com/37assets/svn/765-default-avatar.png'
 const DefaultIntroImg = 'https://cdn.imweb.me/upload/S20191010288d21675b22f/e33c22faf15bc.jpg'
+
+const UserProject = ({ uid, project }) => {
+  return (
+    <div className={style.projectBox} style={{width: '28%'}}>
+      {project.leaderId === uid ? (
+        <span className={`${style.tag} ${style.tagBeforeRunning}`}>관리자</span>
+      ) : (<span></span>)}
+      {project.default ? (
+        <img src={project.image} alt={project.name} />
+      ) : (
+        <img src={project.image.imageUrl} alt={project.name} />
+      )}
+      {project.default ? ( <div className={style.name}>{project.name}</div> ) : (
+        <Link to={`/projecthome/${project.id}`} style={{ textDecoration: 'none' }} className={style.name}>
+          {project.name}
+        </Link>
+      )}
+      <div className={style.comment}>{project.shortDescription}</div>
+    </div>
+  );
+};
 
 const ProfileHeader = ({userData, myProfile}) => {
   const bgImageStyle = {
@@ -272,9 +294,66 @@ const ProfileCareer = ({userData, myProfile}) => {
   );
 };
 
+const MyProject = ({ uid, myProjects }) => {
+  const myProjectsCount = myProjects.length;
+  // For Navigation Button
+  const itemsPerRow = 3; // 한 줄 당 아이템 수
+  const totalRows = 1; // 총 줄 수
+  const itemsPerPage = itemsPerRow * totalRows; // 페이지 당 아이템 수
+  const [page, setPage] = useState(0); // 페이지 상태
+  const totalPages = Math.ceil(myProjects.length / itemsPerPage); // 전체 페이지 수
+  // 이전 페이지 보기
+  const showPreviousPage = () => {
+      setPage((prev) => (prev > 0 ? prev - 1 : prev));
+  };
+  // 다음 페이지 보기
+  const showNextPage = () => {
+      setPage((prev) => (prev < totalPages - 1 ? prev + 1 : prev));
+  };
+  // 현재 페이지에 해당하는 프로젝트 가져오기
+  const visibleProjects = myProjects.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
+
+  return (
+    <div className="career-container">
+      <main>
+        <h2 style={{ marginBottom: '7px' }}>가입한 소모임</h2>
+        <div>
+            {myProjectsCount === 0 ? (
+                <div>
+                    가입한 소모임이 없습니다
+                </div>
+              ) : (
+                <div className={style.projects}>
+                  <div className={style.myProjects}>
+                    <div className={`${style.projectsRow} ${style.myProjectsRow}`}>
+                      {visibleProjects.map((project, index) => (
+                        project ? (
+                          <UserProject key={index} uid={uid} project={project} />
+                        ) : (
+                          <div key={index} className={style.emptyProject}></div>
+                        )
+                      ))}
+                    </div>
+                    {myProjectsCount === 0? null : (
+                      <div className={style.navigation} style={{marginBottom: '-15px'}}>
+                        <button onClick={showPreviousPage} disabled={page === 0} style={{backgroundColor: 'gray'}}>{'<'}</button>
+                        <span>{page + 1} / {totalPages}</span>
+                        <button onClick={showNextPage} disabled={page === totalPages - 1} style={{backgroundColor: 'gray'}}>{'>'}</button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+          </div>
+      </main>
+    </div>
+  );
+};
+
 const ProfileDetail = () => {
   const introRef = useRef(null);
   const careerRef = useRef(null);
+  const projectRef = useRef(null);
   const postRef = useRef(null);
   const commentRef = useRef(null);
 
@@ -288,6 +367,8 @@ const ProfileDetail = () => {
   const [currentUserDataLoaded, setCurrentUserDataLoaded] = useState(false);
   const [profileUserDataLoaded, setProfileUserDataLoaded] = useState(false);
   const [myProfile, setMyProfile] = useState(false);
+
+  const [myProjects, setMyProjects] = useState([]);
 
   // profiledetail에 접속해 있는 user의 정보(currentUserData)를 firebase에서 fetch
   useEffect( () => {
@@ -344,6 +425,46 @@ useEffect(() => {
   }
 }, [uid, currentUserData]);
 
+useEffect(() => {
+  const fetchProjects = async () => {
+    // Fetch projectMember documents where userId matches uid
+    const projectMemberCollection = collection(dbService, 'projectMember');
+    const memberQuery = query(projectMemberCollection, where('userId', '==', uid));
+
+    try {
+      const memberQuerySnapshot = await getDocs(memberQuery);
+
+      const projectIds = memberQuerySnapshot.docs.map((doc) => doc.data().projectId);
+
+      // Fetch all projects from the 'projects' collection
+      const projectsCollection = collection(dbService, 'projects');
+      const allProjectsSnapshot = await getDocs(projectsCollection);
+
+      // Map all project data into an object for quick access
+      const allProjectsData = {};
+      allProjectsSnapshot.forEach((doc) => {
+        allProjectsData[doc.id] = { id: doc.id, ...doc.data() };
+      });
+
+      // Separate projects into myProjects and recommendProjects
+      const myProjectsData = [];
+
+      Object.keys(allProjectsData).forEach((projectId) => {
+        const projectData = allProjectsData[projectId];
+        if (projectIds.includes(projectId)) {
+          myProjectsData.push(projectData);
+        }
+      });
+
+      setMyProjects(myProjectsData);
+    } catch (error) {
+      console.error('Error fetching projects: ', error);
+    }
+  };
+
+  fetchProjects();
+}, [uid]);
+
   // firebase에서 모든 data가 fetch되기 전까지 Loading... 띄우기
   if (!currentUserDataLoaded || !profileUserDataLoaded) {
     return (
@@ -370,11 +491,13 @@ useEffect(() => {
         <div className="buttons">
           <span onClick={() => scrollToRef(introRef)}>소개</span>
           <span onClick={() => scrollToRef(careerRef)}>경험</span>
+          <span onClick={() => scrollToRef(projectRef)}>소모임</span>
           <span onClick={() => scrollToRef(postRef)}>게시글</span>
           <span onClick={() => scrollToRef(commentRef)}>방명록</span>
         </div>
         <div ref={introRef}><ProfileIntro userData={profileUserData} myProfile={myProfile}/></div>
         <div ref={careerRef}><ProfileCareer userData={profileUserData} myProfile={myProfile}/></div>
+        <div ref={projectRef}><MyProject uid={uid} myProjects={myProjects}/></div>
         <div ref={postRef}><ProfilePost currentUserData={currentUserData} userData={profileUserData} myProfile={myProfile}/></div>
         <div ref={commentRef}><ProfileComment currentUserData={currentUserData} myProfile={myProfile} profileUid={uid}/></div>
     </div>

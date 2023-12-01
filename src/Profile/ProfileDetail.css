@@ -27,11 +27,15 @@
 
 .buttons {
     text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
 }
 .buttons span {
     display: inline-block;
     width: 80px;
-    padding: 5px 30px;
+    /* width: none !important; */
+    width: 9% !important;
+    /* padding: 5px 30px; */
     margin: 0 10px;
     background-color: white;
     font-size: 16px;

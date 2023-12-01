@@ -9,13 +9,27 @@
 }
 .checksection_Header{
     display: flex;
+    margin-bottom: 10px;
 }
-.checksection_UnChecked, .checksection_Checked {
+.checksection_Header button {
+    padding: 5px 20px;
+}
+.checksection_userbox {
     display: flex;
 }
+.checksection-generation {
+    margin-bottom: 5px;
+    display: block;
+}
+.checksection_generation_name {
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+.checksection_collection_inner:last-child {
+    margin-top: 20px;
+}
 .checksection_Checked_nickname, .checksection_UnChecked_nickname {
-    margin-left: 50px;
-    width: 200px;
+    width: 100px;
 }
 .checksection_partition{
     text-align: center;
@@ -25,6 +39,7 @@
 .checksection_CurrentDate{
     text-align: center;
     font-weight: bolder;
-    font-size: 30px;
+    font-size: 20px;
     margin: 0 20px;
+    width: 200px;
 }

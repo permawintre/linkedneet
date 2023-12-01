@@ -172,8 +172,10 @@ export const CheckSection = () => {
   const [checkedUserData, setCheckedUserData] = useState();
   const [unCheckedUserData, setUnCheckedUserData] = useState();
   
-  const getDate = () => {
-    let myDate = new Date(currentDate * 1000);
+  const MAX_DATE = moment().unix();
+
+  const getDate = (date) => {
+    let myDate = new Date(date * 1000);
     return(myDate.getFullYear()+"년 "+(myDate.getMonth()+1)+"월 "+myDate.getDate()+"일")
   }
 
@@ -196,50 +198,94 @@ export const CheckSection = () => {
   
   useEffect(() => {
     if (allUserData && whoChecked) {
-      setCheckedUserData(
-        allUserData.filter((doc) => whoChecked.includes(doc.id))
-      );
-      setUnCheckedUserData(
-        allUserData.filter((doc) => !whoChecked.includes(doc.id))
-      );
+      const checkedUsersByGeneration = {};
+      const unCheckedUsersByGeneration = {};
+  
+      allUserData.forEach((doc) => {
+        const { generation } = doc; // generation 필드에 따라 그룹화
+  
+        if (whoChecked.includes(doc.id)) {
+          // 업무인증 완료
+          if (!checkedUsersByGeneration[generation]) {
+            checkedUsersByGeneration[generation] = [];
+          }
+          checkedUsersByGeneration[generation].push(doc);
+        } else {
+          // 업무인증 미완료
+          if (!unCheckedUsersByGeneration[generation]) {
+            unCheckedUsersByGeneration[generation] = [];
+          }
+          unCheckedUsersByGeneration[generation].push(doc);
+        }
+      });
+  
+      setCheckedUserData(checkedUsersByGeneration);
+      setUnCheckedUserData(unCheckedUsersByGeneration);
     }
   }, [allUserData, whoChecked]);
 
-
   return(
-    <div className="checksection_Outer">
+    <div className={`${style.projectDetail} ${style.projectBody}`}>
     <div className="checksection">
       <div className="checksection_Header">
         <button onClick={() => setCurrentDate(currentDate-86400)}>{'이전'}</button>
-        <div className="checksection_CurrentDate">{getDate()}</div>
-        <button onClick={() => setCurrentDate(currentDate+86400)}>{'다음'}</button>
+        <div className="checksection_CurrentDate">{getDate(currentDate)}</div>
+        {currentDate < MAX_DATE && (
+          <button onClick={() => setCurrentDate(currentDate + 86400)}>
+            {'다음'}
+          </button>
+        )}
       </div>
       <div className="checksection_collection">
-        <div className="checksection_partition">업무인증 미완료: {unCheckedUserData && unCheckedUserData.length}</div>
+        <div className="checksection_collection_inner">
+        <div className="checksection_partition">▼ 업무인증 미완료 ▼{unCheckedUserData && unCheckedUserData.length}</div>
         <div className="checksection_UnChecked">
-          <div className="checksection_UnChecked_nickname">
-            {unCheckedUserData && unCheckedUserData.map((doc)=>{
-              return (<div>{doc.nickname}</div>)
-            })}
-          </div>
-          <div className="checksection_UnChecked_email">
-            {unCheckedUserData && unCheckedUserData.map((doc)=>{
-              return (<div>{doc.email}</div>)
-            })}
-          </div>
+          {unCheckedUserData &&
+            Object.keys(unCheckedUserData)
+              .sort((a, b) => b - a) // generation 내림차순 정렬
+              .map((generation) => (
+                <div key={generation} className="checksection-generation">
+                  <div className="checksection_generation_name">{`[${generation} 기]`}</div>
+                  <div className="checksection_userbox">
+                  <div className="checksection_UnChecked_nickname">
+                    {unCheckedUserData[generation].map((doc) => (
+                      <div key={doc.id}>⦁ {doc.nickname}</div>
+                    ))}
+                  </div>
+                  <div className="checksection_UnChecked_email">
+                    {unCheckedUserData[generation].map((doc) => (
+                      <div key={doc.id}>{doc.email}</div>
+                    ))}
+                  </div>
+                  </div>
+                </div>
+              ))}
         </div>
-        <div className="checksection_partition">업무인증 완료: {checkedUserData && checkedUserData.length}</div>
+        </div>
+        <div className="checksection_collection_inner">
+        <div className="checksection_partition">▼ 업무인증 완료 ▼{checkedUserData && checkedUserData.length}</div>
         <div className="checksection_Checked">
-          <div className="checksection_Checked_nickname">
-            {checkedUserData && checkedUserData.map((doc)=>{
-              return (<div>{doc.nickname}</div>)
-            })}
-          </div>
-          <div className="checksection_Checked_email">
-            {checkedUserData && checkedUserData.map((doc)=>{
-              return (<div>{doc.email}</div>)
-            })}
-          </div>
+          {checkedUserData &&
+            Object.keys(checkedUserData)
+              .sort((a, b) => b - a) // generation 내림차순 정렬
+              .map((generation) => (
+                <div key={generation} className="checksection-generation">
+                  <div className="checksection_generation_name">{`[${generation} 기]`}</div>
+                  <div className="checksection_userbox">
+                  <div className="checksection_Checked_nickname">
+                    {checkedUserData[generation].map((doc) => (
+                      <div key={doc.id}>⦁ {doc.nickname}</div>
+                    ))}
+                  </div>
+                  <div className="checksection_Checked_email">
+                    {checkedUserData[generation].map((doc) => (
+                      <div key={doc.id}>{doc.email}</div>
+                    ))}
+                  </div>
+                  </div>
+                </div>
+              ))}
+        </div>
         </div>
       </div>
     </div>
@@ -329,7 +375,7 @@ export const EnrollManage = () => {
           className={`${style.buttonItem} ${style[activeSection === 'checkSection' ? 'active' : '']}`}
           onClick={() => handleButtonClick('checkSection')}
         >
-          <span className={style.text}>출석 관리</span>
+          <span className={style.text}>업무인증 관리</span>
         </span>
       </div>
       <div id="memberSection">

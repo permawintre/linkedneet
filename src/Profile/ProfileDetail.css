@@ -23,6 +23,8 @@
     padding: 0 0 15px 0 !important;
     width: 90%;
     background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 15px;
 }
 
 .buttons {
@@ -33,13 +35,13 @@
 .buttons span {
     display: inline-block;
     width: 80px;
-    /* width: none !important; */
     width: 9% !important;
-    /* padding: 5px 30px; */
     margin: 0 10px;
     background-color: white;
     font-size: 16px;
     cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border-radius: 15px;
 }
 
 main {
